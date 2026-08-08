@@ -141,4 +141,4 @@ manifest already supports multiple entries.
   used non-commercially under Paradox's tolerance of fan works. Game files
   themselves are never committed. Removed on request.
 - This is an unofficial fan project, not affiliated with Paradox
-  Interactive or the Gigastructures team.
+  Interactive.
