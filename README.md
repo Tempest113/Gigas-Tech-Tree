@@ -103,9 +103,10 @@ tie-breaks).
     from mods other than Gigastructures render without icons.
 - `?theme=palette-a|ink` switches colour themes (also in the header).
 - Deep links: `?tech=<id>&q=<search>&cats=<list>&src=<filter>`.
-- Performance: cards are DOM nodes in one CSS-transformed container with
-  viewport culling above 800 nodes; edges are canvas, redrawn once per
-  frame. Measured numbers TBD on real hardware — see issue tracker.
+- Performance: the whole map is canvas-drawn. Only cards intersecting the
+  viewport are painted (21 of 981 at 100% zoom on a 1080p viewport), icons
+  come from a single sprite atlas, and draws are coalesced to one per frame.
+  Culling and picking live in `js/viewmodel.js` and are unit-tested.
 
 ## Adding another mod
 

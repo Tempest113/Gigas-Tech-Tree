@@ -114,7 +114,7 @@ select {
   cursor: grab; touch-action: none;
 }
 .stage.panning { cursor: grabbing; }
-#edge-canvas { position: absolute; inset: 0; pointer-events: none; }
+#edge-canvas { position: absolute; inset: 0; }
 .world {
   position: absolute; top: 0; left: 0;
   transform-origin: 0 0; will-change: transform;

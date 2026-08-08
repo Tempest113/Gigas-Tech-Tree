@@ -189,6 +189,13 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
                               icons_out / "atlas.json")
             model["meta"]["iconWarnings"] = r.warnings
 
+    # Atlas always covers every PNG present (mod + any vanilla icons the
+    # maintainer added), since the canvas renderer draws from it alone.
+    if icons_out is not None and icons_out.is_dir():
+        from tools.icons import build_atlas_from_pngs
+        build_atlas_from_pngs(icons_out, icons_out / "atlas.png",
+                              icons_out / "atlas.json")
+
     return model
 
 

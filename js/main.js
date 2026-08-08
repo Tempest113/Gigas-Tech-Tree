@@ -19,7 +19,7 @@ const DEV = new URLSearchParams(location.search).has("dev");
 
 /* Tool version. Bump on release and keep index.html's ?v= cache-buster in
    step so a stale browser cache can't serve mismatched JS/CSS. */
-export const APP_VERSION = "1.1.2";
+export const APP_VERSION = "1.2.0";
 
 async function boot() {
   const status = $("status");
@@ -127,7 +127,6 @@ function renderModList(merged) {
 
 function showModel(newModel) {
   model = newModel;
-  $("world").replaceChildren();
   $("sidebar-cats").replaceChildren();
   $("explore-tab").replaceChildren();
   $("health-body").replaceChildren();
@@ -135,6 +134,7 @@ function showModel(newModel) {
     const lay = layout(model.techs);
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
                        model, lay, showDetail);
+    window.__view = view;   // test hook (tests/dom-smoke.mjs)
 
     const jump = id => {
       setTab("map");

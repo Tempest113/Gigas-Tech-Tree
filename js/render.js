@@ -1,202 +1,162 @@
-/* render.js — cards as absolutely-positioned DOM inside one CSS-transformed
-   world container; edges on a canvas redrawn on transform change.
-   (Virtualisation and settle-throttling arrive in the performance pass.) */
+/* render.js — canvas map renderer.
 
-import { CARD_W, CARD_H } from "./layout.js";
+   Cards were DOM elements inside a CSS-transformed container. That is fine
+   for a few hundred nodes but not for ~1000: every zoom step forces the
+   browser to re-rasterise the whole layer, and no amount of culling or
+   level-of-detail hides that. Everything on the map — tier washes, category
+   bands, labels, edges and cards — is now drawn on one canvas, so a zoom is
+   a redraw of only what is on screen (typically well under a hundred cards)
+   rather than a repaint of a 12000×10000 layer.
 
-function addEdge(path, from, to) {
-  const x1 = from.x + CARD_W, y1 = from.y + CARD_H / 2;
-  const x2 = to.x, y2 = to.y + CARD_H / 2;
-  const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
-  path.moveTo(x1, y1);
-  path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
-}
+   Icons come from the sprite atlas the build produces, so the whole map
+   costs one image, not a thousand.
+
+   All picking and culling logic lives in viewmodel.js and is unit-tested;
+   this file is drawing and event plumbing. */
+
+import { CARD_W, CARD_H, buildIndex, clampScale, hitTest, lineageOf,
+         viewportRect, visibleCards } from "./viewmodel.js";
+
+const FONT_DISPLAY = '600 12.5px "Chakra Petch", system-ui, sans-serif';
+const FONT_DATA = '11px ui-monospace, "Cascadia Mono", monospace';
+
+/* Below this zoom, text is sub-pixel; cards still draw with their fill,
+   border and area accent so the map keeps its shape. */
+const TEXT_SCALE = 0.38;
+const ICON_SCALE = 0.30;
 
 export class MapView {
   constructor(stage, worldEl, canvas, model, lay, onSelect) {
     this.stage = stage;
-    this.world = worldEl;
     this.canvas = canvas;
     this.model = model;
     this.lay = lay;
     this.onSelect = onSelect;
     this.tx = 40; this.ty = 20; this.scale = 1;
     this.selected = null;
-    this.visible = null;     // Set of ids or null = all
-    this.cardEls = new Map();
-    this._buildDom();
+    this.hovered = null;
+    this.lineage = null;
+    this.visible = null;
+    this.index = buildIndex(lay, null);
+    this.colours = readColours();
+    this.atlas = null;
+    this.atlasMap = null;
+    this._raf = 0;
+
+    worldEl.replaceChildren();
+    worldEl.style.display = "none";   // cards are drawn, not laid out
+
+    this._loadAtlas();
     this._bind();
-    this.applyTransform();
-  }
-
-  _buildDom() {
-    const frag = document.createDocumentFragment();
-
-    for (const f of this.lay.furniture) {
-      const el = document.createElement("div");
-      if (f.kind === "band") {
-        el.className = "section-band";
-        if (f.area) el.dataset.area = f.area;
-        if (f.cat) el.dataset.cat = f.cat;
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-        el.style.width = `${f.w}px`; el.style.height = `${f.h}px`;
-      } else if (f.kind === "header") {
-        el.className = "section-header";
-        if (f.area) el.dataset.area = f.area;
-        if (f.cat) el.dataset.cat = f.cat;
-        el.textContent = f.text;
-        const n = document.createElement("span");
-        n.className = "count";
-        n.textContent = String(f.count);
-        el.appendChild(n);
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-      } else if (f.kind === "rule") {
-        el.className = "section-rule";
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-        el.style.width = `${f.w}px`;
-      } else if (f.kind === "tiercolumn") {
-        el.className = "tier-column";
-        el.dataset.parity = String(f.parity);
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-        el.style.width = `${f.w}px`; el.style.height = `${f.h}px`;
-      } else if (f.kind === "tierdivider") {
-        el.className = "tier-divider";
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-        el.style.height = `${f.h}px`;
-      } else {
-        el.className = "tier-label" + (f.small ? " tier-label-small" : "");
-        el.textContent = f.text;
-        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
-      }
-      frag.appendChild(el);
-    }
-
-    for (const [id, p] of this.lay.pos) {
-      const t = this.model.techs.get(id);
-      const el = document.createElement("div");
-      el.className = "tech-card";
-      el.tabIndex = 0;
-      el.dataset.id = id;
-      if (t.area) el.dataset.area = t.area;
-      el.dataset.src = t.stub || t.crossModGated ? "crossmod"
-        : t.overridesVanilla ? "override" : t.source;
-      if (t.isRare) el.classList.add("rare");
-      if (t.stub) el.classList.add("stub");
-      el.style.left = `${p.x}px`;
-      el.style.top = `${p.y}px`;
-
-      if (!t.stub && t.icon) {
-        const icon = document.createElement("img");
-        icon.className = "tech-icon";
-        icon.src = `assets/icons/${t.icon}.png`;
-        icon.loading = "lazy";
-        icon.alt = "";
-        icon.onerror = () => icon.remove();
-        el.appendChild(icon);
-      }
-      const text = document.createElement("div");
-      text.className = "tech-text";
-      el.appendChild(text);
-
-      const name = document.createElement("div");
-      name.className = "tech-name" + (t.nameMissing ? " loc-missing" : "");
-      name.textContent = t.name;
-      name.title = t.name;
-      text.appendChild(name);
-
-      const sub = document.createElement("div");
-      sub.className = "tech-sub";
-      const cost = document.createElement("span");
-      cost.className = "tech-cost";
-      cost.textContent = t.stub ? "external mod" :
-        t.cost === null ? "" : String(t.cost);
-      sub.appendChild(cost);
-      if (t.tier !== null || t.isRepeatable) {
-        const badge = document.createElement("span");
-        badge.className = "tech-tier-badge";
-        const rep = !t.isRepeatable ? ""
-          : t.levels > 0 ? ` \u00d7${t.levels}`
-          : t.levels === -1 ? " \u221e" : " \u21bb";
-        badge.textContent = (t.tier !== null ? `T${t.tier}` : "") + rep;
-        badge.title = !t.isRepeatable ? ""
-          : t.levels > 0 ? `Repeatable, ${t.levels} levels`
-          : t.levels === -1 ? "Repeatable, unlimited levels"
-          : "Repeatable";
-        sub.appendChild(badge);
-      }
-      text.appendChild(sub);
-
-      if (t.isDangerous) {
-        const d = document.createElement("div");
-        d.className = "tech-danger-line";
-        d.textContent = "Dangerous technology";
-        text.appendChild(d);
-      }
-
-      this.cardEls.set(id, el);
-      frag.appendChild(el);
-    }
-    this.world.appendChild(frag);
-  }
-
-  _bind() {
-    const stage = this.stage;
-    let panning = false, px = 0, py = 0, moved = false;
-    let downCard = null;   // captured BEFORE setPointerCapture retargets
-                           // pointerup to the stage (real-browser behaviour
-                           // jsdom doesn't emulate — see tests/dom-smoke.mjs)
-
-    stage.addEventListener("pointerdown", e => {
-      panning = true; moved = false;
-      downCard = e.target.closest?.(".tech-card") ?? null;
-      px = e.clientX; py = e.clientY;
-      stage.classList.add("panning");
-      stage.setPointerCapture(e.pointerId);
-    });
-    stage.addEventListener("pointermove", e => {
-      if (!panning) return;
-      const dx = e.clientX - px, dy = e.clientY - py;
-      if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
-      this.tx += dx; this.ty += dy;
-      px = e.clientX; py = e.clientY;
-      this.applyTransform();
-    });
-    stage.addEventListener("pointerup", () => {
-      panning = false;
-      stage.classList.remove("panning");
-      if (!moved) this.select(downCard ? downCard.dataset.id : null);
-      downCard = null;
-    });
-    stage.addEventListener("wheel", e => {
-      e.preventDefault();
-      const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
-      this.zoomAt(e.clientX, e.clientY, factor);
-    }, { passive: false });
-
-    stage.addEventListener("keydown", e => {
-      if (e.key === "Escape") this.select(null);
-    });
-    stage.addEventListener("pointerover", e => {
-      if (this.selected) return;   // a selection owns the highlight until
-                                   // blank-space click or another selection
-      const card = e.target.closest(".tech-card");
-      this.highlightLineage(card ? card.dataset.id : null);
-    });
-    stage.addEventListener("pointerleave", () => {
-      if (!this.selected) this.highlightLineage(null);
-    });
-
-    new ResizeObserver(() => this.resizeCanvas()).observe(stage);
     this.resizeCanvas();
   }
 
+  async _loadAtlas() {
+    try {
+      const meta = await fetch("assets/icons/atlas.json").then(r => r.json());
+      const img = new Image();
+      img.decoding = "async";
+      await new Promise((res, rej) => {
+        img.onload = res; img.onerror = rej;
+        img.src = "assets/icons/atlas.png";
+      });
+      this.atlasMap = meta.icons;
+      this.atlas = img;
+      this.redraw();
+    } catch { /* icons are optional; cards render without them */ }
+  }
+
+  // -- events ---------------------------------------------------------
+
+  _bind() {
+    const stage = this.stage;
+    let panning = false, px = 0, py = 0, moved = false, downId = null;
+
+    stage.addEventListener("pointerdown", e => {
+      panning = true; moved = false;
+      px = e.clientX; py = e.clientY;
+      downId = this.pickAt(e.clientX, e.clientY);
+      stage.classList.add("panning");
+      stage.setPointerCapture?.(e.pointerId);
+    });
+
+    stage.addEventListener("pointermove", e => {
+      if (panning) {
+        const dx = e.clientX - px, dy = e.clientY - py;
+        if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+        this.tx += dx; this.ty += dy;
+        px = e.clientX; py = e.clientY;
+        this.applyTransform();
+        return;
+      }
+      // Hover preview only when nothing is selected; a selection owns the
+      // highlight until it is cleared.
+      if (this.selected) return;
+      const id = this.pickAt(e.clientX, e.clientY);
+      if (id !== this.hovered) {
+        this.hovered = id;
+        this.lineage = id ? lineageOf(this.model.techs, id) : null;
+        this.redraw();
+      }
+    });
+
+    stage.addEventListener("pointerup", () => {
+      panning = false;
+      stage.classList.remove("panning");
+      if (!moved) this.select(downId);
+      downId = null;
+    });
+
+    stage.addEventListener("pointerleave", () => {
+      if (!this.selected && this.hovered) {
+        this.hovered = null; this.lineage = null; this.redraw();
+      }
+    });
+
+    stage.addEventListener("wheel", e => {
+      e.preventDefault();
+      this.zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 1 / 1.12);
+    }, { passive: false });
+
+    new ResizeObserver(() => this.resizeCanvas()).observe(stage);
+  }
+
+  pickAt(clientX, clientY) {
+    const r = this.stage.getBoundingClientRect();
+    const wx = (clientX - r.left - this.tx) / this.scale;
+    const wy = (clientY - r.top - this.ty) / this.scale;
+    return hitTest(this.index, wx, wy);
+  }
+
+  // -- view state -----------------------------------------------------
+
+  relayout(lay, visibleSet) {
+    this.lay = lay;
+    this.visible = visibleSet;
+    this.index = buildIndex(lay, visibleSet);
+    if (this.selected && !lay.pos.has(this.selected)) {
+      this.selected = null;
+      this.lineage = null;
+      this.onSelect(null);
+    }
+    this.redraw();
+  }
+
+  select(id) {
+    this.selected = id;
+    this.hovered = null;
+    this.lineage = id ? lineageOf(this.model.techs, id) : null;
+    this.redraw();
+    this.onSelect(id);
+  }
+
   zoomAt(cx, cy, factor) {
-    const rect = this.stage.getBoundingClientRect();
-    const sx = cx - rect.left, sy = cy - rect.top;
-    const ns = Math.min(2.5, Math.max(0.08, this.scale * factor));
-    const real = ns / this.scale;
-    this.tx = sx - (sx - this.tx) * real;
-    this.ty = sy - (sy - this.ty) * real;
+    const r = this.stage.getBoundingClientRect();
+    const sx = cx - r.left, sy = cy - r.top;
+    const ns = clampScale(this.scale * factor);
+    const k = ns / this.scale;
+    this.tx = sx - (sx - this.tx) * k;
+    this.ty = sy - (sy - this.ty) * k;
     this.scale = ns;
     this.applyTransform();
   }
@@ -204,186 +164,6 @@ export class MapView {
   resetView() {
     this.tx = 40; this.ty = 20; this.scale = 1;
     this.applyTransform();
-  }
-
-  applyTransform() {
-    if (this._raf) return;               // coalesce to one update per frame
-    this._raf = requestAnimationFrame(() => {
-      this._raf = 0;
-      this.world.style.transform =
-        `translate(${this.tx}px, ${this.ty}px) scale(${this.scale})`;
-      const readout = document.getElementById("zoom-readout");
-      if (readout) readout.textContent = `${Math.round(this.scale * 100)}%`;
-      this.drawEdges();
-      // Culling touches every card's inline style, which is layout work; do
-      // it once the view settles rather than on every frame of a wheel spin.
-      clearTimeout(this._cullTimer);
-      this._cullTimer = setTimeout(() => this.cull(), 90);
-    });
-  }
-
-  /* Virtualisation: cards outside the viewport (plus margin) are
-     display:none'd so the compositor only handles what's visible.
-     Kicks in above 800 placed cards (spec §8 threshold). */
-  cull() {
-    if (this.lay.pos.size <= 800) return;
-    const { clientWidth: w, clientHeight: h } = this.stage;
-    const m = 300; // margin so cards appear before entering view
-    const x0 = (-this.tx - m) / this.scale, x1 = (w - this.tx + m) / this.scale;
-    const y0 = (-this.ty - m) / this.scale, y1 = (h - this.ty + m) / this.scale;
-    for (const [id, p] of this.lay.pos) {
-      const el = this.cardEls.get(id);
-      if (!el) continue;
-      // Culling and filtering are independent: filter = .hidden class,
-      // culling = inline display. Never skip filtered cards here or their
-      // culled state goes stale and they vanish when the filter clears.
-      const off = p.x > x1 || p.x + 208 < x0 || p.y > y1 || p.y + 64 < y0;
-      if (off !== el._culled) {
-        el._culled = off;
-        el.style.display = off ? "none" : "";
-      }
-    }
-  }
-
-  resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    const { clientWidth: w, clientHeight: h } = this.stage;
-    this.canvas.width = w * dpr;
-    this.canvas.height = h * dpr;
-    this.canvas.style.width = `${w}px`;
-    this.canvas.style.height = `${h}px`;
-    this.drawEdges();
-  }
-
-  /* Edge geometry lives in world coordinates, so it does not change when
-     the view pans or zooms. Build the paths once per layout/filter and
-     stroke them under a canvas transform; rebuilding ~1400 beziers on every
-     frame of a zoom was the real cost, not the number of pixels. */
-  _buildEdgePaths() {
-    const near = new Path2D(), far = new Path2D();
-    for (const [id, p] of this.lay.pos) {
-      if (this.visible !== null && !this.visible.has(id)) continue;
-      const t = this.model.techs.get(id);
-      for (const pid of t.prerequisites) {
-        const pp = this.lay.pos.get(pid);
-        if (!pp) continue;
-        if (this.visible !== null && !this.visible.has(pid)) continue;
-        const path = Math.abs(pp.y - p.y) < 2200 ? near : far;
-        addEdge(path, pp, p);
-      }
-    }
-    this._edgePaths = { near, far };
-  }
-
-  _buildLineagePath() {
-    const lin = new Path2D();
-    if (this.lineage) {
-      for (const [id, p] of this.lay.pos) {
-        if (!this.lineage.has(id)) continue;
-        const t = this.model.techs.get(id);
-        for (const pid of t.prerequisites) {
-          if (!this.lineage.has(pid)) continue;
-          const pp = this.lay.pos.get(pid);
-          if (!pp) continue;
-          addEdge(lin, pp, p);
-        }
-      }
-    }
-    this._lineagePath = lin;
-  }
-
-  drawEdges() {
-    const ctx = this.canvas.getContext("2d");
-    const dpr = window.devicePixelRatio || 1;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.translate(this.tx, this.ty);
-    ctx.scale(this.scale, this.scale);
-
-    if (!this._edgePaths) this._buildEdgePaths();
-    if (this._lineagePath === undefined) this._buildLineagePath();
-
-    const css = getComputedStyle(document.documentElement);
-    const lineCol = css.getPropertyValue("--line").trim() || "#2a3348";
-    const hiCol = css.getPropertyValue("--physics").trim() || "#53a8e2";
-    const dim = this.lineage ? 0.05 : 1;
-
-    ctx.setLineDash([]);
-    ctx.lineWidth = 1.25 / this.scale;
-    ctx.strokeStyle = lineCol;
-    ctx.globalAlpha = 0.5 * dim;
-    ctx.stroke(this._edgePaths.near);
-    ctx.globalAlpha = 0.12 * dim;
-    ctx.setLineDash([5, 5]);
-    ctx.stroke(this._edgePaths.far);
-    ctx.setLineDash([]);
-    if (this.lineage && this._lineagePath) {
-      ctx.strokeStyle = hiCol;
-      ctx.globalAlpha = 0.95;
-      ctx.lineWidth = 2 / this.scale;
-      ctx.stroke(this._lineagePath);
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  relayout(lay, visibleSet) {
-    this.lay = lay;
-    this.visible = visibleSet;
-    this._edgePaths = null;
-    this.cardEls.clear();
-    this.world.replaceChildren();
-    this._buildDom();
-    if (this.selected && !this.lay.pos.has(this.selected)) {
-      this.selected = null;
-      this.lineage = null;
-      this.onSelect(null);
-    } else if (this.selected) {
-      this.cardEls.get(this.selected)?.classList.add("selected");
-      this.highlightLineage(this.selected);
-    }
-    this.cull();
-    this.drawEdges();
-  }
-
-  highlightLineage(id) {
-    if (!id) {
-      this.lineage = null;
-      this._lineagePath = undefined;
-      for (const el of this.cardEls.values()) el.classList.remove("dimmed");
-      this.drawEdges();
-      return;
-    }
-    const keep = new Set([id]);
-    const walk = (start, key) => {
-      const stack = [start];
-      while (stack.length) {
-        const t = this.model.techs.get(stack.pop());
-        for (const n of t[key]) {
-          if (!keep.has(n)) { keep.add(n); stack.push(n); }
-        }
-      }
-    };
-    walk(id, "prerequisites");
-    walk(id, "unlocks");
-    for (const [cid, el] of this.cardEls)
-      el.classList.toggle("dimmed", !keep.has(cid));
-    this.lineage = keep;
-    this._lineagePath = undefined;
-    this.drawEdges();
-  }
-
-  select(id) {
-    if (this.selected) {
-      const prev = this.cardEls.get(this.selected);
-      if (prev) prev.classList.remove("selected");
-    }
-    this.selected = id;
-    if (id) {
-      const el = this.cardEls.get(id);
-      if (el) el.classList.add("selected");
-    }
-    this.highlightLineage(id);
-    this.onSelect(id);
   }
 
   centreOn(id) {
@@ -394,4 +174,304 @@ export class MapView {
     this.ty = h / 2 - (p.y + CARD_H / 2) * this.scale;
     this.applyTransform();
   }
+
+  applyTransform() {
+    const readout = document.getElementById("zoom-readout");
+    if (readout) readout.textContent = `${Math.round(this.scale * 100)}%`;
+    this.redraw();
+  }
+
+  resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const { clientWidth: w, clientHeight: h } = this.stage;
+    this.canvas.width = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this.canvas.style.width = `${w}px`;
+    this.canvas.style.height = `${h}px`;
+    this.redraw();
+  }
+
+  redraw() {
+    if (this._raf) return;                 // coalesce to one draw per frame
+    this._raf = requestAnimationFrame(() => { this._raf = 0; this._draw(); });
+  }
+
+  // -- drawing --------------------------------------------------------
+
+  _draw() {
+    const ctx = this.canvas.getContext("2d");
+    if (!ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.stage.clientWidth, h = this.stage.clientHeight;
+    const C = this.colours;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(this.tx, this.ty);
+    ctx.scale(this.scale, this.scale);
+
+    const rect = viewportRect(this.tx, this.ty, this.scale, w, h);
+    this._drawFurniture(ctx, rect, C);
+    this._drawEdges(ctx, rect, C);
+
+    const cards = visibleCards(this.index, rect);
+    const withText = this.scale >= TEXT_SCALE;
+    const withIcons = this.scale >= ICON_SCALE && this.atlas;
+    for (const it of cards) this._drawCard(ctx, it, C, withText, withIcons);
+
+    ctx.restore();
+  }
+
+  _drawFurniture(ctx, rect, C) {
+    for (const f of this.lay.furniture) {
+      switch (f.kind) {
+        case "tiercolumn":
+          if (f.x + f.w < rect.x0 || f.x > rect.x1) continue;
+          ctx.fillStyle = f.parity ? C.tierB : C.tierA;
+          ctx.fillRect(f.x, f.y, f.w, f.h);
+          break;
+        case "band": {
+          if (f.y + f.h < rect.y0 || f.y > rect.y1) continue;
+          const accent = C.area[f.cat === "blokkats" ? "blokkat" : f.area]
+            ?? C.stub;
+          ctx.fillStyle = withAlpha(accent, 0.09);
+          roundRect(ctx, f.x, f.y, f.w, f.h, 10);
+          ctx.fill();
+          ctx.strokeStyle = withAlpha(accent, 0.22);
+          ctx.lineWidth = 1 / this.scale;
+          ctx.stroke();
+          break;
+        }
+        case "header": {
+          if (f.y + 30 < rect.y0 || f.y > rect.y1) continue;
+          if (this.scale < 0.12) continue;
+          const accent = C.area[f.cat === "blokkats" ? "blokkat" : f.area]
+            ?? C.muted;
+          const label = f.text.toUpperCase();
+          ctx.font = '600 15px "Chakra Petch", system-ui, sans-serif';
+          const tw = ctx.measureText(label).width + 2.6 * label.length;
+          const cw = tw + 46;
+          ctx.fillStyle = withAlpha(accent, 0.18);
+          roundRect(ctx, f.x, f.y, cw, 26, 6);
+          ctx.fill();
+          ctx.strokeStyle = withAlpha(accent, 0.4);
+          ctx.lineWidth = 1 / this.scale;
+          ctx.stroke();
+          ctx.fillStyle = accent;
+          drawTracked(ctx, label, f.x + 12, f.y + 18, 2.6);
+          ctx.font = FONT_DATA;
+          ctx.fillStyle = C.muted;
+          ctx.fillText(String(f.count), f.x + cw - 26, f.y + 18);
+          break;
+        }
+        case "tierlabel": {
+          if (f.y + 20 < rect.y0 || f.y > rect.y1) continue;
+          if (f.x > rect.x1 || f.x + 300 < rect.x0) continue;
+          if (this.scale < 0.12) continue;
+          ctx.font = f.small
+            ? '600 10px "Chakra Petch", system-ui, sans-serif'
+            : '600 13px "Chakra Petch", system-ui, sans-serif';
+          ctx.fillStyle = f.small ? withAlpha(C.muted, 0.55) : C.muted;
+          drawTracked(ctx, f.text.toUpperCase(), f.x, f.y + 12,
+                      f.small ? 1.6 : 1.8);
+          break;
+        }
+        case "tierdivider":
+          if (f.x < rect.x0 || f.x > rect.x1) continue;
+          ctx.strokeStyle = withAlpha(C.line, 0.35);
+          ctx.lineWidth = 1 / this.scale;
+          ctx.beginPath();
+          ctx.moveTo(f.x, f.y);
+          ctx.lineTo(f.x, f.y + f.h);
+          ctx.stroke();
+          break;
+      }
+    }
+  }
+
+  _drawEdges(ctx, rect, C) {
+    const dim = this.lineage ? 0.06 : 1;
+    const near = new Path2D(), far = new Path2D(), lin = new Path2D();
+
+    for (const it of visibleCards(this.index, expand(rect, 2400))) {
+      const t = this.model.techs.get(it.id);
+      if (!t) continue;
+      const p = this.lay.pos.get(it.id);
+      for (const pid of t.prerequisites) {
+        const pp = this.lay.pos.get(pid);
+        if (!pp) continue;
+        if (this.visible !== null && !this.visible.has(pid)) continue;
+        if (Math.max(pp.x, p.x) + CARD_W < rect.x0 ||
+            Math.min(pp.x, p.x) > rect.x1) continue;
+        const inLin = this.lineage &&
+          this.lineage.has(it.id) && this.lineage.has(pid);
+        addEdge(inLin ? lin : (Math.abs(pp.y - p.y) < 2200 ? near : far),
+                pp, p);
+      }
+    }
+
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1.25 / this.scale;
+    ctx.strokeStyle = C.line;
+    ctx.globalAlpha = 0.5 * dim;
+    ctx.stroke(near);
+    ctx.globalAlpha = 0.12 * dim;
+    ctx.setLineDash([5 / this.scale, 5 / this.scale]);
+    ctx.stroke(far);
+    ctx.setLineDash([]);
+    if (this.lineage) {
+      ctx.strokeStyle = C.accent;
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = 2 / this.scale;
+      ctx.stroke(lin);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  _drawCard(ctx, it, C, withText, withIcons) {
+    const t = this.model.techs.get(it.id);
+    if (!t) return;
+    const dimmed = this.lineage && !this.lineage.has(it.id);
+    ctx.globalAlpha = dimmed ? 0.25 : 1;
+
+    const accent = t.stub ? C.rare
+      : t.isRare ? C.rare
+      : (t.categories?.[0] === "blokkats" ? C.area.blokkat
+         : C.area[t.area] ?? C.line);
+
+    // body
+    ctx.fillStyle = t.stub ? "transparent" : C.card;
+    roundRect(ctx, it.x, it.y, CARD_W, CARD_H, 4);
+    if (!t.stub) ctx.fill();
+    ctx.strokeStyle = it.id === this.selected ? accent : C.line;
+    ctx.lineWidth = (it.id === this.selected ? 2 : 1) / this.scale;
+    if (t.stub) ctx.setLineDash([4 / this.scale, 3 / this.scale]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // area accent bar
+    ctx.fillStyle = accent;
+    roundRect(ctx, it.x, it.y, 3, CARD_H, 2);
+    ctx.fill();
+
+    let textX = it.x + 12;
+    if (withIcons && t.icon && this.atlasMap?.[t.icon]) {
+      const s = this.atlasMap[t.icon];
+      ctx.drawImage(this.atlas, s.x, s.y, s.w, s.h,
+                    it.x + 9, it.y + 12, 40, 40);
+      textX = it.x + 57;
+    }
+
+    if (!withText) { ctx.globalAlpha = 1; return; }
+
+    ctx.font = FONT_DISPLAY;
+    ctx.fillStyle = t.nameMissing ? C.muted : C.text;
+    ctx.fillText(fit(ctx, t.name ?? t.id, it.x + CARD_W - 10 - textX),
+                 textX, it.y + 26);
+
+    ctx.font = FONT_DATA;
+    ctx.fillStyle = C.muted;
+    const cost = t.stub ? "external mod"
+      : (t.cost === null || t.cost === undefined ? "" : String(t.cost));
+    if (cost) ctx.fillText(cost, textX, it.y + 42);
+
+    if (t.tier !== null || t.isRepeatable) {
+      const rep = !t.isRepeatable ? ""
+        : t.levels > 0 ? ` \u00d7${t.levels}`
+        : t.levels === -1 ? " \u221e" : " \u21bb";
+      const badge = (t.tier !== null ? `T${t.tier}` : "") + rep;
+      ctx.font = '600 10px "Chakra Petch", system-ui, sans-serif';
+      const bw = ctx.measureText(badge).width;
+      ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 42);
+    }
+
+    if (t.isDangerous) {
+      ctx.font = FONT_DATA;
+      ctx.fillStyle = C.danger;
+      ctx.fillText("Dangerous technology", textX, it.y + 56);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+// -- helpers ----------------------------------------------------------------
+
+function addEdge(path, from, to) {
+  const x1 = from.x + CARD_W, y1 = from.y + CARD_H / 2;
+  const x2 = to.x, y2 = to.y + CARD_H / 2;
+  const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
+  path.moveTo(x1, y1);
+  path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
+}
+
+function expand(r, m) {
+  return { x0: r.x0 - m, y0: r.y0 - m, x1: r.x1 + m, y1: r.y1 + m };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/* Canvas has no letter-spacing in older engines; draw per glyph so the
+   display face keeps its tracking. */
+function drawTracked(ctx, text, x, y, spacing) {
+  let cx = x;
+  for (const ch of text) {
+    ctx.fillText(ch, cx, y);
+    cx += ctx.measureText(ch).width + spacing;
+  }
+}
+
+function fit(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let lo = 0, hi = text.length;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (ctx.measureText(text.slice(0, mid) + "\u2026").width <= maxWidth)
+      lo = mid;
+    else hi = mid - 1;
+  }
+  return text.slice(0, lo) + "\u2026";
+}
+
+function withAlpha(colour, a) {
+  const c = colour.trim();
+  if (c.startsWith("#") && (c.length === 7 || c.length === 4)) {
+    const hex = c.length === 4
+      ? c[1] + c[1] + c[2] + c[2] + c[3] + c[3] : c.slice(1);
+    const n = parseInt(hex, 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+  }
+  return c;
+}
+
+function readColours() {
+  const s = getComputedStyle(document.documentElement);
+  const v = (name, dflt) => (s.getPropertyValue(name) || dflt).trim();
+  return {
+    bg: v("--bg", "#141414"),
+    card: v("--card", "#212125"),
+    line: v("--line", "#38363c"),
+    text: v("--text", "#eef0f2"),
+    muted: v("--muted", "#8f8b94"),
+    rare: v("--rare", "#a07be0"),
+    danger: v("--danger", "#e05c5c"),
+    stub: v("--stub", "#726e75"),
+    accent: v("--physics", "#53a8e2"),
+    tierA: "rgba(255,255,255,0.014)",
+    tierB: "rgba(255,255,255,0.038)",
+    area: {
+      physics: v("--physics", "#53a8e2"),
+      society: v("--society", "#63c78a"),
+      engineering: v("--engineering", "#e0a458"),
+      blokkat: v("--blokkat", "#52d97e"),
+    },
+  };
 }

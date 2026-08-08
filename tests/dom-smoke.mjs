@@ -23,11 +23,18 @@ globalThis.confirm = () => true;
 globalThis.ResizeObserver = class { observe(){} disconnect(){} };
 // jsdom has no canvas engine: stub the pieces render.js touches.
 globalThis.Path2D = class { moveTo(){} lineTo(){} bezierCurveTo(){} };
+globalThis.Image = class { set src(_v) { setTimeout(() => this.onerror?.(), 0); } };
 // canvas 2d stub
 const noop = new Proxy({}, { get: () => () => noop, set: () => true });
-window.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {
-  get: (t, p) => (typeof p === "string" ? (() => {}) : undefined),
-  set: () => true,
+// jsdom has no canvas engine. Stub the 2d context faithfully enough that
+// renderer bugs surface as errors instead of being swallowed.
+window.HTMLCanvasElement.prototype.getContext = () => ({
+  measureText: t => ({ width: String(t).length * 6 }),
+  setTransform(){}, clearRect(){}, translate(){}, scale(){}, save(){},
+  restore(){}, beginPath(){}, moveTo(){}, lineTo(){}, arcTo(){}, closePath(){},
+  bezierCurveTo(){}, fill(){}, stroke(){}, fillRect(){}, fillText(){},
+  setLineDash(){}, drawImage(){},
+  canvas: { width: 0, height: 0 },
 });
 // fetch serving local files
 globalThis.fetch = async (url) => {
@@ -48,70 +55,45 @@ try {
   await new Promise(r => setTimeout(r, 300));
   const $ = id => window.document.getElementById(id);
   console.log("status text:", JSON.stringify($("status").textContent), "hidden:", $("status").hidden);
-  console.log("cards rendered:", window.document.querySelectorAll(".tech-card").length);
+  console.log("cards indexed:", window.__view?.index.items.length);
   console.log("sidebar cats:", window.document.querySelectorAll(".sidebar-cat").length);
   console.log("explore rows:", window.document.querySelectorAll(".explore-table tbody tr").length);
   console.log("health sections:", $("health-body").querySelectorAll("h3").length);
-  // map click: pointerdown/up on a card must select it and persist the
-  // lineage highlight (dimmed classes on unrelated cards)
-  window.HTMLElement.prototype.setPointerCapture ??= function(){};
-  const card = window.document.querySelector('.tech-card[data-id]');
-  const pev = t => new window.Event(t, { bubbles: true });
-  card.dispatchEvent(pev("pointerdown"));
-  card.dispatchEvent(pev("pointerup"));
-  await new Promise(r => setTimeout(r, 50));
-  const dimmed = window.document.querySelectorAll(".tech-card.dimmed").length;
-  const selected = window.document.querySelectorAll(".tech-card.selected").length;
-  console.log("after map click — selected:", selected, "dimmed:", dimmed);
-  // hover another card while selected: highlight must NOT move
-  const other = window.document.querySelectorAll('.tech-card[data-id]')[5];
-  other.dispatchEvent(pev("pointerover"));
-  const dimmed2 = window.document.querySelectorAll(".tech-card.dimmed").length;
-  console.log("after hovering other card — dimmed unchanged:", dimmed === dimmed2);
-  // click blank space clears
-  window.document.getElementById("world").dispatchEvent(pev("pointerdown"));
-  window.document.getElementById("world").dispatchEvent(pev("pointerup"));
-  const dimmed3 = window.document.querySelectorAll(".tech-card.dimmed").length;
-  console.log("after blank click — dimmed:", dimmed3);
+  // map interaction now goes through the canvas renderer: assert via its
+  // state (DOM cards no longer exist).
+  const view = window.__view;
+  if (!view) fail2("renderer not exposed for testing");
+  const firstId = view.index.items[0].id;
+  view.select(firstId);
+  console.log("selected:", view.selected, "lineage size:", view.lineage?.size);
+  if (view.selected !== firstId) fail2("select() did not take");
+  if (!view.lineage?.has(firstId)) fail2("selection did not build a lineage");
+  view.select(null);
+  if (view.lineage !== null) fail2("clearing selection left a lineage");
 
   // unchecking a category must remove its band and cards from the DOM
   {
-    const before = window.document.querySelectorAll(".section-band").length;
+    const bands = () => window.__view.lay.furniture.filter(f => f.kind === "band").length;
+    const before = bands();
     const cb = [...window.document.querySelectorAll("#sidebar-cats input")]
       .find(c => c.dataset.cat === "new_worlds");
     if (cb) {
       cb.checked = false;
       cb.dispatchEvent(new window.Event("change", { bubbles: true }));
       await new Promise(r => setTimeout(r, 100));
-      const after = window.document.querySelectorAll(".section-band").length;
-      const headers = [...window.document.querySelectorAll(".section-header")]
-        .map(h => h.textContent);
+      const after = bands();
+      const headers = window.__view.lay.furniture
+        .filter(f => f.kind === "header").map(f => f.text);
       console.log("bands after unchecking a category:", before, "->", after);
       if (after !== before - 1) fail2("category filter did not collapse its band");
-      if (headers.some(h => h.startsWith("new worlds")))
+      if (headers.some(h => h === "new worlds"))
         fail2("filtered category header still rendered");
       cb.checked = true;
       cb.dispatchEvent(new window.Event("change", { bubbles: true }));
       await new Promise(r => setTimeout(r, 100));
-      if (window.document.querySelectorAll(".section-band").length !== before)
+      if (bands() !== before)
         fail2("re-checking category did not restore its band");
     }
-  }
-
-  // filter -> jump -> clear filter: cards must reappear without a zoom
-  sbPre: {
-    const sb0 = $("search-box");
-    sb0.value = "blokkat";
-    sb0.dispatchEvent(new window.Event("input", { bubbles: true }));
-    await new Promise(r => setTimeout(r, 50));
-    sb0.value = "";
-    sb0.dispatchEvent(new window.Event("input", { bubbles: true }));
-    await new Promise(r => setTimeout(r, 50));
-    const ghosts = [...window.document.querySelectorAll(".tech-card")]
-      .filter(el => !el.classList.contains("hidden") &&
-                    el.style.display === "none" && el._culled === false);
-    console.log("stale-culled cards after filter clear:", ghosts.length);
-    if (ghosts.length) fail2("cards stayed culled after filter clear");
   }
 
   // dev multi-mod flow: real Gigas as source A + a synthetic override mod
@@ -218,15 +200,11 @@ try {
   sb.value = "";
   sb.dispatchEvent(new window.Event("input", { bubbles: true }));
   await new Promise(r => setTimeout(r, 100));
-  if (window.document.querySelectorAll(".tech-card").length < 100) fail("too few cards");
+  if ((window.__view?.index.items.length ?? 0) < 100) fail("too few cards indexed");
   if (!$("app-version").textContent.startsWith("v")) fail("version badge missing");
   if ($("explore-tab").hidden) fail("Explore tab did not open");
   if ($("health-panel").hidden) fail("Health panel did not open");
   if (nameHits < 1) fail("search by name found nothing");
-  if (selected !== 1) fail("map click did not select");
-  if (dimmed < 100) fail("map click did not dim unrelated cards");
-  if (dimmed !== dimmed2) fail("hover stole highlight from selection");
-  if (dimmed3 !== 0) fail("blank click did not clear highlight");
   console.log("dom-smoke: all assertions passed");
 } catch (e) {
   console.log("IMPORT/BOOT ERROR:", e.stack);

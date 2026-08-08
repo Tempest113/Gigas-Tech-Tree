@@ -123,3 +123,42 @@ def resolve_icon(tech_id: str, explicit_icon: Optional[str],
         if ci and ci in available:
             return ci
     return None
+
+
+def build_atlas_from_pngs(icon_dir: Path, out_png: Path,
+                          out_json: Path) -> dict:
+    """Build a sprite atlas over every PNG in ``icon_dir`` (mod icons plus
+    any vanilla icons the maintainer has added). The viewer draws cards on
+    canvas and takes every icon from this one image, so it must cover the
+    whole set, not just the mod's own icons."""
+    files = sorted((f for f in icon_dir.glob("*.png")
+                    if f.name != "atlas.png"), key=lambda p: p.name)
+    if not files:
+        return {}
+    images = []
+    for f in files:
+        try:
+            im = Image.open(f)
+            im.load()
+            images.append((f.stem, im.convert("RGBA")))
+        except Exception:
+            continue
+
+    cell_w = max(im.width for _, im in images)
+    cell_h = max(im.height for _, im in images)
+    cols = 32
+    rows = math.ceil(len(images) / cols)
+    atlas = Image.new("RGBA", (cols * cell_w, rows * cell_h), (0, 0, 0, 0))
+    coords = {}
+    for idx, (stem, im) in enumerate(images):
+        cx = (idx % cols) * cell_w + (cell_w - im.width) // 2
+        cy = (idx // cols) * cell_h + (cell_h - im.height) // 2
+        atlas.paste(im, (cx, cy))
+        coords[stem] = {"x": cx, "y": cy, "w": im.width, "h": im.height}
+
+    _save_png_deterministic(atlas, out_png)
+    out_json.write_text(
+        json.dumps({"cell": {"w": cell_w, "h": cell_h}, "columns": cols,
+                    "icons": dict(sorted(coords.items()))},
+                   indent=0, sort_keys=True) + "\n", encoding="utf-8")
+    return coords

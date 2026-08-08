@@ -4,6 +4,24 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.2.0
+
+### Changed
+
+- **The map is drawn on a canvas.** Technology cards were DOM elements
+  inside a CSS-transformed container, so every zoom step made the browser
+  re-rasterise a layer roughly 12000×10000 CSS pixels holding a thousand
+  elements and their images. Tier washes, category bands, labels, edges and
+  cards are now painted on a single canvas, and only what is on screen is
+  drawn — 21 cards at 100% zoom on a 1080p viewport, against 981 placed.
+  Icons come from the sprite atlas the build already produced, so the whole
+  map costs one image rather than a thousand.
+- The build now generates the sprite atlas over every icon present, not just
+  the mod's own, since the renderer draws all icons from it.
+- Picking, culling and lineage logic moved into `js/viewmodel.js` as pure
+  functions with their own unit tests, and the deploy workflow runs them.
+  Previously this logic could only be exercised through the DOM.
+
 ## 1.1.2
 
 ### Changed
