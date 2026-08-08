@@ -92,7 +92,10 @@ select {
 .sidebar-area.area-physics { color: var(--physics); }
 .sidebar-area.area-society { color: var(--society); }
 .sidebar-area.area-engineering { color: var(--engineering); }
-.sidebar-area.area-cross-area { color: var(--blokkat); }
+.sidebar-divider {
+  height: 1px; background: var(--muted); opacity: 0.5;
+  margin: 14px 2px 8px;
+}
 .sidebar-cat {
   display: flex; align-items: center; gap: 6px;
   font-size: 12.5px; padding: 2px 0; cursor: pointer;
@@ -135,6 +138,7 @@ select {
 }
 .section-header {
   position: absolute; pointer-events: none; user-select: none;
+  white-space: nowrap;
   font-family: var(--font-display); font-weight: 600; font-size: 15px;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: color-mix(in srgb, var(--band-accent, var(--muted)) 70%, var(--text));
@@ -153,6 +157,7 @@ select {
 
 .tier-label {
   position: absolute; pointer-events: none; user-select: none;
+  white-space: nowrap;
   font-family: var(--font-display); font-weight: 600; font-size: 13px;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
 }

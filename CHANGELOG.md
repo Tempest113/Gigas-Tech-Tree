@@ -4,6 +4,35 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.1.2
+
+### Changed
+
+- Categories whose technologies span research areas (Blokkats, and any
+  future crisis or event line such as Aeternite) are listed after a plain
+  divider at the foot of the sidebar rather than filed under whichever area
+  happens to hold the most of them. No heading — the rule alone reads as
+  "everything else".
+
+## 1.1.1
+
+### Fixed
+
+- **Zoom-out performance.** Edge geometry is in world coordinates and does
+  not change when the view moves, but it was being rebuilt from scratch on
+  every animation frame of a pan or zoom — roughly 880 bezier curves per
+  frame. Paths are now built once per layout and stroked under a canvas
+  transform. Culling, which touches every card's inline style, moved off the
+  hot path to 90 ms after the view settles.
+- Reverted the level-of-detail rendering added in 1.1.0: it degraded cards to
+  coloured blocks when zoomed out without addressing the actual bottleneck.
+- Repeatable technologies from the base game claimed unlimited levels. The
+  vanilla extractor reported that a technology was repeatable but never how
+  many levels it had, so the viewer defaulted to unlimited; it now exports
+  the count. Badges show `×5` when the count is known, `∞` only for a genuine
+  unlimited repeatable, and `↻` when the count is unknown, rather than
+  asserting a cap that was never read.
+
 ## 1.1.0
 
 ### Added

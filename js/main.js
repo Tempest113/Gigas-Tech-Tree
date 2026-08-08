@@ -19,7 +19,7 @@ const DEV = new URLSearchParams(location.search).has("dev");
 
 /* Tool version. Bump on release and keep index.html's ?v= cache-buster in
    step so a stale browser cache can't serve mismatched JS/CSS. */
-export const APP_VERSION = "1.1.1";
+export const APP_VERSION = "1.1.2";
 
 async function boot() {
   const status = $("status");

@@ -203,8 +203,10 @@ export function layout(techs, visible = null) {
     });
     furniture.push({ kind: "tierlabel", text: colLabel(i), x: tierX[i], y: 14 });
     for (const y of sectionTops) {
+      // Sit in the gap above the band, clear of the category chip which
+      // occupies the band's top-left corner.
       furniture.push({ kind: "tierlabel", text: colLabel(i),
-                       x: tierX[i], y: y - 34, small: true });
+                       x: tierX[i], y: y - 66, small: true });
     }
   }
 

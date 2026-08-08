@@ -46,8 +46,11 @@ export class Panels {
         total += k;
         if (k > n || (k === n && String(a) < String(best))) { best = a; n = k; }
       }
-      if (m.size > 1 && n / total < 0.8) return "cross-area";
-      return best ?? "other";
+      // Categories spread across research areas (Blokkats, and any future
+      // crisis/event line like Aeternite) are grouped as misc rather than
+      // filed under whichever area happens to hold the most.
+      if (m.size > 1 && n / total < 0.8) return "misc";
+      return best ?? "misc";
     };
     const groups = new Map();
     for (const c of [...counts.keys()].sort()) {
@@ -56,14 +59,22 @@ export class Panels {
       groups.get(a).push(c);
     }
 
-    const order = ["physics", "society", "engineering", "cross-area", "other"];
+    const order = ["physics", "society", "engineering", "misc"];
     for (const area of order) {
       const cats = groups.get(area);
       if (!cats) continue;
-      const h = document.createElement("h3");
-      h.className = `sidebar-area area-${area}`;
-      h.textContent = area === "cross-area" ? "cross-area" : area;
-      host.appendChild(h);
+      if (area === "misc") {
+        // No heading: a plain rule, so misc categories read as "everything
+        // else" rather than as a named group.
+        const hr = document.createElement("div");
+        hr.className = "sidebar-divider";
+        host.appendChild(hr);
+      } else {
+        const h = document.createElement("h3");
+        h.className = `sidebar-area area-${area}`;
+        h.textContent = area;
+        host.appendChild(h);
+      }
       for (const c of cats) {
         const label = document.createElement("label");
         label.className = "sidebar-cat";
