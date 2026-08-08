@@ -17,8 +17,13 @@ let modSources = [];   // dev: ordered list of locally-loaded mod folders
 
 const DEV = new URLSearchParams(location.search).has("dev");
 
+/* Tool version. Bump on release and keep index.html's ?v= cache-buster in
+   step so a stale browser cache can't serve mismatched JS/CSS. */
+export const APP_VERSION = "1.0.0";
+
 async function boot() {
   const status = $("status");
+  $("app-version").textContent = `v${APP_VERSION}`;
   try {
     const manifest = await loadManifest();
     const m0 = await loadDataset(manifest.datasets[0]);
@@ -138,7 +143,10 @@ function showModel(newModel) {
       view.centreOn(id);
     };
     panels = new Panels(model,
-      visible => { view.setFilter(visible); explore?.setFilter(visible); },
+      visible => {
+        view.relayout(layout(model.techs, visible), visible);
+        explore?.setFilter(visible);
+      },
       jump);
 
     explore = new ExploreTable($("explore-tab"), model, jump);

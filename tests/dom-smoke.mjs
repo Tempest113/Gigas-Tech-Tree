@@ -72,6 +72,30 @@ try {
   const dimmed3 = window.document.querySelectorAll(".tech-card.dimmed").length;
   console.log("after blank click — dimmed:", dimmed3);
 
+  // unchecking a category must remove its band and cards from the DOM
+  {
+    const before = window.document.querySelectorAll(".section-band").length;
+    const cb = [...window.document.querySelectorAll("#sidebar-cats input")]
+      .find(c => c.dataset.cat === "new_worlds");
+    if (cb) {
+      cb.checked = false;
+      cb.dispatchEvent(new window.Event("change", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 100));
+      const after = window.document.querySelectorAll(".section-band").length;
+      const headers = [...window.document.querySelectorAll(".section-header")]
+        .map(h => h.textContent);
+      console.log("bands after unchecking a category:", before, "->", after);
+      if (after !== before - 1) fail2("category filter did not collapse its band");
+      if (headers.some(h => h.startsWith("new worlds")))
+        fail2("filtered category header still rendered");
+      cb.checked = true;
+      cb.dispatchEvent(new window.Event("change", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 100));
+      if (window.document.querySelectorAll(".section-band").length !== before)
+        fail2("re-checking category did not restore its band");
+    }
+  }
+
   // filter -> jump -> clear filter: cards must reappear without a zoom
   sbPre: {
     const sb0 = $("search-box");
@@ -178,7 +202,8 @@ try {
   const sb = $("search-box");
   sb.value = "mega-engineering";
   sb.dispatchEvent(new window.Event("input", { bubbles: true }));
-  console.log("search 'mega-engineering' hits:", $("search-results").children.length);
+  const nameHits = $("search-results").children.length;
+  console.log("search 'mega-engineering' hits:", nameHits);
   sb.value = "tech_mega_engineering";
   sb.dispatchEvent(new window.Event("input", { bubbles: true }));
   console.log("search 'tech_mega_engineering' hits:", $("search-results").children.length);
@@ -186,10 +211,16 @@ try {
   const fail = msg => { console.error("FAIL:", msg); process.exit(1); };
   globalThis.fail2 = fail;
   if (!$("status").hidden) fail("status not hidden: " + $("status").textContent);
+  // Clear the search first: filters now re-lay-out, so an active query
+  // legitimately leaves one card on the map.
+  sb.value = "";
+  sb.dispatchEvent(new window.Event("input", { bubbles: true }));
+  await new Promise(r => setTimeout(r, 100));
   if (window.document.querySelectorAll(".tech-card").length < 100) fail("too few cards");
+  if (!$("app-version").textContent.startsWith("v")) fail("version badge missing");
   if ($("explore-tab").hidden) fail("Explore tab did not open");
   if ($("health-panel").hidden) fail("Health panel did not open");
-  if ($("search-results").children.length < 1) fail("search by name found nothing");
+  if (nameHits < 1) fail("search by name found nothing");
   if (selected !== 1) fail("map click did not select");
   if (dimmed < 100) fail("map click did not dim unrelated cards");
   if (dimmed !== dimmed2) fail("hover stole highlight from selection");

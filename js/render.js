@@ -288,15 +288,24 @@ export class MapView {
     ctx.setLineDash([]);
   }
 
-  setFilter(visibleSet) {
+  /* Re-lay-out for a new filter. Hidden categories collapse their rows
+     entirely, so node positions change and the world must be rebuilt;
+     the pan/zoom transform is preserved so the user keeps their place. */
+  relayout(lay, visibleSet) {
+    this.lay = lay;
     this.visible = visibleSet;
-    for (const [id, el] of this.cardEls) {
-      el.classList.toggle("hidden",
-        visibleSet !== null && !visibleSet.has(id));
+    this.cardEls.clear();
+    this.world.replaceChildren();
+    this._buildDom();
+    if (this.selected && !this.lay.pos.has(this.selected)) {
+      this.selected = null;
+      this.lineage = null;
+      this.onSelect(null);
+    } else if (this.selected) {
+      this.cardEls.get(this.selected)?.classList.add("selected");
+      this.highlightLineage(this.selected);
     }
-    this.cull();       // recompute display for the current viewport NOW —
-                       // otherwise cards stay culled until the next
-                       // pan/zoom recomputes it (the "reappear on zoom" bug)
+    this.cull();
     this.drawEdges();
   }
 
