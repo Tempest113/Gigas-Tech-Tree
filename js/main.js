@@ -69,17 +69,6 @@ function closeModals() {
 }
 
 function bindChrome(jump) {
-  const themeSel = $("theme-select");
-  const applyTheme = t => {
-    document.body.dataset.theme = t === "merged" ? "" : t;
-    themeSel.value = t;
-    const p = new URLSearchParams(location.search);
-    if (t !== "merged") p.set("theme", t); else p.delete("theme");
-    history.replaceState(null, "", p.size ? `?${p}` : location.pathname);
-    view?.drawEdges();   // canvas colours come from CSS vars
-  };
-  themeSel.onchange = () => applyTheme(themeSel.value);
-  applyTheme(new URLSearchParams(location.search).get("theme") ?? "merged");
 
   for (const b of document.querySelectorAll(".tab"))
     b.onclick = () => setTab(b.dataset.tab);

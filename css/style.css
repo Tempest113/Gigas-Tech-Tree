@@ -3,8 +3,7 @@
    Display face: Chakra Petch (instrument-panel angularity); data: monospace. */
 
 :root {
-  /* Merged v2: Palette A's neutral black/grey/white for every surface,
-     space-ink's colour set for all accents and highlighting. */
+  /* Palette A neutrals for every surface, space-ink colours for accents. */
   --bg: #141414;
   --panel: #1b1b1e;
   --card: #212125;
@@ -26,21 +25,6 @@
   --card-h: 64px;
 }
 
-body[data-theme="palette-a"] {
-  --bg: #141414; --panel: #1b1b1e; --card: #212125;
-  --card-hover: #29292e; --line: #3a383e;
-  --text: #eef0f2; --muted: #8f8b94;
-  --physics: #00a7e1; --society: #eef0f2; --engineering: #007ea7;
-  --rare: #9b8ec4; --danger: #d16a6a; --stub: #726e75;
-}
-
-body[data-theme="ink"] {
-  --bg: #0b0e16; --panel: #131826; --card: #1a2132;
-  --card-hover: #212a40; --line: #2a3348;
-  --text: #d7dce8; --muted: #8b93a7;
-  --physics: #53a8e2; --society: #63c78a; --engineering: #e0a458;
-  --rare: #a07be0; --danger: #e05c5c; --stub: #4a5266;
-}
 
 * { box-sizing: border-box; }
 

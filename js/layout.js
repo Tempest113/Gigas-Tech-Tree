@@ -13,7 +13,7 @@
 export const CARD_W = 208, CARD_H = 64;
 const SUBCOL_GAP = 44;        // between sub-columns inside a tier
 const TIER_GAP = 140;         // between tiers
-const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 84;
+const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
 const MAX_ROWS = 8;           // wrap taller stacks into extra columns
 const AREA_ORDER = ["physics", "society", "engineering", null];
 
