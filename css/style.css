@@ -1,0 +1,366 @@
+/* Gigastructures Tech Tree — token system
+   Palette: deep-space ink; area accents are the only saturated colour.
+   Display face: Chakra Petch (instrument-panel angularity); data: monospace. */
+
+:root {
+  /* Merged v2: Palette A's neutral black/grey/white for every surface,
+     space-ink's colour set for all accents and highlighting. */
+  --bg: #141414;
+  --panel: #1b1b1e;
+  --card: #212125;
+  --card-hover: #2a2a2f;
+  --line: #38363c;
+  --text: #eef0f2;
+  --muted: #8f8b94;
+  --physics: #53a8e2;
+  --society: #63c78a;
+  --engineering: #e0a458;
+  --rare: #a07be0;
+  --danger: #e05c5c;
+  --stub: #726e75;
+  --blokkat: #52d97e;
+  --font-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --font-body: system-ui, "Segoe UI", sans-serif;
+  --font-data: ui-monospace, "Cascadia Mono", "JetBrains Mono", monospace;
+  --card-w: 208px;
+  --card-h: 64px;
+}
+
+body[data-theme="palette-a"] {
+  --bg: #141414; --panel: #1b1b1e; --card: #212125;
+  --card-hover: #29292e; --line: #3a383e;
+  --text: #eef0f2; --muted: #8f8b94;
+  --physics: #00a7e1; --society: #eef0f2; --engineering: #007ea7;
+  --rare: #9b8ec4; --danger: #d16a6a; --stub: #726e75;
+}
+
+body[data-theme="ink"] {
+  --bg: #0b0e16; --panel: #131826; --card: #1a2132;
+  --card-hover: #212a40; --line: #2a3348;
+  --text: #d7dce8; --muted: #8b93a7;
+  --physics: #53a8e2; --society: #63c78a; --engineering: #e0a458;
+  --rare: #a07be0; --danger: #e05c5c; --stub: #4a5266;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-body); font-size: 14px;
+}
+
+/* -- header ------------------------------------------------------------- */
+
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 48px; padding: 0 16px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.app-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 16px; letter-spacing: 0.06em; margin: 0;
+  text-transform: uppercase;
+}
+.app-title-dim { color: var(--muted); font-weight: 500; }
+.header-controls { display: flex; align-items: center; gap: 10px; }
+.dataset-label { color: var(--muted); font-size: 12px; }
+select {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; padding: 4px 8px;
+  max-width: 100%; text-overflow: ellipsis;
+}
+.build-info { font-family: var(--font-data); font-size: 11px; color: var(--muted); }
+
+/* -- app body ------------------------------------------------------------ */
+
+.app-body { display: flex; height: calc(100% - 48px); }
+.sidebar {
+  flex: 0 0 240px; overflow-y: auto;
+  background: var(--panel); border-right: 1px solid var(--line);
+  padding: 12px; display: flex; flex-direction: column; gap: 10px;
+}
+#search-box {
+  width: 100%; background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; padding: 6px 8px;
+}
+.search-results { list-style: none; margin: 0; padding: 0; }
+.search-results li {
+  padding: 4px 6px; border-radius: 3px; cursor: pointer; font-size: 12.5px;
+}
+.search-results li:hover, .search-results li:focus-visible {
+  background: var(--card-hover);
+}
+.sidebar-row { display: flex; gap: 6px; }
+.sidebar-row select { flex: 1; min-width: 0; }
+.sidebar-row button {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; font-size: 12px; padding: 4px 8px; cursor: pointer;
+}
+.sidebar-area {
+  font-family: var(--font-display); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin: 10px 0 4px; color: var(--muted);
+}
+.sidebar-area.area-physics { color: var(--physics); }
+.sidebar-area.area-society { color: var(--society); }
+.sidebar-area.area-engineering { color: var(--engineering); }
+.sidebar-cat {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12.5px; padding: 2px 0; cursor: pointer;
+}
+.sidebar-cat span:first-of-type { text-transform: capitalize; }
+.sidebar-count {
+  margin-left: auto; font-family: var(--font-data);
+  font-size: 11px; color: var(--muted);
+}
+
+/* -- stage -------------------------------------------------------------- */
+
+.stage-wrap { position: relative; flex: 1; }
+.stage {
+  position: absolute; inset: 0; overflow: hidden;
+  cursor: grab; touch-action: none;
+}
+.stage.panning { cursor: grabbing; }
+#edge-canvas { position: absolute; inset: 0; pointer-events: none; }
+.world {
+  position: absolute; top: 0; left: 0;
+  transform-origin: 0 0; will-change: transform;
+}
+
+/* -- section furniture (the signature: axes rendered as structure) ------ */
+
+.section-band {
+  position: absolute; pointer-events: none;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--band-accent, var(--stub)) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--band-accent, var(--stub)) 22%, transparent);
+}
+.section-band[data-area="physics"] { --band-accent: var(--physics); }
+.section-band[data-area="society"] { --band-accent: var(--society); }
+.section-band[data-area="engineering"] { --band-accent: var(--engineering); }
+.section-band[data-cat="blokkats"] {
+  --band-accent: var(--blokkat);
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97'%3E%3Cg fill='none' stroke='%2352d97e' stroke-opacity='0.10' stroke-width='1'%3E%3Cpath d='M28 0 L56 16.17 L56 48.5 L28 64.67 L0 48.5 L0 16.17 Z'/%3E%3Cpath d='M28 64.67 L28 97'/%3E%3C/g%3E%3C/svg%3E");
+  background-color: color-mix(in srgb, var(--blokkat) 7%, transparent);
+}
+.section-header {
+  position: absolute; pointer-events: none; user-select: none;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--band-accent, var(--muted)) 70%, var(--text));
+  background: color-mix(in srgb, var(--band-accent, var(--stub)) 18%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--band-accent, var(--stub)) 40%, transparent);
+  border-radius: 6px; padding: 3px 12px;
+}
+.section-header[data-area="physics"] { --band-accent: var(--physics); }
+.section-header[data-area="society"] { --band-accent: var(--society); }
+.section-header[data-area="engineering"] { --band-accent: var(--engineering); }
+.section-header[data-cat="blokkats"] { --band-accent: var(--blokkat); }
+.section-header .count {
+  font-family: var(--font-data); font-size: 11px; opacity: 0.7;
+  margin-left: 8px; letter-spacing: 0;
+}
+
+.tier-label {
+  position: absolute; pointer-events: none; user-select: none;
+  font-family: var(--font-display); font-weight: 600; font-size: 13px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+}
+
+/* -- cards -------------------------------------------------------------- */
+
+.tech-card {
+  position: absolute; width: var(--card-w); height: var(--card-h);
+  background: var(--card); border: 1px solid var(--line);
+  border-left: 3px solid var(--area-accent, var(--line));
+  border-radius: 4px; padding: 6px 8px;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; overflow: hidden;
+}
+.tech-icon {
+  width: 40px; height: 40px; flex: none;
+  image-rendering: auto; border-radius: 3px;
+}
+.tech-text {
+  min-width: 0; flex: 1;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tier-divider {
+  position: absolute; pointer-events: none;
+  border-left: 1px solid var(--line); opacity: 0.35; width: 0;
+}
+.tech-card:hover { background: var(--card-hover); }
+.tech-card:focus-visible { outline: 2px solid var(--physics); outline-offset: 1px; }
+.tech-card.selected {
+  border-color: var(--area-accent, var(--text));
+  box-shadow: 0 0 0 1px var(--area-accent, var(--text));
+}
+.tech-card.dimmed { opacity: 0.25; }
+.tech-card.hidden { display: none; }
+.tech-card[data-area="physics"] { --area-accent: var(--physics); }
+.tech-card[data-area="society"] { --area-accent: var(--society); }
+.tech-card[data-area="engineering"] { --area-accent: var(--engineering); }
+.tech-card.rare { --area-accent: var(--rare); }
+.tech-card.stub {
+  background: transparent; border-style: dashed;
+  border-color: var(--rare); --area-accent: var(--rare);
+  color: var(--muted);
+}
+.tech-card.stub .tech-cost { color: var(--rare); }
+
+.tech-name {
+  font-family: var(--font-display); font-weight: 600; font-size: 12.5px;
+  line-height: 1.2; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tech-name.loc-missing { font-family: var(--font-data); font-weight: 400; }
+.tech-sub {
+  display: flex; gap: 8px; align-items: baseline;
+  font-size: 11px; color: var(--muted);
+}
+.tech-cost { font-family: var(--font-data); }
+.tech-tier-badge {
+  margin-left: auto; font-family: var(--font-display);
+  font-size: 10px; color: var(--muted);
+}
+.tech-danger-line { font-size: 10px; color: var(--danger); }
+.tech-flags { font-size: 10px; color: var(--rare); }
+
+/* -- zoom controls ------------------------------------------------------ */
+
+.zoom-controls {
+  position: absolute; right: 16px; bottom: 16px;
+  display: flex; align-items: center; gap: 6px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 8px;
+}
+.zoom-controls button {
+  width: 28px; height: 28px; border-radius: 4px;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line); font-size: 15px; cursor: pointer;
+}
+.zoom-controls button:hover { background: var(--card-hover); }
+#zoom-readout {
+  min-width: 44px; text-align: center;
+  font-family: var(--font-data); font-size: 12px; color: var(--muted);
+}
+
+/* -- detail panel -------------------------------------------------------- */
+
+.detail-panel {
+  position: absolute; top: 12px; right: 12px; width: 340px;
+  max-height: calc(100% - 24px); overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px 16px;
+}
+.detail-close {
+  position: absolute; top: 8px; right: 8px;
+  background: none; border: none; color: var(--muted);
+  font-size: 18px; cursor: pointer;
+}
+.detail-close:hover { color: var(--text); }
+.detail-panel h2 {
+  font-family: var(--font-display); font-size: 16px;
+  margin: 0 30px 2px 0;
+}
+.detail-meta {
+  font-family: var(--font-data); font-size: 11px; color: var(--muted);
+  margin-bottom: 8px;
+}
+.detail-desc { font-size: 13px; line-height: 1.45; color: var(--text); }
+.detail-panel h3 {
+  font-family: var(--font-display); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin: 12px 0 4px;
+}
+.detail-panel ul { margin: 0; padding-left: 16px; font-size: 12.5px; }
+.detail-panel a { color: var(--physics); }
+.tech-link { cursor: pointer; color: var(--physics); text-decoration: underline; }
+.badge {
+  display: inline-block; font-size: 10px; padding: 1px 6px;
+  border-radius: 3px; border: 1px solid var(--line);
+  font-family: var(--font-data); color: var(--muted); margin-right: 4px;
+}
+.badge.override { color: var(--engineering); border-color: var(--engineering); }
+.badge.crossmod { color: var(--rare); border-color: var(--rare); }
+
+/* -- status ------------------------------------------------------------- */
+
+.status {
+  position: absolute; left: 50%; top: 40%;
+  transform: translateX(-50%);
+  font-family: var(--font-display); color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.status[hidden] { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tech-card { transition: background 120ms ease, opacity 160ms ease; }
+}
+
+/* -- tabs & header buttons ---------------------------------------------- */
+.tabs { display: flex; gap: 4px; }
+.tab {
+  background: none; border: none; color: var(--muted);
+  font-family: var(--font-display); font-size: 13px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 12px; cursor: pointer; border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--physics); }
+.header-btn {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; font-size: 12px; padding: 4px 10px; cursor: pointer;
+}
+.header-btn:hover { background: var(--card-hover); }
+
+/* -- tab panels & modal panels ------------------------------------------ */
+.tab-panel {
+  position: absolute; inset: 0; overflow: auto;
+  background: var(--bg); padding: 12px 16px;
+}
+.modal-panel {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: min(680px, calc(100% - 24px)); max-height: calc(100% - 24px);
+  overflow-y: auto; z-index: 10;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px 18px;
+}
+.modal-panel h2 { font-family: var(--font-display); font-size: 15px; margin: 0 0 8px; }
+.modal-panel h3 {
+  font-family: var(--font-display); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin: 14px 0 4px;
+}
+.modal-panel ul { margin: 0; padding-left: 16px; font-size: 12.5px; }
+.modal-panel code {
+  font-family: var(--font-data); font-size: 11.5px; color: var(--engineering);
+}
+.health-summary { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+
+/* -- explore table ------------------------------------------------------- */
+.explore-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.explore-table th {
+  font-family: var(--font-display); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  text-align: left; padding: 6px 10px; cursor: pointer;
+  border-bottom: 1px solid var(--line); position: sticky; top: 0;
+  background: var(--bg);
+}
+.explore-table td {
+  padding: 5px 10px; border-bottom: 1px solid var(--line);
+}
+.explore-table tbody tr { cursor: pointer; }
+.explore-table tbody tr:hover { background: var(--card); }
+
+
+/* -- capitalisation of derived identifiers ------------------------------- */
+.detail-meta { text-transform: capitalize; }
+.explore-table td:nth-child(2), .explore-table td:nth-child(3),
+.explore-table td:nth-child(7) { text-transform: capitalize; }
+.research-path { padding-left: 18px; font-size: 12.5px; }

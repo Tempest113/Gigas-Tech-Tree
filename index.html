@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gigastructures Tech Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=10">
+</head>
+<body>
+<header class="app-header">
+  <h1 class="app-title">Gigastructures <span class="app-title-dim">Tech Tree</span></h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="map" role="tab" aria-selected="true">Map</button>
+    <button class="tab" data-tab="explore" role="tab" aria-selected="false">Explore</button>
+  </nav>
+  <div class="header-controls">
+    <select id="theme-select" aria-label="Colour theme" title="Colour theme">
+      <option value="merged">Merged</option>
+      <option value="palette-a">Palette A</option>
+      <option value="ink">Space ink</option>
+    </select>
+    <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
+    <span id="build-info" class="build-info" title="Upstream commit"></span>
+  </div>
+</header>
+
+<main class="app-body">
+<aside class="sidebar" aria-label="Filters">
+  <input id="search-box" type="search" placeholder="Search techs  (F)"
+         aria-label="Search technologies">
+  <ul id="search-results" class="search-results"></ul>
+  <div class="sidebar-row">
+    <select id="source-filter" aria-label="Source filter">
+      <option value="all">All sources</option>
+      <option value="gigas">Gigastructures</option>
+      <option value="vanilla">Vanilla</option>
+      <option value="override">Overrides vanilla</option>
+      <option value="crossmod">Requires another mod</option>
+    </select>
+    <button id="show-all">Show all</button>
+  </div>
+  <div id="sidebar-cats" class="sidebar-cats"></div>
+</aside>
+<div class="stage-wrap">
+  <div id="stage" class="stage" role="application"
+       aria-label="Technology tree map. Drag to pan, scroll to zoom, click a technology to select it.">
+    <canvas id="edge-canvas"></canvas>
+    <div id="world" class="world"></div>
+  </div>
+
+  <div class="zoom-controls" role="group" aria-label="Zoom">
+    <button id="zoom-in" aria-label="Zoom in">+</button>
+    <span id="zoom-readout" aria-live="polite">100%</span>
+    <button id="zoom-out" aria-label="Zoom out">−</button>
+    <button id="zoom-reset" aria-label="Reset view">⌂</button>
+  </div>
+
+  <aside id="detail" class="detail-panel" hidden aria-label="Technology details">
+    <button id="detail-close" class="detail-close" aria-label="Close details">×</button>
+    <div id="detail-body"></div>
+  </aside>
+
+  <div id="status" class="status" role="status">Loading…</div>
+
+  <div id="explore-tab" class="tab-panel" hidden></div>
+
+  <aside id="health-panel" class="modal-panel" hidden aria-label="Build health">
+    <button class="detail-close" data-close="health-panel" aria-label="Close">×</button>
+    <h2>Build health</h2>
+    <div id="health-body"></div>
+  </aside>
+
+</div>
+</main>
+
+<script type="module" src="js/main.js?v=10"></script>
+</body>
+</html>

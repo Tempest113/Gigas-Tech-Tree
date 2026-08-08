@@ -1,0 +1,122 @@
+# Gigastructures Tech Tree
+
+An interactive browser for the Stellaris technology tree with first-class
+support for **Gigastructural Engineering & More** (Pouchkinn's fork),
+composed with vanilla data. Static site for GitHub Pages: all parsing happens
+at build time; the browser loads pre-baked JSON.
+
+**Live:** enable GitHub Pages for this repo (Settings → Pages → Source:
+GitHub Actions) and the *Deploy Pages* workflow publishes it.
+
+## Quick start (local)
+
+```bash
+python -m http.server 8000     # from the repo root
+# open http://localhost:8000
+```
+
+Everything needed to *view* the site is committed (data, icons). Rebuilding
+the data requires a Gigastructures checkout:
+
+```bash
+pip install Pillow pytest --user
+git clone --depth 1 --branch Master-Dev --filter=blob:none --sparse \
+    https://github.com/Pouchkinn-s-Gigastructures/Gigastructures upstream
+git -C upstream sparse-checkout set common/technology \
+    common/scripted_variables common/inline_scripts \
+    localisation/english gfx/interface/icons/technologies
+
+python tools/build_data.py --mod-dir upstream \
+    --out data --icons-out assets/icons \
+    --commit "$(git -C upstream rev-parse HEAD)" \
+    --vanilla data/vanilla-structural.json
+
+python -m pytest tools/tests/ -q          # parser/build suite
+npm i -D jsdom@24 && node tests/dom-smoke.mjs   # boots the page headlessly
+```
+
+## Vanilla data
+
+Vanilla cannot be redistributed as game files, so the site composes the mod
+dataset with **derived facts** extracted from a legitimate Stellaris install
+by the maintainer:
+
+```bash
+python tools/extract_vanilla.py \
+  --game-dir ~/.local/share/Steam/steamapps/common/Stellaris \
+  --out data/vanilla-structural.json --game-version 4.5.0 --desc
+# optionally after a game patch adds icons:  --icons vanilla-icons
+```
+
+Re-run after each Stellaris patch and commit the JSON (plus any new icon
+PNGs into `assets/icons/`). Techs referencing IDs from other mods (e.g.
+ACOT) render as "external mod" stubs.
+
+## Architecture
+
+```
+tools/            Python 3.11+ build pipeline (stdlib + Pillow)
+  pdx/            Clausewitz lexer, parser, scripted-variable resolution
+  inline_scripts  Paradox inline_script macro expansion ($param$, [[opt]])
+  loc.py          Stellaris .yml localisation (not YAML)
+  icons.py        DDS → PNG + sprite atlas, deterministic output
+  merge.py        load order, whole-file replacement, same-ID overrides
+  graph.py        field extraction, validation, JSON model
+  build_data.py   entry point
+  extract_vanilla.py  vanilla structural-facts extractor (maintainer-run)
+js/               Plain ES modules, no build step, no runtime dependencies
+data/             manifest + dataset JSON + vanilla-structural.json
+assets/icons/     converted PNGs + atlas
+tests/            headless DOM smoke test (dev-only jsdom)
+```
+
+Determinism: identical inputs produce byte-identical JSON, icons, and node
+positions (sorted inputs, sorted keys, no timestamps, alphabetical layout
+tie-breaks).
+
+## Viewer notes
+
+- `?dev` in the URL reveals the **Health** panel: dangling prerequisites,
+  tier inversions, missing localisation — the build doubles as a mod-QA
+  lint of every upstream commit.
+- `?theme=palette-a|ink` switches colour themes (also in the header).
+- Deep links: `?tech=<id>&q=<search>&cats=<list>&src=<filter>`.
+- Performance: cards are DOM nodes in one CSS-transformed container with
+  viewport culling above 800 nodes; edges are canvas, redrawn once per
+  frame. Measured numbers TBD on real hardware — see issue tracker.
+
+## Adding another mod
+
+The pipeline is source-list based (`tools/merge.py`): add a second
+`Source`, its sparse paths in the refresh workflow, and a dataset entry in
+the manifest. No parser or viewer changes required; the viewer's dataset
+manifest already supports multiple entries.
+
+## Automation
+
+- **Refresh data** (`.github/workflows/refresh-data.yml`): weekly cron +
+  manual dispatch; sparse-checks-out Gigastructures `Master-Dev`, rebuilds,
+  validates (tech-count floor, test suite), commits only on change, and
+  writes a summary with the upstream SHA.
+- **Deploy Pages** (`deploy-pages.yml`): on push; publishes only if the
+  parser suite *and* the DOM smoke test pass.
+- GitHub **disables scheduled workflows after 60 days of repository
+  inactivity** in public repos, and the workflow's own commits don't count
+  as activity. If updates stop: Actions → *Refresh data* → *Run workflow*,
+  or push any commit. (Alternative: author the data commit with a personal
+  access token instead of `GITHUB_TOKEN`.)
+
+## Licensing
+
+- **Code** in this repository (build pipeline, viewer): MIT — see `LICENSE`.
+- **Gigastructures content** (technology data, localisation text, icons
+  under `assets/icons/giga_*`): © the Gigastructural Engineering & More
+  team. The upstream repo publishes no licence; this material is
+  redistributed as non-commercial fan tooling with the maintainers'
+  awareness, and will be removed on request.
+- **Vanilla-derived content** (`data/vanilla-structural.json`, icons under
+  `assets/icons/tech_*`): derived from Stellaris, © Paradox Interactive,
+  used non-commercially under Paradox's tolerance of fan works. Game files
+  themselves are never committed. Removed on request.
+- This is an unofficial fan project, not affiliated with Paradox
+  Interactive or the Gigastructures team.
