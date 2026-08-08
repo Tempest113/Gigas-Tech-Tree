@@ -76,9 +76,19 @@ tie-breaks).
 
 ## Viewer notes
 
-- `?dev` in the URL reveals the **Health** panel: dangling prerequisites,
-  tier inversions, missing localisation — the build doubles as a mod-QA
-  lint of every upstream commit.
+- `?dev` in the URL reveals developer tools:
+  - **Health** panel — dangling prerequisites, tier inversions, missing
+    localisation; the build doubles as a mod-QA lint of every upstream commit.
+  - **Load mod…** — pick one or more mod folders (the directory containing
+    `common/`); they are parsed in your browser by `js/pdxparse.js` (a port
+    of the Python pipeline, kept honest by `tests/pdxparse-test.mjs`) and
+    merged in load order against the baked vanilla data. The **Mods** panel
+    lists them with enable/disable, reorder, and remove; names come from
+    each mod's `descriptor.mod`. Nothing is uploaded. Useful for previewing
+    uncommitted local changes, and for seeing how a mod list assembles —
+    e.g. loading ACOT alongside Gigastructures resolves the `@acot_*`
+    placeholder techs. Limitation: browsers cannot decode `.dds`, so techs
+    from mods other than Gigastructures render without icons.
 - `?theme=palette-a|ink` switches colour themes (also in the header).
 - Deep links: `?tech=<id>&q=<search>&cats=<list>&src=<filter>`.
 - Performance: cards are DOM nodes in one CSS-transformed container with

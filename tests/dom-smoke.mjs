@@ -88,49 +88,81 @@ try {
     if (ghosts.length) fail2("cards stayed culled after filter clear");
   }
 
-  // dev local-mod flow: feed real mod files through the browser-side path
+  // dev multi-mod flow: real Gigas as source A + a synthetic override mod
+  // as source B; asserts descriptor naming, load-order override, and
+  // enable/disable.
   {
-    const { loadLocalMod } = await import(pathToFileURL("js/localmod.js").href);
-    const { compose } = await import(pathToFileURL("js/data.js").href);
+    const { readModSource, buildFromSources } =
+      await import(pathToFileURL("js/localmod.js").href);
     const { readFileSync: rf, readdirSync, existsSync } = await import("fs");
     if (existsSync("/home/claude/gigas-src/common/technology")) {
-      const mk = (p, root) => ({
+      const root = "/home/claude/gigas-src";
+      const mk = (p, folder = "Gigastructures") => ({
         name: p.split("/").pop(),
-        webkitRelativePath: "mod/" + p,
-        // Node Buffers view a shared pool; slice to this file's bytes
-        // (browser File.arrayBuffer() has no such trap).
+        webkitRelativePath: folder + "/" + p,
         arrayBuffer: async () => {
           const b = rf(root + "/" + p);
           return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
         },
       });
-      const files = [];
-      const root = "/home/claude/gigas-src";
+      const files = [mk("descriptor.mod")];
       for (const f of readdirSync(root + "/common/technology"))
-        if (f.endsWith(".txt")) files.push(mk("common/technology/" + f, root));
+        if (f.endsWith(".txt")) files.push(mk("common/technology/" + f));
       for (const f of readdirSync(root + "/common/scripted_variables"))
-        files.push(mk("common/scripted_variables/" + f, root));
-      const walk = (dir, relp) => {
+        files.push(mk("common/scripted_variables/" + f));
+      const walk = dir => {
         for (const e of readdirSync(root + "/" + dir, { withFileTypes: true })) {
-          if (e.isDirectory()) walk(dir + "/" + e.name, relp + "/" + e.name);
-          else if (e.name.endsWith(".txt"))
-            files.push(mk(dir + "/" + e.name, root));
+          if (e.isDirectory()) walk(dir + "/" + e.name);
+          else if (e.name.endsWith(".txt")) files.push(mk(dir + "/" + e.name));
         }
       };
-      walk("common/inline_scripts", "common/inline_scripts");
+      walk("common/inline_scripts");
       for (const f of readdirSync(root + "/localisation/english"))
-        if (f.endsWith(".yml"))
-          files.push(mk("localisation/english/" + f, root));
-      const localModel = await loadLocalMod(files, "Gigas-local");
-      console.log("localmod techs:", localModel.technologies.length,
-        " parse errors:", localModel.meta.parseErrors.length);
-      const t = localModel.technologies.find(
-        x => x.id === "giga_tech_repeatable_dyson_swarm_cap");
-      console.log("localmod dyson swarm:", t?.name, "T", t?.tier,
-        "cost", t?.cost);
-      if (localModel.technologies.length < 250) fail2("localmod too few techs");
-      if (t?.name !== "Dyson Swarm Management Protocols")
-        fail2("localmod inline/loc pipeline broken: " + t?.name);
+        if (f.endsWith(".yml")) files.push(mk("localisation/english/" + f));
+
+      const gigas = await readModSource(files);
+      console.log("mod A label from descriptor:", gigas.label);
+      if (gigas.label !== "Gigastructural Engineering DEV")
+        fail2("descriptor.mod name not picked up: " + gigas.label);
+
+      // synthetic second mod overriding one Gigas tech
+      const enc = new TextEncoder();
+      const buf = str => enc.encode(str).buffer;
+      const modB = [
+        { name: "descriptor.mod", webkitRelativePath: "OtherMod/descriptor.mod",
+          arrayBuffer: async () => buf('name="Test Override Mod"\n') },
+        { name: "zz_over.txt",
+          webkitRelativePath: "OtherMod/common/technology/zz_over.txt",
+          arrayBuffer: async () =>
+            buf("giga_tech_alderson_disk = { tier = 9 cost = 4242 area = physics category = { computing } }\n") },
+      ];
+      const other = await readModSource(modB);
+      if (other.label !== "Test Override Mod")
+        fail2("mod B descriptor name wrong: " + other.label);
+
+      let merged = await buildFromSources([gigas, other]);
+      let ad = merged.technologies.find(t => t.id === "giga_tech_alderson_disk");
+      console.log("merged techs:", merged.technologies.length,
+        "| alderson tier:", ad.tier, "cost:", ad.cost,
+        "| source:", ad.sourceLabel, "| override:", ad.overridesVanilla);
+      if (ad.tier !== 9 || ad.cost !== 4242)
+        fail2("later mod did not override earlier one");
+      if (!ad.overridesVanilla) fail2("override not flagged");
+
+      // reverse the order: Gigas should win now
+      merged = await buildFromSources([other, gigas]);
+      ad = merged.technologies.find(t => t.id === "giga_tech_alderson_disk");
+      if (ad.tier === 9) fail2("load order reversal had no effect");
+      console.log("order reversed — alderson tier back to:", ad.tier);
+
+      // disable the override mod
+      other.enabled = false;
+      merged = await buildFromSources([gigas, other]);
+      ad = merged.technologies.find(t => t.id === "giga_tech_alderson_disk");
+      if (ad.tier === 9) fail2("disabled mod still applied");
+      console.log("disable works — alderson tier:", ad.tier,
+        "| parse errors:", merged.meta.parseErrors.length);
+      if (merged.meta.parseErrors.length) fail2("parse errors in merge");
     } else {
       console.log("localmod: source checkout absent, skipped (CI)");
     }

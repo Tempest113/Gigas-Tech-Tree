@@ -13,6 +13,7 @@ let view = null;
 let model = null;
 let panels = null;
 let explore = null;
+let modSources = [];   // dev: ordered list of locally-loaded mod folders
 
 const DEV = new URLSearchParams(location.search).has("dev");
 
@@ -29,6 +30,93 @@ async function boot() {
   } catch (err) {
     status.textContent =
       `Could not load data — ${err.message}. Run tools/build_data.py first.`;
+  }
+}
+
+/* Rebuild the view from the current local mod list (dev feature). With no
+   mods loaded, falls back to the shipped Gigastructures dataset. */
+async function refreshMods() {
+  const status = $("status");
+  const hasMods = modSources.length > 0;
+  $("localmod-reset").hidden = !hasMods;
+  $("modlist-btn").hidden = !DEV;
+  renderModList();
+  if (!hasMods) { await boot(); return; }
+  status.textContent = "Merging mods\u2026";
+  status.hidden = false;
+  try {
+    const { buildFromSources } = await import("./localmod.js");
+    const merged = await buildFromSources(modSources);
+    showModel(compose(merged, await loadVanilla()));
+    const enabled = modSources.filter(s => s.enabled).length;
+    $("build-info").textContent =
+      `${enabled}/${modSources.length} mods \u00b7 ` +
+      `${merged.technologies.length} techs (local)`;
+    renderModList(merged);
+    status.hidden = true;
+  } catch (err) {
+    status.textContent = `Merge failed \u2014 ${err.message}`;
+  }
+}
+
+function renderModList(merged) {
+  const host = $("modlist");
+  if (!host) return;
+  host.replaceChildren();
+  const counts = new Map();
+  for (const t of merged?.technologies ?? [])
+    counts.set(t.source, (counts.get(t.source) ?? 0) + 1);
+
+  modSources.forEach((s, i) => {
+    const li = document.createElement("li");
+    li.classList.toggle("disabled", !s.enabled);
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = s.enabled;
+    cb.title = "Include this mod in the merge";
+    cb.onchange = () => { s.enabled = cb.checked; refreshMods(); };
+
+    const name = document.createElement("span");
+    name.className = "mod-name";
+    name.textContent = s.label;
+    name.title = s.id;
+
+    const count = document.createElement("span");
+    count.className = "mod-count";
+    count.textContent = counts.has(s.id) ? `${counts.get(s.id)} techs` : "";
+
+    const up = document.createElement("button");
+    up.textContent = "\u2191";
+    up.title = "Load earlier (lower priority)";
+    up.disabled = i === 0;
+    up.onclick = () => {
+      [modSources[i - 1], modSources[i]] = [modSources[i], modSources[i - 1]];
+      refreshMods();
+    };
+
+    const down = document.createElement("button");
+    down.textContent = "\u2193";
+    down.title = "Load later (higher priority)";
+    down.disabled = i === modSources.length - 1;
+    down.onclick = () => {
+      [modSources[i + 1], modSources[i]] = [modSources[i], modSources[i + 1]];
+      refreshMods();
+    };
+
+    const rm = document.createElement("button");
+    rm.textContent = "\u2715";
+    rm.title = "Remove";
+    rm.onclick = () => { modSources.splice(i, 1); refreshMods(); };
+
+    li.append(cb, name, count, up, down, rm);
+    host.appendChild(li);
+  });
+
+  if (!modSources.length) {
+    const li = document.createElement("li");
+    li.textContent = "No mods loaded \u2014 showing the shipped dataset.";
+    host.appendChild(li);
   }
 }
 
@@ -88,39 +176,38 @@ function bindChrome(jump) {
   // report. Visible only with ?dev in the URL.
   if (DEV) {
     $("health-btn").hidden = false;
+    $("health-btn").onclick = e => {
+      e.stopPropagation();
+      $("health-panel").hidden = !$("health-panel").hidden;
+    };
     $("localmod-btn").hidden = false;
     $("localmod-btn").onclick = () => $("localmod-input").click();
+    $("modlist-btn").onclick = e => {
+      e.stopPropagation();
+      $("modlist-panel").hidden = !$("modlist-panel").hidden;
+    };
+    $("modlist-add").onclick = () => $("localmod-input").click();
+    $("modlist-clear").onclick = () => { modSources = []; refreshMods(); };
     $("localmod-input").onchange = async e => {
       const files = [...e.target.files];
+      e.target.value = "";
       if (!files.length) return;
       const status = $("status");
-      status.textContent = "Parsing mod locally…";
+      status.textContent = "Reading mod\u2026";
       status.hidden = false;
       try {
-        const { loadLocalMod } = await import("./localmod.js");
-        const folder = files[0].webkitRelativePath?.split("/")[0] || "Local mod";
-        const localModel = await loadLocalMod(files, folder);
-        showModel(compose(localModel, await loadVanilla()));
-        $("localmod-reset").hidden = false;
-        $("build-info").textContent =
-          `${folder} · ${localModel.technologies.length} techs (local)`;
-        status.hidden = true;
+        const { readModSource } = await import("./localmod.js");
+        const src = await readModSource(files);
+        const dup = modSources.findIndex(s => s.id === src.id);
+        if (dup !== -1) modSources[dup] = src; else modSources.push(src);
+        await refreshMods();
       } catch (err) {
-        status.textContent = `Local mod failed — ${err.message}`;
+        status.textContent = `Could not read mod \u2014 ${err.message}`;
       }
-      e.target.value = "";
     };
-    $("localmod-reset").onclick = () => {
-      $("localmod-reset").hidden = true;
-      boot();
-    };
+    $("localmod-reset").onclick = () => { modSources = []; refreshMods(); };
   }
-  $("health-btn").onclick = e => {
-    e.stopPropagation();
-    $("health-panel").hidden = !$("health-panel").hidden;
-  };
 
-  // Click outside any open modal panel closes it.
   document.addEventListener("pointerdown", e => {
     for (const p of document.querySelectorAll(".modal-panel:not([hidden])")) {
       if (!p.contains(e.target)) p.hidden = true;

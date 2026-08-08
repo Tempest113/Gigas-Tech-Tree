@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 <header class="app-header">
@@ -22,6 +22,7 @@
       Load mod…</button>
     <input id="localmod-input" type="file" webkitdirectory multiple hidden>
     <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
+    <button id="modlist-btn" class="header-btn" hidden>Mods</button>
     <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
     <span id="build-info" class="build-info" title="Upstream commit"></span>
   </div>
@@ -67,6 +68,19 @@
 
   <div id="explore-tab" class="tab-panel" hidden></div>
 
+  <aside id="modlist-panel" class="modal-panel" hidden aria-label="Loaded mods">
+    <button class="detail-close" data-close="modlist-panel" aria-label="Close">×</button>
+    <h2>Loaded mods</h2>
+    <p class="modlist-note">Merged top to bottom — mods lower in the list
+    override those above, matching Paradox load order. Parsed in your browser;
+    nothing is uploaded.</p>
+    <ol id="modlist" class="modlist"></ol>
+    <div class="modlist-actions">
+      <button id="modlist-add" class="header-btn">Add mod…</button>
+      <button id="modlist-clear" class="header-btn">Remove all</button>
+    </div>
+  </aside>
+
   <aside id="health-panel" class="modal-panel" hidden aria-label="Build health">
     <button class="detail-close" data-close="health-panel" aria-label="Close">×</button>
     <h2>Build health</h2>
@@ -76,6 +90,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=12"></script>
+<script type="module" src="js/main.js?v=13"></script>
 </body>
 </html>
