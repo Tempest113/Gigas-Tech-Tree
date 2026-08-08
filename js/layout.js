@@ -79,11 +79,16 @@ export function layout(techs, visible = null) {
     const ac = sectionArea.get(cat);
     ac.set(t.area, (ac.get(t.area) ?? 0) + 1);
   }
+  // Matches panels.js: a category spread across areas is not filed under
+  // any single one.
   const dominantArea = cat => {
-    let best = null, n = -1;
-    for (const [a, c] of sectionArea.get(cat)) {
+    const m = sectionArea.get(cat);
+    let best = null, n = -1, total = 0;
+    for (const [a, c] of m) {
+      total += c;
       if (c > n || (c === n && String(a) < String(best))) { best = a; n = c; }
     }
+    if (m.size > 1 && n / total < 0.8) return null;
     return best;
   };
   const sectionKeys = [...sections.keys()].sort((a, b) => {
@@ -150,9 +155,11 @@ export function layout(techs, visible = null) {
 
   const pos = new Map();
   const furniture = [];
+  const sectionTops = [];
   let yCursor = SECTION_PAD_TOP;
 
   for (const key of sectionKeys) {
+    sectionTops.push(yCursor);
     const cells = sectionCells.get(key);
     const flatCols = [];
     for (const tierCols of cells) for (const c of tierCols) flatCols.push(c);
@@ -183,18 +190,23 @@ export function layout(techs, visible = null) {
     yCursor += sectionH + SECTION_GAP;
   }
 
-  furniture.push({ kind: "tierlabel", text: "Untiered",
-                   x: tierX[0], y: 14 });
-  tiers.forEach((t, i) => {
-    furniture.push({ kind: "tierlabel", text: `Tier ${t}`,
-                     x: tierX[i + 1], y: 14 });
-    furniture.push({ kind: "tierdivider", x: tierX[i + 1] - TIER_GAP / 2,
-                     y: 0, h: yCursor });
-  });
-  furniture.push({ kind: "tierlabel", text: "Repeatables",
-                   x: tierX[REP], y: 14 });
-  furniture.push({ kind: "tierdivider", x: tierX[REP] - TIER_GAP / 2,
-                   y: 0, h: yCursor });
+  // Tier columns: a full-height wash alternating in brightness so tier
+  // boundaries read at any zoom, plus labels repeated above every section
+  // (not just at the top of the world).
+  const colLabel = i =>
+    i === 0 ? "Untiered" : i === REP ? "Repeatables" : `Tier ${tiers[i - 1]}`;
+  for (let i = 0; i < nTiers; i++) {
+    furniture.push({
+      kind: "tiercolumn", index: i, parity: i % 2,
+      x: tierX[i] - TIER_GAP / 2, y: 0,
+      w: tierW[i] + TIER_GAP, h: yCursor,
+    });
+    furniture.push({ kind: "tierlabel", text: colLabel(i), x: tierX[i], y: 14 });
+    for (const y of sectionTops) {
+      furniture.push({ kind: "tierlabel", text: colLabel(i),
+                       x: tierX[i], y: y - 34, small: true });
+    }
+  }
 
   return { pos, furniture, width: worldW, height: yCursor };
 }

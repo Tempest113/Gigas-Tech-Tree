@@ -118,6 +118,7 @@ def extract(game_dir: Path, game_version: str,
                 "isRare": b.get_last("is_rare") == "yes",
                 "isDangerous": b.get_last("is_dangerous") == "yes",
                 "isRepeatable": levels is not None,
+                "levels": _resolved_num("levels"),
             })
 
     tiers = {}
@@ -173,6 +174,10 @@ def main() -> None:
                     help="include tech display names")
     ap.add_argument("--desc", action="store_true",
                     help="include tech descriptions (implies --loc)")
+    ap.add_argument("--fill-loc-keys", type=Path,
+                    default=Path("data/unresolved-loc-keys.json"),
+                    help="JSON list of loc keys the mod couldn't resolve; "
+                         "their vanilla values are captured into locExtra")
     ap.add_argument("--icons", type=Path, default=None, metavar="OUTDIR",
                     help="convert vanilla tech icons (.dds) to PNG in OUTDIR")
     args = ap.parse_args()
@@ -180,6 +185,19 @@ def main() -> None:
     model = extract(args.game_dir, args.game_version,
                     include_names=args.loc or args.desc,
                     include_desc=args.desc)
+
+    # Capture vanilla values for substitution keys the mod references but
+    # does not define (e.g. $orbital_arc_furnace_4$).
+    if args.fill_loc_keys and args.fill_loc_keys.is_file():
+        wanted = json.loads(args.fill_loc_keys.read_text(encoding="utf-8"))
+        loc_all = load_loc(args.game_dir)
+        extra = {}
+        for k in wanted:
+            v = loc_all.get(k)
+            if v:
+                extra[k] = v
+        model["locExtra"] = dict(sorted(extra.items()))
+        print(f"loc keys filled: {len(extra)}/{len(wanted)}")
     if args.icons:
         from tools.icons import convert_icons
         icon_src = (args.game_dir / "gfx" / "interface" / "icons"

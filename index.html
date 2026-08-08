@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 <header class="app-header">
@@ -23,6 +23,7 @@
     <input id="localmod-input" type="file" webkitdirectory multiple hidden>
     <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
     <button id="modlist-btn" class="header-btn" hidden>Mods</button>
+    <button id="guide-btn" class="header-btn" title="How to read this tree">Guide</button>
     <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
     <span id="build-info" class="build-info" title="Upstream commit"></span>
     <span id="app-version" class="build-info" title="Tool version"></span>
@@ -69,6 +70,54 @@
 
   <div id="explore-tab" class="tab-panel" hidden></div>
 
+  <aside id="guide-panel" class="modal-panel" hidden aria-label="Guide">
+    <button class="detail-close" data-close="guide-panel" aria-label="Close">×</button>
+    <h2>Reading the tree</h2>
+
+    <h3>Layout</h3>
+    <p>Columns are research tiers, left to right, with repeatables in their
+    own column at the far right. Within a tier, a technology sits one column
+    further right for each same-tier prerequisite in its chain, so short
+    flows read left to right. Rows are grouped into categories; each band is
+    tinted by its research area.</p>
+    <p>In game, a tier is only available once you have researched
+    <strong>six technologies of the previous tier in the same area</strong>
+    (physics, society, engineering counted separately). Tier 1 has no such
+    requirement.</p>
+
+    <h3>Cards</h3>
+    <ul class="legend">
+      <li><span class="sw" data-area="physics"></span> Physics</li>
+      <li><span class="sw" data-area="society"></span> Society</li>
+      <li><span class="sw" data-area="engineering"></span> Engineering</li>
+      <li><span class="sw" data-kind="rare"></span> Rare technology</li>
+      <li><span class="sw" data-kind="blokkat"></span> Blokkats category</li>
+      <li><span class="sw" data-kind="stub"></span> From another mod, not loaded</li>
+    </ul>
+    <p><code>T3</code> is the tier. <code>∞</code> marks an unlimited
+    repeatable; <code>×40</code> a repeatable capped at 40 levels. A red line
+    marks a dangerous technology. The number under the name is research cost.</p>
+
+    <h3>Interaction</h3>
+    <ul>
+      <li>Click a technology to select it: its prerequisites and unlocks stay
+      highlighted, everything else dims. Click empty space to clear.</li>
+      <li>Hover previews the same highlight when nothing is selected.</li>
+      <li>Drag to pan, scroll to zoom, or use the controls bottom-right.</li>
+      <li><kbd>F</kbd> search · <kbd>Esc</kbd> deselect · <kbd>Backspace</kbd> back</li>
+      <li>The sidebar filters by category and by source; unchecking a
+      category removes its row entirely.</li>
+      <li>The <strong>Explore</strong> tab lists everything as a sortable
+      table.</li>
+    </ul>
+
+    <h3>Sources</h3>
+    <p>Technologies are shown from Gigastructural Engineering &amp; More
+    merged over base Stellaris. Cards badged <em>overrides vanilla</em>
+    replace a base-game technology; <em>requires another mod</em> means the
+    technology only appears if that mod is also installed.</p>
+  </aside>
+
   <aside id="modlist-panel" class="modal-panel" hidden aria-label="Loaded mods">
     <button class="detail-close" data-close="modlist-panel" aria-label="Close">×</button>
     <h2>Loaded mods</h2>
@@ -91,6 +140,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=15"></script>
+<script type="module" src="js/main.js?v=17"></script>
 </body>
 </html>

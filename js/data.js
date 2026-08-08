@@ -51,7 +51,7 @@ export function compose(model, vanilla) {
         icon: v.icon ?? v.id,   // explicit key, else id-named file
         area: v.area, categories: v.categories, tier: v.tier,
         cost: v.cost ?? null, weight: v.weight ?? null,
-        levels: null, costPerLevel: null,
+        levels: v.levels ?? null, costPerLevel: null,
         isStart: v.isStart, isRare: v.isRare, isDangerous: v.isDangerous,
         isRepeatable: v.isRepeatable,
         prerequisites: v.prerequisites, unlocks: [],

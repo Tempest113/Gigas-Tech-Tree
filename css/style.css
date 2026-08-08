@@ -92,6 +92,7 @@ select {
 .sidebar-area.area-physics { color: var(--physics); }
 .sidebar-area.area-society { color: var(--society); }
 .sidebar-area.area-engineering { color: var(--engineering); }
+.sidebar-area.area-cross-area { color: var(--blokkat); }
 .sidebar-cat {
   display: flex; align-items: center; gap: 6px;
   font-size: 12.5px; padding: 2px 0; cursor: pointer;
@@ -383,3 +384,37 @@ select {
 }
 .modlist button:hover { color: var(--text); background: var(--card-hover); }
 .modlist-actions { display: flex; gap: 6px; }
+
+/* -- tier columns & small labels ----------------------------------------- */
+.tier-column {
+  position: absolute; pointer-events: none;
+  background: rgba(255, 255, 255, 0.014);
+}
+.tier-column[data-parity="1"] { background: rgba(255, 255, 255, 0.038); }
+.tier-label-small {
+  font-size: 10px; letter-spacing: 0.16em; opacity: 0.55;
+}
+
+/* -- guide panel --------------------------------------------------------- */
+#guide-panel p { font-size: 12.5px; line-height: 1.5; }
+#guide-panel ul { margin: 0 0 8px; padding-left: 16px; font-size: 12.5px; }
+#guide-panel kbd {
+  font-family: var(--font-data); font-size: 11px;
+  border: 1px solid var(--line); border-radius: 3px;
+  padding: 0 4px; background: var(--card);
+}
+.legend { list-style: none; padding-left: 0 !important; }
+.legend li { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.legend .sw {
+  width: 22px; height: 12px; border-radius: 3px;
+  border: 1px solid var(--line); background: var(--card);
+  border-left: 3px solid var(--muted);
+}
+.legend .sw[data-area="physics"] { border-left-color: var(--physics); }
+.legend .sw[data-area="society"] { border-left-color: var(--society); }
+.legend .sw[data-area="engineering"] { border-left-color: var(--engineering); }
+.legend .sw[data-kind="rare"] { border-left-color: var(--rare); }
+.legend .sw[data-kind="blokkat"] { border-left-color: var(--blokkat); }
+.legend .sw[data-kind="stub"] {
+  border-left-color: var(--rare); border-style: dashed; background: transparent;
+}

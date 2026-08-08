@@ -21,6 +21,8 @@ for (const k of ["document","window","location","history","localStorage",
 globalThis.window = window;
 globalThis.confirm = () => true;
 globalThis.ResizeObserver = class { observe(){} disconnect(){} };
+// jsdom has no canvas engine: stub the pieces render.js touches.
+globalThis.Path2D = class { moveTo(){} lineTo(){} bezierCurveTo(){} };
 // canvas 2d stub
 const noop = new Proxy({}, { get: () => () => noop, set: () => true });
 window.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {

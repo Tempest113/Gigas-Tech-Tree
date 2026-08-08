@@ -37,10 +37,16 @@ export class Panels {
       const m = areaOf.get(c);
       m.set(t.area, (m.get(t.area) ?? 0) + 1);
     }
+    // A category whose techs span research areas (Blokkats: physics,
+    // society and engineering) doesn't belong under any one area heading.
     const dominant = c => {
-      let best = null, n = -1;
-      for (const [a, k] of areaOf.get(c))
+      const m = areaOf.get(c);
+      let best = null, n = -1, total = 0;
+      for (const [a, k] of m) {
+        total += k;
         if (k > n || (k === n && String(a) < String(best))) { best = a; n = k; }
+      }
+      if (m.size > 1 && n / total < 0.8) return "cross-area";
       return best ?? "other";
     };
     const groups = new Map();
@@ -50,13 +56,13 @@ export class Panels {
       groups.get(a).push(c);
     }
 
-    const order = ["physics", "society", "engineering", "other"];
+    const order = ["physics", "society", "engineering", "cross-area", "other"];
     for (const area of order) {
       const cats = groups.get(area);
       if (!cats) continue;
       const h = document.createElement("h3");
       h.className = `sidebar-area area-${area}`;
-      h.textContent = area;
+      h.textContent = area === "cross-area" ? "cross-area" : area;
       host.appendChild(h);
       for (const c of cats) {
         const label = document.createElement("label");

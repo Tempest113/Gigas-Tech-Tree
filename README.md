@@ -8,6 +8,8 @@ at build time; the browser loads pre-baked JSON.
 **Live:** enable GitHub Pages for this repo (Settings → Pages → Source:
 GitHub Actions) and the *Deploy Pages* workflow publishes it.
 
+Version history: [CHANGELOG.md](CHANGELOG.md).
+
 ## Quick start (local)
 
 ```bash
@@ -48,8 +50,18 @@ python tools/extract_vanilla.py \
 # optionally after a game patch adds icons:  --icons vanilla-icons
 ```
 
+Repo path (maintainer): `/home/Tempest1273/Github/Gigas-Tech-Tree/`.
+
 Re-run after each Stellaris patch and commit the JSON (plus any new icon
-PNGs into `assets/icons/`). Techs referencing IDs from other mods (e.g.
+PNGs into `assets/icons/`, using `cp -n` so existing files aren't clobbered).
+Push the vanilla commit **before** the weekly mod refresh runs: the mod build
+resolves `@tier5cost2`-style variables against whichever
+`vanilla-structural.json` is committed.
+
+The build writes `data/unresolved-loc-keys.json` listing substitution keys
+the mod references but doesn't define (e.g. `$orbital_arc_furnace_4$`). The
+extractor reads that file automatically and captures those keys' vanilla
+values into `locExtra`, so re-running the extractor after a build fixes them. Techs referencing IDs from other mods (e.g.
 ACOT) render as "external mod" stubs.
 
 ## Architecture

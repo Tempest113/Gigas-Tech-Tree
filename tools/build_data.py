@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools.graph import build_graph, to_json_model
 from tools.inline_scripts import InlineScriptLibrary
-from tools.loc import LocTable
+from tools.loc import LocEntry, LocTable
 from tools.merge import MergeResult, Source, merge_sources
 from tools.pdx.parser import Block, parse_bytes
 from tools.pdx.values import VarTable
@@ -39,6 +39,19 @@ def load_variables(mod_dir: Path, vanilla_vars: VarTable | None) -> VarTable:
         for f in sorted(var_dir.glob("*.txt")):
             table.load_definitions(parse_bytes(f.read_bytes()), f.name)
     return table
+
+
+def load_vanilla_loc(path: Path, loc: LocTable) -> int:
+    """Seed the loc table with vanilla entries the extractor captured for
+    keys the mod references but doesn't define (e.g. $orbital_arc_furnace_4$).
+    Loaded BEFORE mod loc so mod definitions still win."""
+    if not path.is_file():
+        return 0
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    extra = doc.get("locExtra") or {}
+    for k, v in extra.items():
+        loc.entries[k] = LocEntry(v, "vanilla-structural.json", 0)
+    return len(extra)
 
 
 def load_vanilla_structural(path: Path) -> VarTable:
@@ -76,6 +89,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
           vanilla_path: Path | None = None,
           ) -> dict:
     loc = LocTable()
+    if vanilla_path:
+        load_vanilla_loc(vanilla_path, loc)
     loc_dir = mod_dir / "localisation" / "english"
     if loc_dir.is_dir():
         for f in sorted(loc_dir.glob("*.yml")):
@@ -125,6 +140,20 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         "parseErrors": merged.parse_errors,
         "mergeWarnings": merged.warnings,
     }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Record substitution keys that stayed unresolved so the maintainer can
+    # capture them from vanilla loc on the next extractor run.
+    import re as _re
+    unresolved = sorted({
+        m for t in graph.techs.values()
+        for m in _re.findall(r"\$([A-Za-z0-9_.\-']+)\$",
+                             f"{t.name or ''} {t.desc or ''}")
+    })
+    meta["unresolvedLocKeys"] = unresolved
+    (out_dir if out_dir.is_dir() else Path(".")).mkdir(parents=True, exist_ok=True)
+    (out_dir / "unresolved-loc-keys.json").write_text(
+        json.dumps(unresolved, indent=1) + "\n", encoding="utf-8")
+
     model = to_json_model(graph, categories, meta)
 
     n = len(graph.techs)
@@ -132,7 +161,6 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         raise SystemExit(
             f"BUILD FAILED: {n} technologies < floor {TECH_COUNT_FLOOR}")
 
-    out_dir.mkdir(parents=True, exist_ok=True)
     dataset = f"{mod_id}-{commit[:12]}.json" if commit != "unknown" \
         else f"{mod_id}.json"
     (out_dir / dataset).write_text(

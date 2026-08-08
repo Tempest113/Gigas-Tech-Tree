@@ -19,7 +19,7 @@ const DEV = new URLSearchParams(location.search).has("dev");
 
 /* Tool version. Bump on release and keep index.html's ?v= cache-buster in
    step so a stale browser cache can't serve mismatched JS/CSS. */
-export const APP_VERSION = "1.0.0";
+export const APP_VERSION = "1.1.1";
 
 async function boot() {
   const status = $("status");
@@ -180,6 +180,11 @@ function bindChrome(jump) {
   for (const x of document.querySelectorAll("[data-close]"))
     x.onclick = () => { $(x.dataset.close).hidden = true; };
 
+  $("guide-btn").onclick = e => {
+    e.stopPropagation();
+    $("guide-panel").hidden = !$("guide-panel").hidden;
+  };
+
   // Health is a mod-developer instrument; end users don't need a lint
   // report. Visible only with ?dev in the URL.
   if (DEV) {
@@ -304,7 +309,10 @@ function showDetail(id) {
   if (t.crossModGated) addBadge("requires another mod", "crossmod");
   if (t.isRare) addBadge("rare");
   if (t.isDangerous) addBadge("dangerous");
-  if (t.isRepeatable) addBadge("repeatable");
+  if (t.isRepeatable) {
+    addBadge(t.levels > 0 ? `repeatable · ${t.levels} levels`
+      : t.levels === -1 ? "repeatable · unlimited" : "repeatable");
+  }
   body.appendChild(badges);
 
   if (t.desc) {

@@ -4,6 +4,14 @@
 
 import { CARD_W, CARD_H } from "./layout.js";
 
+function addEdge(path, from, to) {
+  const x1 = from.x + CARD_W, y1 = from.y + CARD_H / 2;
+  const x2 = to.x, y2 = to.y + CARD_H / 2;
+  const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
+  path.moveTo(x1, y1);
+  path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
+}
+
 export class MapView {
   constructor(stage, worldEl, canvas, model, lay, onSelect) {
     this.stage = stage;
@@ -46,12 +54,18 @@ export class MapView {
         el.className = "section-rule";
         el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
         el.style.width = `${f.w}px`;
+      } else if (f.kind === "tiercolumn") {
+        el.className = "tier-column";
+        el.dataset.parity = String(f.parity);
+        el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
+        el.style.width = `${f.w}px`; el.style.height = `${f.h}px`;
       } else if (f.kind === "tierdivider") {
         el.className = "tier-divider";
         el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
         el.style.height = `${f.h}px`;
       } else {
-        el.className = "tier-label"; el.textContent = f.text;
+        el.className = "tier-label" + (f.small ? " tier-label-small" : "");
+        el.textContent = f.text;
         el.style.left = `${f.x}px`; el.style.top = `${f.y}px`;
       }
       frag.appendChild(el);
@@ -100,10 +114,14 @@ export class MapView {
       if (t.tier !== null || t.isRepeatable) {
         const badge = document.createElement("span");
         badge.className = "tech-tier-badge";
-        badge.textContent =
-          (t.tier !== null ? `T${t.tier}` : "") +
-          (t.isRepeatable ? "\u221e" : "");
-        badge.title = t.isRepeatable ? "Repeatable" : "";
+        const rep = !t.isRepeatable ? ""
+          : t.levels > 0 ? ` \u00d7${t.levels}`
+          : t.levels === -1 ? " \u221e" : " \u21bb";
+        badge.textContent = (t.tier !== null ? `T${t.tier}` : "") + rep;
+        badge.title = !t.isRepeatable ? ""
+          : t.levels > 0 ? `Repeatable, ${t.levels} levels`
+          : t.levels === -1 ? "Repeatable, unlimited levels"
+          : "Repeatable";
         sub.appendChild(badge);
       }
       text.appendChild(sub);
@@ -196,8 +214,11 @@ export class MapView {
         `translate(${this.tx}px, ${this.ty}px) scale(${this.scale})`;
       const readout = document.getElementById("zoom-readout");
       if (readout) readout.textContent = `${Math.round(this.scale * 100)}%`;
-      this.cull();
       this.drawEdges();
+      // Culling touches every card's inline style, which is layout work; do
+      // it once the view settles rather than on every frame of a wheel spin.
+      clearTimeout(this._cullTimer);
+      this._cullTimer = setTimeout(() => this.cull(), 90);
     });
   }
 
@@ -234,6 +255,43 @@ export class MapView {
     this.drawEdges();
   }
 
+  /* Edge geometry lives in world coordinates, so it does not change when
+     the view pans or zooms. Build the paths once per layout/filter and
+     stroke them under a canvas transform; rebuilding ~1400 beziers on every
+     frame of a zoom was the real cost, not the number of pixels. */
+  _buildEdgePaths() {
+    const near = new Path2D(), far = new Path2D();
+    for (const [id, p] of this.lay.pos) {
+      if (this.visible !== null && !this.visible.has(id)) continue;
+      const t = this.model.techs.get(id);
+      for (const pid of t.prerequisites) {
+        const pp = this.lay.pos.get(pid);
+        if (!pp) continue;
+        if (this.visible !== null && !this.visible.has(pid)) continue;
+        const path = Math.abs(pp.y - p.y) < 2200 ? near : far;
+        addEdge(path, pp, p);
+      }
+    }
+    this._edgePaths = { near, far };
+  }
+
+  _buildLineagePath() {
+    const lin = new Path2D();
+    if (this.lineage) {
+      for (const [id, p] of this.lay.pos) {
+        if (!this.lineage.has(id)) continue;
+        const t = this.model.techs.get(id);
+        for (const pid of t.prerequisites) {
+          if (!this.lineage.has(pid)) continue;
+          const pp = this.lay.pos.get(pid);
+          if (!pp) continue;
+          addEdge(lin, pp, p);
+        }
+      }
+    }
+    this._lineagePath = lin;
+  }
+
   drawEdges() {
     const ctx = this.canvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
@@ -242,58 +300,36 @@ export class MapView {
     ctx.translate(this.tx, this.ty);
     ctx.scale(this.scale, this.scale);
 
+    if (!this._edgePaths) this._buildEdgePaths();
+    if (this._lineagePath === undefined) this._buildLineagePath();
+
     const css = getComputedStyle(document.documentElement);
     const lineCol = css.getPropertyValue("--line").trim() || "#2a3348";
     const hiCol = css.getPropertyValue("--physics").trim() || "#53a8e2";
+    const dim = this.lineage ? 0.05 : 1;
 
-    const vw = this.stage.clientWidth, vh = this.stage.clientHeight;
-    const vx0 = (-this.tx) / this.scale - 300, vx1 = (vw - this.tx) / this.scale + 300;
-    const vy0 = (-this.ty) / this.scale - 300, vy1 = (vh - this.ty) / this.scale + 300;
-
+    ctx.setLineDash([]);
     ctx.lineWidth = 1.25 / this.scale;
-    for (const [id, p] of this.lay.pos) {
-      const t = this.model.techs.get(id);
-      if (this.visible !== null && !this.visible.has(id)) continue;
-      for (const pid of t.prerequisites) {
-        const pp = this.lay.pos.get(pid);
-        if (!pp) continue;
-        if (this.visible !== null && !this.visible.has(pid)) continue;
-        const lox = Math.min(pp.x, p.x), hix = Math.max(pp.x + 208, p.x + 208);
-        const loy = Math.min(pp.y, p.y), hiy = Math.max(pp.y + 64, p.y + 64);
-        if (hix < vx0 || lox > vx1 || hiy < vy0 || loy > vy1) continue;
-        const sameSection = Math.abs(pp.y - p.y) < 2200;
-        const inLineage = this.lineage &&
-          this.lineage.has(id) && this.lineage.has(pid);
-        ctx.strokeStyle = inLineage ? hiCol : lineCol;
-        // Quiet by default; ancestry pops on hover/select; everything else
-        // recedes almost entirely while a lineage is active.
-        ctx.globalAlpha = this.lineage
-          ? (inLineage ? 0.95 : 0.05)
-          : (sameSection ? 0.5 : 0.12);
-        ctx.lineWidth = (inLineage ? 2 : 1.25) / this.scale;
-        ctx.setLineDash(sameSection || inLineage ? [] : [5, 5]);
-        const x1 = pp.x + CARD_W, y1 = pp.y + CARD_H / 2;
-        const x2 = p.x, y2 = p.y + CARD_H / 2;
-        // Cubic bezier with horizontal tangents: distinct endpoints give
-        // distinct curves, so unrelated edges no longer overlap into
-        // phantom connections the way shared orthogonal elbows did.
-        const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
-        ctx.stroke();
-      }
+    ctx.strokeStyle = lineCol;
+    ctx.globalAlpha = 0.5 * dim;
+    ctx.stroke(this._edgePaths.near);
+    ctx.globalAlpha = 0.12 * dim;
+    ctx.setLineDash([5, 5]);
+    ctx.stroke(this._edgePaths.far);
+    ctx.setLineDash([]);
+    if (this.lineage && this._lineagePath) {
+      ctx.strokeStyle = hiCol;
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = 2 / this.scale;
+      ctx.stroke(this._lineagePath);
     }
     ctx.globalAlpha = 1;
-    ctx.setLineDash([]);
   }
 
-  /* Re-lay-out for a new filter. Hidden categories collapse their rows
-     entirely, so node positions change and the world must be rebuilt;
-     the pan/zoom transform is preserved so the user keeps their place. */
   relayout(lay, visibleSet) {
     this.lay = lay;
     this.visible = visibleSet;
+    this._edgePaths = null;
     this.cardEls.clear();
     this.world.replaceChildren();
     this._buildDom();
@@ -312,6 +348,7 @@ export class MapView {
   highlightLineage(id) {
     if (!id) {
       this.lineage = null;
+      this._lineagePath = undefined;
       for (const el of this.cardEls.values()) el.classList.remove("dimmed");
       this.drawEdges();
       return;
@@ -331,6 +368,7 @@ export class MapView {
     for (const [cid, el] of this.cardEls)
       el.classList.toggle("dimmed", !keep.has(cid));
     this.lineage = keep;
+    this._lineagePath = undefined;
     this.drawEdges();
   }
 
