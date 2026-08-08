@@ -16,17 +16,18 @@ export async function loadDataset(entry) {
   const r = await fetch(`data/${entry.file}`);
   if (!r.ok) throw new Error(`${entry.file}: HTTP ${r.status}`);
   const model = await r.json();
-
-  let vanilla = null;
-  try {
-    const rv = await fetch("data/vanilla-structural.json");
-    if (rv.ok) vanilla = await rv.json();
-  } catch { /* absent: mod-only mode */ }
-
-  return compose(model, vanilla);
+  return compose(model, await loadVanilla());
 }
 
-function compose(model, vanilla) {
+export async function loadVanilla() {
+  try {
+    const rv = await fetch("data/vanilla-structural.json");
+    if (rv.ok) return await rv.json();
+  } catch { /* absent: mod-only mode */ }
+  return null;
+}
+
+export function compose(model, vanilla) {
   const byId = new Map();
   for (const t of model.technologies) byId.set(t.id, { ...t, stub: false });
 

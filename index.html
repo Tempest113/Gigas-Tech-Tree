@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 <header class="app-header">
@@ -17,6 +17,11 @@
     <button class="tab" data-tab="explore" role="tab" aria-selected="false">Explore</button>
   </nav>
   <div class="header-controls">
+    <button id="localmod-btn" class="header-btn"
+      title="Load a mod folder (parsed locally, nothing is uploaded)" hidden>
+      Load mod…</button>
+    <input id="localmod-input" type="file" webkitdirectory multiple hidden>
+    <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
     <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
     <span id="build-info" class="build-info" title="Upstream commit"></span>
   </div>
@@ -71,6 +76,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=11"></script>
+<script type="module" src="js/main.js?v=12"></script>
 </body>
 </html>

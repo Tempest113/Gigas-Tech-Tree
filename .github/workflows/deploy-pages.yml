@@ -38,6 +38,7 @@ jobs:
       - name: DOM smoke test (boots the real page)
         run: |
           npm install --no-fund --no-audit jsdom@24
+          node tests/pdxparse-test.mjs
           node tests/dom-smoke.mjs
 
   deploy:

@@ -88,6 +88,54 @@ try {
     if (ghosts.length) fail2("cards stayed culled after filter clear");
   }
 
+  // dev local-mod flow: feed real mod files through the browser-side path
+  {
+    const { loadLocalMod } = await import(pathToFileURL("js/localmod.js").href);
+    const { compose } = await import(pathToFileURL("js/data.js").href);
+    const { readFileSync: rf, readdirSync, existsSync } = await import("fs");
+    if (existsSync("/home/claude/gigas-src/common/technology")) {
+      const mk = (p, root) => ({
+        name: p.split("/").pop(),
+        webkitRelativePath: "mod/" + p,
+        // Node Buffers view a shared pool; slice to this file's bytes
+        // (browser File.arrayBuffer() has no such trap).
+        arrayBuffer: async () => {
+          const b = rf(root + "/" + p);
+          return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+        },
+      });
+      const files = [];
+      const root = "/home/claude/gigas-src";
+      for (const f of readdirSync(root + "/common/technology"))
+        if (f.endsWith(".txt")) files.push(mk("common/technology/" + f, root));
+      for (const f of readdirSync(root + "/common/scripted_variables"))
+        files.push(mk("common/scripted_variables/" + f, root));
+      const walk = (dir, relp) => {
+        for (const e of readdirSync(root + "/" + dir, { withFileTypes: true })) {
+          if (e.isDirectory()) walk(dir + "/" + e.name, relp + "/" + e.name);
+          else if (e.name.endsWith(".txt"))
+            files.push(mk(dir + "/" + e.name, root));
+        }
+      };
+      walk("common/inline_scripts", "common/inline_scripts");
+      for (const f of readdirSync(root + "/localisation/english"))
+        if (f.endsWith(".yml"))
+          files.push(mk("localisation/english/" + f, root));
+      const localModel = await loadLocalMod(files, "Gigas-local");
+      console.log("localmod techs:", localModel.technologies.length,
+        " parse errors:", localModel.meta.parseErrors.length);
+      const t = localModel.technologies.find(
+        x => x.id === "giga_tech_repeatable_dyson_swarm_cap");
+      console.log("localmod dyson swarm:", t?.name, "T", t?.tier,
+        "cost", t?.cost);
+      if (localModel.technologies.length < 250) fail2("localmod too few techs");
+      if (t?.name !== "Dyson Swarm Management Protocols")
+        fail2("localmod inline/loc pipeline broken: " + t?.name);
+    } else {
+      console.log("localmod: source checkout absent, skipped (CI)");
+    }
+  }
+
   // click the Explore tab
   window.document.querySelector('[data-tab="explore"]').dispatchEvent(
     new window.Event("click", { bubbles: true }));

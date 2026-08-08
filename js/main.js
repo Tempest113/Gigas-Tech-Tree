@@ -1,6 +1,6 @@
 /* main.js — bootstrap: manifest → dataset → layout → render. */
 
-import { loadManifest, loadDataset } from "./data.js";
+import { loadManifest, loadDataset, loadVanilla, compose } from "./data.js";
 import { layout } from "./layout.js";
 import { MapView } from "./render.js";
 import { Panels } from "./panels.js";
@@ -20,12 +20,25 @@ async function boot() {
   const status = $("status");
   try {
     const manifest = await loadManifest();
-    model = await loadDataset(manifest.datasets[0]);
-
+    const m0 = await loadDataset(manifest.datasets[0]);
     const commit = manifest.datasets[0].commit ?? "";
     $("build-info").textContent =
       commit && commit !== "unknown" ? commit.slice(0, 10) : "";
+    showModel(m0);
+    status.hidden = true;
+  } catch (err) {
+    status.textContent =
+      `Could not load data — ${err.message}. Run tools/build_data.py first.`;
+  }
+}
 
+function showModel(newModel) {
+  model = newModel;
+  $("world").replaceChildren();
+  $("sidebar-cats").replaceChildren();
+  $("explore-tab").replaceChildren();
+  $("health-body").replaceChildren();
+  {
     const lay = layout(model.techs);
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
                        model, lay, showDetail);
@@ -47,10 +60,6 @@ async function boot() {
     const deepTech = panels.applyUrl();
     if (deepTech && model.techs.has(deepTech)) jump(deepTech);
     bindKeys();
-    status.hidden = true;
-  } catch (err) {
-    status.textContent =
-      `Could not load data — ${err.message}. Run tools/build_data.py first.`;
   }
 }
 
@@ -77,7 +86,35 @@ function bindChrome(jump) {
 
   // Health is a mod-developer instrument; end users don't need a lint
   // report. Visible only with ?dev in the URL.
-  if (DEV) $("health-btn").hidden = false;
+  if (DEV) {
+    $("health-btn").hidden = false;
+    $("localmod-btn").hidden = false;
+    $("localmod-btn").onclick = () => $("localmod-input").click();
+    $("localmod-input").onchange = async e => {
+      const files = [...e.target.files];
+      if (!files.length) return;
+      const status = $("status");
+      status.textContent = "Parsing mod locally…";
+      status.hidden = false;
+      try {
+        const { loadLocalMod } = await import("./localmod.js");
+        const folder = files[0].webkitRelativePath?.split("/")[0] || "Local mod";
+        const localModel = await loadLocalMod(files, folder);
+        showModel(compose(localModel, await loadVanilla()));
+        $("localmod-reset").hidden = false;
+        $("build-info").textContent =
+          `${folder} · ${localModel.technologies.length} techs (local)`;
+        status.hidden = true;
+      } catch (err) {
+        status.textContent = `Local mod failed — ${err.message}`;
+      }
+      e.target.value = "";
+    };
+    $("localmod-reset").onclick = () => {
+      $("localmod-reset").hidden = true;
+      boot();
+    };
+  }
   $("health-btn").onclick = e => {
     e.stopPropagation();
     $("health-panel").hidden = !$("health-panel").hidden;
