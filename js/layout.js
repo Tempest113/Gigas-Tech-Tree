@@ -17,8 +17,15 @@ const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
 const MAX_ROWS = 8;           // wrap taller stacks into extra columns
 const AREA_ORDER = ["physics", "society", "engineering", null];
 
-export function layout(techs) {
-  const nodes = [...techs.values()];
+export function layout(techs, visible = null) {
+  // `visible` (a Set of ids, or null) lets the caller lay out only the
+  // filtered subset, so hidden categories collapse their row entirely
+  // rather than leaving an empty band.
+  const nodes = [...techs.values()]
+    .filter(t => visible === null || visible.has(t.id));
+  if (!nodes.length) {
+    return { pos: new Map(), furniture: [], width: 0, height: 0 };
+  }
 
   const tiers = [...new Set(nodes.filter(t => !t.isRepeatable)
     .map(t => t.tier).filter(t => t !== null))].sort((a, b) => a - b);

@@ -77,6 +77,8 @@ export class ExploreTable {
     for (const t of rows) {
       const tr = document.createElement("tr");
       tr.tabIndex = 0;
+      if (t.area) tr.dataset.area = t.area;
+      if (t.categories[0]) tr.dataset.cat = t.categories[0];
       const cells = [
         t.name, t.area ?? "", (t.categories[0] ?? "").replace(/_/g, " "),
         t.isRepeatable

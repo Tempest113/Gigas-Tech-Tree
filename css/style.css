@@ -339,7 +339,20 @@ select {
 .explore-table td {
   padding: 5px 10px; border-bottom: 1px solid var(--line);
 }
-.explore-table tbody tr { cursor: pointer; }
+.explore-table tbody tr {
+  cursor: pointer;
+  border-left: 3px solid var(--row-accent, transparent);
+}
+.explore-table tbody tr[data-area="physics"] { --row-accent: var(--physics); }
+.explore-table tbody tr[data-area="society"] { --row-accent: var(--society); }
+.explore-table tbody tr[data-area="engineering"] { --row-accent: var(--engineering); }
+.explore-table tbody tr[data-cat="blokkats"] { --row-accent: var(--blokkat); }
+.explore-table tbody tr td:first-child {
+  box-shadow: inset 3px 0 0 var(--row-accent, transparent);
+}
+.explore-table tbody tr[data-area] td:nth-child(2) {
+  color: color-mix(in srgb, var(--row-accent, var(--text)) 75%, var(--text));
+}
 .explore-table tbody tr:hover { background: var(--card); }
 
 
