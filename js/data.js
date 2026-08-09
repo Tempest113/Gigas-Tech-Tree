@@ -62,6 +62,9 @@ export function compose(model, vanilla) {
         isStart: v.isStart, isRare: v.isRare, isDangerous: v.isDangerous,
         isRepeatable: v.isRepeatable,
         prerequisites: v.prerequisites, unlocks: [],
+        ascensionPerks: v.ascensionPerks ?? [], inheritedPerks: [],
+        grantedByPerks: v.grantedByPerks ?? [],
+        perkReasons: v.perkReasons ?? {},
         unlockText: [], weightModifiers: [], swaps: [],
         crossModGated: false, source: "vanilla", overridesVanilla: false,
         sourceFile: null, stub: false, vanillaStructural: true,
@@ -84,6 +87,22 @@ export function compose(model, vanilla) {
     }
   }
   for (const t of byId.values()) t.unlocks.sort();
+
+  // Perk grants from the mod apply to base-game technologies as well.
+  for (const [techId, perks] of Object.entries(model.meta?.perkGrants ?? {})) {
+    const t = byId.get(techId);
+    if (!t) continue;
+    t.grantedByPerks = [...new Set([...(t.grantedByPerks ?? []), ...perks])];
+    t.perkReasons = { ...(t.perkReasons ?? {}) };
+    for (const p of perks) {
+      if (!(t.ascensionPerks ?? []).includes(p)) {
+        t.ascensionPerks = [...(t.ascensionPerks ?? []), p];
+        t.perkReasons[p] = "granted";
+      }
+    }
+  }
+
+  propagatePerks(byId);
 
   // Stubs (ids referenced but defined nowhere — with vanilla data present,
   // these are external-mod techs like ACOT's) collocate with the techs that
@@ -118,6 +137,39 @@ export function compose(model, vanilla) {
   };
 }
 
+/* An ascension perk requirement carries down the prerequisite graph: a
+   technology behind Ring World is equally unreachable without Galactic
+   Wonders. Recomputed here rather than at build time because the mod and
+   vanilla halves are only joined once composed. Depth-first with a visiting
+   set, so prerequisite cycles terminate. */
+function propagatePerks(byId) {
+  const done = new Set();
+  const visiting = new Set();
+
+  const visit = id => {
+    if (done.has(id) || visiting.has(id)) return;
+    visiting.add(id);
+    const t = byId.get(id);
+    if (t) {
+      const inherited = new Set(t.inheritedPerks ?? []);
+      for (const pid of t.prerequisites) {
+        visit(pid);
+        const p = byId.get(pid);
+        if (!p) continue;
+        for (const perk of [...(p.ascensionPerks ?? []),
+                            ...(p.inheritedPerks ?? [])]) {
+          if (!(t.ascensionPerks ?? []).includes(perk)) inherited.add(perk);
+        }
+      }
+      t.inheritedPerks = [...inherited].sort();
+    }
+    visiting.delete(id);
+    done.add(id);
+  };
+
+  for (const id of [...byId.keys()].sort()) visit(id);
+}
+
 function makeStub(id) {
   return {
     id, name: id, nameMissing: false, desc: null,
@@ -125,6 +177,7 @@ function makeStub(id) {
     cost: null, weight: null, levels: null, costPerLevel: null,
     isStart: false, isRare: false, isDangerous: false, isRepeatable: false,
     prerequisites: [], unlocks: [],
+    ascensionPerks: [], inheritedPerks: [],
     unlockText: [], weightModifiers: [], swaps: [],
     crossModGated: false, source: "vanilla", overridesVanilla: false,
     sourceFile: null, stub: true,

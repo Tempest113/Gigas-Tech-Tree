@@ -4,6 +4,124 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.6.4
+
+### Fixed
+
+- Dyson Sphere and Matter Decompressor lost their Galactic Wonders
+  requirement in 1.6.3. They had never carried perk data of their own — they
+  were inheriting it from Mega-Engineering, which 1.6.2 had marked wrongly,
+  so removing that false marking took a correct-looking result with it.
+  The mod's perk grants now apply to base-game technologies as well, which
+  is where the requirement genuinely comes from, and the weight test
+  introduced in 1.6.2 is gone: it only existed to work around the AI-only
+  grant that 1.6.3 fixed at source.
+- The five markings that have each broken at some point — Ring World, Dyson
+  Sphere, Matter Decompressor, Mega-Engineering and Gateway Construction —
+  are now asserted together in the smoke test, so a change cannot fix one by
+  breaking another.
+
+## 1.6.3
+
+### Fixed
+
+- **AI-only perk grants counted as player requirements.** Galactic Wonders
+  hands Mega-Engineering to AI empires only, inside
+  `if = { limit = { is_ai = yes } … }`; the grant collector ignored the
+  surrounding `limit` blocks entirely. Grants now respect their conditions,
+  which removes Mega-Engineering — and everything downstream of it — from
+  the Galactic Wonders requirement.
+
+### Added
+
+- **`data/perk-audit.json` and an "Ascension perk markings" section in the
+  health panel** (`?dev`): every perk attached to every technology, with its
+  provenance — the technology's own `potential`, a perk granting it, or the
+  prerequisite it was inherited from. Markings can now be checked against
+  the script rather than taken on trust.
+
+## 1.6.2
+
+### Fixed
+
+- **False ascension perk requirements.** A perk that hands over a technology
+  was treated as gating it, so Mega-Engineering — granted by Galactic
+  Wonders but with a normal research weight, and reachable without the perk
+  — was marked as requiring it, and the requirement then propagated to
+  everything downstream, including Gateway Construction. A grant now only
+  implies a requirement when the technology cannot come up in research at
+  all, which is what Ring World does and Mega-Engineering does not.
+- The parser missed a bare `factor` directly inside a `weight_modifier`
+  block (as opposed to a conditional `modifier = { … }`), which is exactly
+  how Ring World zeroes its weight.
+
+## 1.6.1
+
+### Fixed
+
+- The isolate bar never disappeared, because `.isolate-bar` sets
+  `display: flex` and a class selector outranks the browser's built-in
+  `[hidden] { display: none }` rule — so the element was correctly marked
+  hidden and painted anyway. `[hidden]` is now enforced globally, which
+  also protects every other panel from the same trap.
+- The isolate bar used the rare-technology purple, which is not part of the
+  interface palette; it now uses the standard panel border with the
+  interactive accent as a marker.
+
+## 1.6.0
+
+### Added
+
+- **Requirement filter**: show only technologies that need Mega-Engineering
+  somewhere in their prerequisite chain, or that need Galactic Wonders or
+  Gigastructural Constructs (directly or through a prerequisite).
+- **Middle-click a technology to isolate it** — the map shows only that
+  technology, everything it needs and everything it leads to, which is the
+  quickest way to see a route to something. A bar names what is isolated;
+  Clear or `Esc` restores. Category and source filters step aside while a
+  chain is isolated, since a chain crosses categories by definition. The
+  state is in the URL (`?only=<id>`), so a route can be linked.
+
+### Changed
+
+- "Show all" is now "Hide all" / "Show all", so a narrow view can be built
+  up from nothing rather than by unchecking a dozen categories.
+- Dropped the "Overrides vanilla" source filter: it selected two
+  technologies, both of which the detail panel already badges.
+- "Requires another mod" now also matches external-mod stubs.
+
+## 1.5.2
+
+### Changed
+
+- Ascension perk requirements read "Needs <perk>" on every card. Previously
+  a technology gated behind a perk said "Needs", one granted by it said
+  "From" and one inheriting the requirement said "Via" — three phrasings for
+  what amounts to the same thing to a player. The distinctions remain in the
+  detail panel, where there is room to explain them.
+
+## 1.5.0
+
+### Added
+
+- **Technologies granted by an ascension perk.** Ring World, Dyson Sphere,
+  Matter Decompressor and Mega-Engineering carry no `potential` gate and zero
+  research weight: the perk hands them over directly, through
+  `add_research_option` in its own definition. Both the build and the
+  extractor read perk definitions for those grants, so these show "From
+  Galactic Wonders" rather than nothing at all — no hardcoding, and it picks
+  up every other granted technology too (twelve on the mod side).
+
+- **Ascension perk gating for base-game technologies.** The extractor now
+  reads vanilla `potential` blocks and resolves vanilla scripted triggers, so
+  Dyson Sphere and Matter Decompressor show Galactic Wonders and the
+  colossus weapons show the Colossus Project. Previously only mod
+  technologies carried perk requirements, because the extractor took
+  structural facts alone.
+- Perk requirements propagate across the **composed** graph rather than the
+  mod half only, so a mod technology sitting behind a perk-gated base-game
+  one inherits the requirement.
+
 ## 1.4.4
 
 ### Fixed

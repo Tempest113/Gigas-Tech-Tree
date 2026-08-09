@@ -19,7 +19,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tools.graph import build_graph, load_ascension_triggers, to_json_model
+from tools.graph import (build_graph, load_ascension_triggers,
+                         load_perk_tech_grants, to_json_model, weight_is_zero)
 from tools.inline_scripts import InlineScriptLibrary
 from tools.loc import LocEntry, LocTable, strip_markup
 from tools.merge import MergeResult, Source, merge_sources
@@ -116,10 +117,12 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     lib = InlineScriptLibrary.from_dir(mod_dir)
     for td in merged.techs.values():
         td.body = lib.expand_block(td.body, context=td.id)
+    td_bodies = {tid: td.body for tid, td in merged.techs.items()}
 
     graph = build_graph(merged.techs, vars_, loc,
                         icon_stems=icon_stems, categories=categories,
-                        ascension_triggers=load_ascension_triggers(mod_dir))
+                        ascension_triggers=load_ascension_triggers(mod_dir),
+                        perk_grants=load_perk_tech_grants(mod_dir))
 
     meta = {
         "schemaVersion": SCHEMA_VERSION,
@@ -168,6 +171,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         vdoc = json.loads(vanilla_path.read_text(encoding="utf-8"))
         for v in vdoc.get("technologies", []):
             needed.add(v.get("icon") or v["id"])
+            for p in v.get("ascensionPerks", []):
+                needed.add(p)
     needed = sorted(needed)
     (out_dir / "needed-icons.json").write_text(
         json.dumps(needed, indent=1) + "\n", encoding="utf-8")
@@ -175,12 +180,40 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     # Display names for the perks this dataset references. Mod-defined
     # perks are named in the mod's own localisation; vanilla ones come from
     # data/vanilla-structural.json and are merged client-side.
+    # The mod's ascension perks grant base-game technologies too (Galactic
+    # Wonders hands over Ring World, Dyson Sphere and Matter Decompressor).
+    # Those are vanilla technologies, composed client-side, so the map has
+    # to travel with the dataset.
+    meta["perkGrants"] = {k: v for k, v in
+                          sorted(load_perk_tech_grants(mod_dir).items())}
+
     meta["perkNames"] = {
         p: strip_markup(loc.name(p) or "") or p
         for p in sorted({q for t in graph.techs.values()
-                         for q in t.ascension_perks + t.inherited_perks})
+                         for q in t.ascension_perks + t.inherited_perks} |
+                        {q for v in meta["perkGrants"].values() for q in v})
         if loc.get(p)
     }
+
+    # An auditable record of every ascension perk marking: which perk, and
+    # whether it comes from the technology's own `potential`, from a perk
+    # granting it outright, or from a prerequisite.
+    audit = []
+    for tid in sorted(graph.techs):
+        t = graph.techs[tid]
+        if not (t.ascension_perks or t.inherited_perks):
+            continue
+        audit.append({
+            "techId": tid,
+            "name": t.name or tid,
+            "perks": {p: t.perk_reasons.get(p, "?")
+                      for p in t.ascension_perks + t.inherited_perks},
+            "weightZero": weight_is_zero(td_bodies[tid], vars_),
+            "source": f"common/technology/{t.raw.source_file}#L{t.raw.line}",
+        })
+    (out_dir / "perk-audit.json").write_text(
+        json.dumps(audit, indent=1, ensure_ascii=False) + "\n",
+        encoding="utf-8")
 
     model = to_json_model(graph, categories, meta)
 
@@ -258,6 +291,8 @@ def main() -> None:
     print(f"tier inv.    : {len(h['tierInversions'])}")
     print(f"missing loc  : {len(h['missingLoc'])}")
     print(f"warnings     : {len(h['warnings'])}")
+    print(f"perk-marked  : {len([t for t in model['technologies'] if t['ascensionPerks'] or t['inheritedPerks']])}"
+          f"  (see data/perk-audit.json)")
 
 
 if __name__ == "__main__":

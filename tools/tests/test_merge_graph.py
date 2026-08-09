@@ -107,6 +107,52 @@ def test_tier_inversion_flagged():
     assert (inv["techId"], inv["prereq"]) == ("tech_lo", "tech_hi")
 
 
+def test_perk_grant_only_locks_when_unresearchable():
+    """A perk that hands over a technology only *requires* the perk when the
+    technology cannot come up in research on its own. Mega-Engineering is
+    granted by Galactic Wonders but has real weight, so it is reachable
+    without the perk; Ring World zeroes its weight, so it is not."""
+    from tools.graph import weight_is_zero
+    from tools.pdx.parser import parse
+
+    reachable = parse("t = { weight = 20 }").get("t")
+    zeroed = parse("t = { weight = 20 weight_modifier = { factor = 0 } }").get("t")
+    explicit = parse("t = { weight = 0 }").get("t")
+    conditional = parse(
+        "t = { weight = 20 weight_modifier = { modifier = { factor = 0 "
+        "has_technology = x } } }").get("t")
+
+    vars_ = VarTable()
+    assert weight_is_zero(reachable, vars_) is False
+    assert weight_is_zero(zeroed, vars_) is True
+    assert weight_is_zero(explicit, vars_) is True
+    # A conditional zero is not an unconditional lock.
+    assert weight_is_zero(conditional, vars_) is False
+
+
+def test_ai_only_perk_grants_are_ignored(tmp_path):
+    """Galactic Wonders hands Mega-Engineering to AI empires only:
+    `if = { limit = { is_ai = yes … } add_research_option = … }`. A human
+    player never receives it, so it must not count as a requirement."""
+    from tools.graph import load_perk_tech_grants
+    d = tmp_path / "common" / "ascension_perks"
+    d.mkdir(parents=True)
+    (d / "perks.txt").write_text(
+        "ap_test = {\n"
+        "  on_enabled = {\n"
+        "    hidden_effect = {\n"
+        "      if = { limit = { NOT = { has_technology = tech_open } }\n"
+        "             add_research_option = tech_open }\n"
+        "      if = { limit = { is_ai = yes }\n"
+        "             add_research_option = tech_ai_only }\n"
+        "    }\n"
+        "  }\n"
+        "}\n", encoding="utf-8")
+    grants = load_perk_tech_grants(tmp_path)
+    assert grants.get("tech_open") == ["ap_test"]
+    assert "tech_ai_only" not in grants
+
+
 def test_cross_mod_gating_via_compat_file():
     vars_ = VarTable()
     vars_.define("acot_tier6cost2", 0, "zz_giga_compat_overwrite_me.txt")

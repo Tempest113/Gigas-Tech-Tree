@@ -86,6 +86,29 @@ export class HealthPanel {
       li.appendChild(c);
     });
 
+    // Every ascension perk marking with its provenance, so a wrong one can
+    // be traced to the script that caused it rather than guessed at.
+    const perkRows = [];
+    for (const t of this.model.techs.values()) {
+      const reasons = t.perkReasons ?? {};
+      const all = [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? [])];
+      for (const p of all) {
+        perkRows.push({ techId: t.id, name: t.name, perk: p,
+                        why: reasons[p] ?? "?" });
+      }
+    }
+    perkRows.sort((a, b) =>
+      (a.why < b.why ? -1 : a.why > b.why ? 1 : 0) ||
+      (a.name < b.name ? -1 : 1));
+    this._section("Ascension perk markings", perkRows, (li, e) => {
+      this._jumpLink(li, e.techId, e.name);
+      li.append(" — ");
+      const c = document.createElement("code");
+      c.textContent = e.perk;
+      li.appendChild(c);
+      li.append(` (${e.why})`);
+    });
+
     this._section("Prerequisite cycles", h.cycles, (li, cyc) => {
       li.textContent = cyc.join(" → ");
     });

@@ -132,7 +132,8 @@ function showModel(newModel) {
   {
     const lay = layout(model.techs);
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
-                       model, lay, showDetail);
+                       model, lay, showDetail,
+                       id => panels?.isolate(id));
     window.__view = view;   // test hook (tests/dom-smoke.mjs)
 
     if (DEV) {
@@ -255,6 +256,7 @@ function bindChrome(jump) {
     innerWidth / 2, innerHeight / 2, 1 / 1.25);
   $("zoom-reset").onclick = () => view.resetView();
   $("detail-close").onclick = () => view.select(null);
+  $("isolate-clear").onclick = () => panels.isolate(null);
 }
 
 function bindKeys() {
@@ -267,6 +269,7 @@ function bindKeys() {
       e.preventDefault(); $("search-box").focus();
     } else if (e.key === "Escape") {
       closeModals();
+      if (panels?.isolated) panels.isolate(null);
       view.select(null);
     } else if (e.key === "Backspace") {
       e.preventDefault(); history.back();
@@ -333,10 +336,13 @@ function showDetail(id) {
   if (t.overridesVanilla) addBadge("overrides vanilla", "override");
   if (t.crossModGated) addBadge("requires another mod", "crossmod");
   for (const ap of t.ascensionPerks ?? [])
-    addBadge(`requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
+    addBadge(t.grantedByPerks?.includes(ap)
+      ? `granted by ascension perk: ${apName(ap, model.perkNames)}`
+      : `requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
   for (const ap of t.inheritedPerks ?? [])
     if (!(t.ascensionPerks ?? []).includes(ap))
-      addBadge(`needs ${apName(ap, model.perkNames)} via a prerequisite`, "ap");
+      addBadge(`needs ${apName(ap, model.perkNames)}, via a prerequisite`,
+               "ap");
   if (t.isRare) addBadge("rare");
   if (t.isDangerous) addBadge("dangerous");
   if (t.isRepeatable) {

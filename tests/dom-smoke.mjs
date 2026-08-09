@@ -74,6 +74,34 @@ try {
   view.select(null);
   if (view.lineage !== null) fail2("clearing selection left a lineage");
 
+  // Ascension perk markings that have regressed before, each for a
+  // different reason. Kept together so a change cannot fix one by
+  // breaking another.
+  {
+    const perksOf = id => {
+      const t = view.model.techs.get(id);
+      return [...(t?.ascensionPerks ?? []), ...(t?.inheritedPerks ?? [])];
+    };
+    const must = (id, perk) => {
+      if (!perksOf(id).includes(perk))
+        fail2(`${id} should require ${perk}`);
+    };
+    const mustNot = (id, perk) => {
+      if (perksOf(id).includes(perk))
+        fail2(`${id} should NOT require ${perk} (${JSON.stringify(perksOf(id))})`);
+    };
+    // Granted outright by the perk.
+    must("tech_ring_world", "ap_galactic_wonders");
+    must("tech_dyson_sphere", "ap_galactic_wonders");
+    must("tech_matter_decompressor", "ap_galactic_wonders");
+    // Granted to AI empires only — not a player requirement.
+    mustNot("tech_mega_engineering", "ap_galactic_wonders");
+    // Must not inherit the requirement through Mega-Engineering.
+    mustNot("tech_gateway_construction", "ap_galactic_wonders");
+    console.log("perk markings: ring/dyson/decompressor set, "
+      + "mega-eng and gateway clear");
+  }
+
   // ascension-perk locked technologies must be marked on the map
   {
     const apTech = [...view.model.techs.values()]
@@ -87,10 +115,53 @@ try {
     const texts = globalThis.__drawnText.map(d => d.t);
     console.log("AP tech marked:", apTech.id,
       "badge:", texts.includes("\u2726"),
-      "label:", texts.some(t => /^(Needs|Via) /.test(t)));
+      "label:", texts.some(t => /^Needs /.test(t)));
     if (!texts.includes("\u2726")) fail2("ascension perk badge not drawn");
-    if (!texts.some(t => /^(Needs|Via) /.test(t)))
+    if (!texts.some(t => /^Needs /.test(t)))
       fail2("ascension perk label not drawn");
+    if (texts.some(t => /^(Via|From) /.test(t)))
+      fail2("card uses more than one phrasing for perk requirements");
+  }
+
+  // requirement filters, hide/show all, and middle-click isolate
+  {
+    const n = () => view.index.items.length;
+    const all = n();
+    const req = $("req-filter");
+    const set = v => {
+      req.value = v;
+      req.dispatchEvent(new window.Event("change", { bubbles: true }));
+    };
+    set("tech:tech_mega_engineering");
+    await new Promise(r => setTimeout(r, 60));
+    const mega = n();
+    set("perk:ap_galactic_wonders");
+    await new Promise(r => setTimeout(r, 60));
+    const galwon = n();
+    set("all");
+    await new Promise(r => setTimeout(r, 60));
+    console.log(`filters — all ${all}, mega-eng ${mega}, galwon ${galwon}`);
+    if (!(mega > 0 && mega < all)) fail2("Requires Mega-Engineering filter");
+    if (!(galwon > 0 && galwon < all)) fail2("Requires Galactic Wonders filter");
+    if (n() !== all) fail2("clearing the requirement filter did not restore");
+
+    const btn = $("show-all");
+    btn.dispatchEvent(new window.Event("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 60));
+    if (n() !== 0) fail2("Hide all left technologies visible");
+    btn.dispatchEvent(new window.Event("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 60));
+    if (n() !== all) fail2("Show all did not restore");
+
+    view.onIsolate("giga_tech_alderson_disk");
+    await new Promise(r => setTimeout(r, 80));
+    const iso = n();
+    console.log("isolate shows:", iso);
+    if (!(iso > 1 && iso < all)) fail2("isolate did not narrow the map");
+    if ($("isolate-bar").hidden) fail2("isolate bar not shown");
+    $("isolate-clear").dispatchEvent(new window.Event("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 60));
+    if (n() !== all) fail2("clearing isolate did not restore");
   }
 
   // unchecking a category must remove its band and cards from the DOM

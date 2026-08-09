@@ -1,0 +1,656 @@
+[
+ {
+  "techId": "giga_tech_alderson_disk",
+  "name": "The Alderson Disk",
+  "perks": {
+   "ap_gigastructural_constructs": "potential",
+   "ap_galactic_wonders": "via giga_tech_ringworld_gargantuan_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L623"
+ },
+ {
+  "techId": "giga_tech_asteroid_artillery_damage_upgrade",
+  "name": "Reimagined Asteroid Weaponry",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_war_moon_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_12_asteroid_artillery.txt#L105"
+ },
+ {
+  "techId": "giga_tech_asteroid_artillery_planetcraft_upgrade",
+  "name": "Modernized Asteroid Weaponry",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_asteroid_artillery_damage_upgrade",
+   "ap_gigastructural_constructs": "via giga_tech_war_planet"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_12_asteroid_artillery.txt#L132"
+ },
+ {
+  "techId": "giga_tech_birch_world_1",
+  "name": "The Birch World",
+  "perks": {
+   "ap_vast_expanses": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L154"
+ },
+ {
+  "techId": "giga_tech_brain_o_star",
+  "name": "Matrioshka Brain Suprainsulation",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_matrioshka_brain_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L1102"
+ },
+ {
+  "techId": "giga_tech_fusion_suppressor",
+  "name": "Stellar Fusion Manipulation",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L397"
+ },
+ {
+  "techId": "giga_tech_hrae_mc",
+  "name": "Relativistic Singularity Harvesting",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L31"
+ },
+ {
+  "techId": "giga_tech_hyperstructural_ass",
+  "name": "Gargantuan Shipyard Facilities",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L218"
+ },
+ {
+  "techId": "giga_tech_interstellar_ringworld",
+  "name": "Interstellar Ring Worlds",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_ringworld_titanic_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L705"
+ },
+ {
+  "techId": "giga_tech_lifter_o_star",
+  "name": "Star Lifter Suprainsulation",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_star_lifter"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L1070"
+ },
+ {
+  "techId": "giga_tech_lunar_assembly",
+  "name": "Lunar-Scale Fabrication Protocols",
+  "perks": {
+   "ap_celestial_printing": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_01_physics.txt#L975"
+ },
+ {
+  "techId": "giga_tech_maginot_planetcraft_upgrade",
+  "name": "Updated Maginot Reinforcement Techniques",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_war_planet",
+   "ap_galactic_wonders": "via giga_tech_war_planet"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_15_maginot.txt#L150"
+ },
+ {
+  "techId": "giga_tech_maginot_systemcraft_upgrade",
+  "name": "Stellar Retrofit",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_maginot_planetcraft_upgrade",
+   "ap_galactic_wonders": "via giga_tech_maginot_planetcraft_upgrade",
+   "ap_celestial_printing": "via giga_tech_war_system_6"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_15_maginot.txt#L176"
+ },
+ {
+  "techId": "giga_tech_matrioshka_brain_1",
+  "name": "Gigascale Stellar Computing",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L59"
+ },
+ {
+  "techId": "giga_tech_ndb_1",
+  "name": "Phased Hyperenergetic Power Capacitors",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L438"
+ },
+ {
+  "techId": "giga_tech_ndb_2",
+  "name": "Hyperfocusing Macroscale Crystalline Lenses",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_ndb_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L482"
+ },
+ {
+  "techId": "giga_tech_ndb_3",
+  "name": "Artificial Interstellar Wormhole Generation",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_ndb_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L517"
+ },
+ {
+  "techId": "giga_tech_ndb_4",
+  "name": "Offensive Gigascale Energy Redirection",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_ndb_3"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L552"
+ },
+ {
+  "techId": "giga_tech_neutronium_gigaforge",
+  "name": "Mass Neutronium Extraction",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L393"
+ },
+ {
+  "techId": "giga_tech_nidavellir",
+  "name": "Spatio-Temporal Alloy Forging",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L328"
+ },
+ {
+  "techId": "giga_tech_orbital_ring_iodizium_hub",
+  "name": "Orbital Suppression Field Projection",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_fusion_suppressor"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L312"
+ },
+ {
+  "techId": "giga_tech_penrose_sphere_2",
+  "name": "Controlled Ergosphere Harvesting",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L682"
+ },
+ {
+  "techId": "giga_tech_penrose_sphere_3",
+  "name": "Autonomous Starless Ringworld Infrastructure",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_penrose_sphere_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L438"
+ },
+ {
+  "techId": "giga_tech_planet_assembly",
+  "name": "Planetary-Scale Fabrication Protocols",
+  "perks": {
+   "ap_celestial_printing": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L1002"
+ },
+ {
+  "techId": "giga_tech_planetary_computer",
+  "name": "Planetary Scale Computing Complexes",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_02_society.txt#L593"
+ },
+ {
+  "techId": "giga_tech_planetary_matter_dumping",
+  "name": "Hyperefficient Telluric Dumping",
+  "perks": {
+   "ap_celestial_printing": "potential",
+   "ap_galactic_wonders": "via tech_ring_world"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L8"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_1",
+  "name": "Hyperdimensional Shielding",
+  "perks": {
+   "ap_qso": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L87"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_2",
+  "name": "Gravitational Accretion Compression",
+  "perks": {
+   "ap_qso": "via giga_tech_quasi_stellar_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L222"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_3",
+  "name": "Relativistic Jet Deflection",
+  "perks": {
+   "ap_qso": "via giga_tech_quasi_stellar_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L253"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_4",
+  "name": "Terascale Computing Machines",
+  "perks": {
+   "ap_qso": "via giga_tech_quasi_stellar_3"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L67"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_5",
+  "name": "Quasaric Energy Manipulation",
+  "perks": {
+   "ap_qso": "via giga_tech_quasi_stellar_4"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L821"
+ },
+ {
+  "techId": "giga_tech_quasi_stellar_6",
+  "name": "The Quasi-Stellar Obliterator",
+  "perks": {
+   "ap_qso": "via giga_tech_quasi_stellar_5"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L854"
+ },
+ {
+  "techId": "giga_tech_repeatable_alderson_cap",
+  "name": "Alderson Disk Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_alderson_disk",
+   "ap_galactic_wonders": "via giga_tech_alderson_disk"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L123"
+ },
+ {
+  "techId": "giga_tech_repeatable_asteroid_artillery_upgrade",
+  "name": "Streamlined Artillery Design",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_asteroid_artillery_planetcraft_upgrade",
+   "ap_gigastructural_constructs": "via giga_tech_asteroid_artillery_planetcraft_upgrade"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_12_asteroid_artillery.txt#L159"
+ },
+ {
+  "techId": "giga_tech_repeatable_dimensional_storage",
+  "name": "Hyperdimensional Storage Applications",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_tetradimensional_engineering"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_04_repeatables.txt#L4"
+ },
+ {
+  "techId": "giga_tech_repeatable_gigaforge_cap",
+  "name": "Neutronium Gigaforge Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_neutronium_gigaforge"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L370"
+ },
+ {
+  "techId": "giga_tech_repeatable_hraemc_cap",
+  "name": "HRAE-MC Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_hrae_mc"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L266"
+ },
+ {
+  "techId": "giga_tech_repeatable_hyperstructural_ass_cap",
+  "name": "Hyperstructural Assembly Yard Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_hyperstructural_ass"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L279"
+ },
+ {
+  "techId": "giga_tech_repeatable_lifters_cap",
+  "name": "Star Lifter Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_star_lifter"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L487"
+ },
+ {
+  "techId": "giga_tech_repeatable_matrioshka_brain_cap",
+  "name": "Matrioshka Brain Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_matrioshka_brain_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L357"
+ },
+ {
+  "techId": "giga_tech_repeatable_nidavellir_cap",
+  "name": "Nidavellir Hyperforge Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_nidavellir"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L383"
+ },
+ {
+  "techId": "giga_tech_repeatable_planetary_computer_cap",
+  "name": "Planetary Computing Complex Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_planetary_computer"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L461"
+ },
+ {
+  "techId": "giga_tech_repeatable_suppressor_cap",
+  "name": "Fusion Suppressor Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_fusion_suppressor"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L227"
+ },
+ {
+  "techId": "giga_tech_repeatable_systemcraft_cap",
+  "name": "Stellar Systemcraft Management Protocols",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_6"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L513"
+ },
+ {
+  "techId": "giga_tech_repeatable_the_vat_cap",
+  "name": "The Vat Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_the_vat",
+   "ap_mechromancy": "via giga_tech_the_vat"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L565"
+ },
+ {
+  "techId": "giga_tech_repeatable_vanilla_ringworld_cap",
+  "name": "Ringworld Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via tech_ring_world"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L82"
+ },
+ {
+  "techId": "giga_tech_repeatable_warmoon_cap",
+  "name": "Attack Moon Management Protocols",
+  "perks": {
+   "ap_galactic_wonders": "via giga_tech_war_moon_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L149"
+ },
+ {
+  "techId": "giga_tech_repeatable_warplanet_cap",
+  "name": "Behemoth Planetcraft Management Protocols",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_war_planet",
+   "ap_galactic_wonders": "via giga_tech_war_planet"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_07_repeatables_megastructures.txt#L175"
+ },
+ {
+  "techId": "giga_tech_ringworld_behemoth",
+  "name": "Behemoth Ringworld Construction",
+  "perks": {
+   "ap_gigastructural_constructs": "potential",
+   "ap_galactic_wonders": "via giga_tech_ringworld_titanic_2"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L194"
+ },
+ {
+  "techId": "giga_tech_ringworld_gargantuan_1",
+  "name": "Supratitanic Habitat Stabilization Systems",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_ringworld_behemoth",
+   "ap_galactic_wonders": "via giga_tech_ringworld_behemoth"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L551"
+ },
+ {
+  "techId": "giga_tech_ringworld_gargantuan_2",
+  "name": "Gargantuan Ringworld Construction",
+  "perks": {
+   "ap_gigastructural_constructs": "via giga_tech_ringworld_gargantuan_1",
+   "ap_galactic_wonders": "via giga_tech_ringworld_gargantuan_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L587"
+ },
+ {
+  "techId": "giga_tech_ringworld_titanic_1",
+  "name": "Superscale Pseudosunlight Application",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L713"
+ },
+ {
+  "techId": "giga_tech_ringworld_titanic_2",
+  "name": "Titanic Ringworld Construction",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L513"
+ },
+ {
+  "techId": "giga_tech_ringworld_upgrade",
+  "name": "Ultra-Efficient Ringworld Support Systems",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L473"
+ },
+ {
+  "techId": "giga_tech_star_lifter",
+  "name": "Hyperscale Stellar Lifting",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L148"
+ },
+ {
+  "techId": "giga_tech_supermassive_ehof",
+  "name": "Event Horizon Offset Facility Hyperscaling",
+  "perks": {
+   "ap_supermassive_ehof": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L230"
+ },
+ {
+  "techId": "giga_tech_tetradimensional_engineering",
+  "name": "Tetradimensional Engineering",
+  "perks": {
+   "ap_gigastructural_constructs": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L190"
+ },
+ {
+  "techId": "giga_tech_the_vat",
+  "name": "Gargantuan Cloning Facilities",
+  "perks": {
+   "ap_galactic_wonders": "potential",
+   "ap_mechromancy": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_02_society.txt#L300"
+ },
+ {
+  "techId": "giga_tech_war_moon_2",
+  "name": "Celestial Body Weaponization",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L781"
+ },
+ {
+  "techId": "giga_tech_war_moon_artillery",
+  "name": "Lunar Artillery",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L821"
+ },
+ {
+  "techId": "giga_tech_war_moon_sections",
+  "name": "Advanced Attack Moon Configurations",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L853"
+ },
+ {
+  "techId": "giga_tech_war_moon_specialization",
+  "name": "Attack Moon Specialization",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L6"
+ },
+ {
+  "techId": "giga_tech_war_planet",
+  "name": "Super-Earth Planetary Body Manipulation",
+  "perks": {
+   "ap_gigastructural_constructs": "potential",
+   "ap_galactic_wonders": "via giga_tech_war_moon_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L885"
+ },
+ {
+  "techId": "giga_tech_war_system_1",
+  "name": "Theoretical Stellarscale Propulsion",
+  "perks": {
+   "ap_celestial_printing": "potential"
+  },
+  "weightZero": true,
+  "source": "common/technology/giga_05_weightless.txt#L4"
+ },
+ {
+  "techId": "giga_tech_war_system_2",
+  "name": "Stabilized Solar Compression",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_1"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L883"
+ },
+ {
+  "techId": "giga_tech_war_system_3",
+  "name": "Hyperdimensional Energy Channelling",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_2"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L913"
+ },
+ {
+  "techId": "giga_tech_war_system_4",
+  "name": "Ubertensile Meta-Alloys",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_3"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L284"
+ },
+ {
+  "techId": "giga_tech_war_system_5",
+  "name": "Pseudo-Erasure Weaponry",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_4"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_01_physics.txt#L943"
+ },
+ {
+  "techId": "giga_tech_war_system_6",
+  "name": "The Stellar Systemcraft",
+  "perks": {
+   "ap_celestial_printing": "via giga_tech_war_system_5"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_03_engineering.txt#L1070"
+ },
+ {
+  "techId": "tech_ring_world",
+  "name": "tech_ring_world",
+  "perks": {
+   "ap_galactic_wonders": "granted"
+  },
+  "weightZero": true,
+  "source": "common/technology/zz_giga_tech_overwrites.txt#L4"
+ },
+ {
+  "techId": "tech_sm_megastructure",
+  "name": "Sentient Metal Forge",
+  "perks": {
+   "ap_galactic_wonders": "potential"
+  },
+  "weightZero": false,
+  "source": "common/technology/giga_09_ehof_other.txt#L821"
+ }
+]

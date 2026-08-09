@@ -112,6 +112,11 @@ class Tech:
     ascension_perks: list[str] = field(default_factory=list)
     #: perks required only via a prerequisite, not by this tech's own script
     inherited_perks: list[str] = field(default_factory=list)
+    #: perks that hand this technology to the player outright
+    granted_by: list[str] = field(default_factory=list)
+    #: why each perk is attached: perk id -> "potential" | "granted" |
+    #: "via <tech id>". Written to data/perk-audit.json for review.
+    perk_reasons: dict = field(default_factory=dict)
     cross_mod_gated: bool = False
     cross_mod_reason: Optional[str] = None
 
@@ -156,16 +161,107 @@ def _cond_text(block: Block) -> str:
     return " ".join(parts)
 
 
+def weight_is_zero(body: Block, vars_: VarTable) -> bool:
+    """True when a technology cannot come up in research on its own.
+
+    Either `weight = 0`, or a `weight_modifier` that multiplies by zero
+    unconditionally — written as a bare `factor = 0` directly inside the
+    weight_modifier block, not as a conditional `modifier = { … }`. Ring
+    World does exactly this: the perk hands it over and nothing else can.
+    """
+    w, _err, _src = _resolve_field(body.get_last("weight"), vars_, vars_)
+    if isinstance(w, (int, float)) and w == 0:
+        return True
+    wm = body.get_last("weight_modifier")
+    if isinstance(wm, Block):
+        for p in wm.pairs():
+            if p.key != "factor":
+                continue
+            f, _e, _s = _resolve_field(p.value, vars_, vars_)
+            if isinstance(f, (int, float)) and f == 0:
+                return True
+    return False
+
+
+def load_perk_tech_grants(root) -> dict:
+    """Map technology id -> perks that grant it.
+
+    Some technologies are not gated by a `potential` block at all: they carry
+    zero research weight and are handed to the player by an ascension perk
+    (`add_research_option = tech_ring_world` inside the perk's effect). That
+    is still an ascension perk requirement from a player's point of view, so
+    it belongs on the card.
+    """
+    from pathlib import Path
+    from .pdx.parser import parse_bytes, ParseError
+    from .pdx.lexer import LexError
+
+    out: dict = {}
+    d = Path(root) / "common" / "ascension_perks"
+    if not d.is_dir():
+        return out
+
+    def ai_only(limit: Block) -> bool:
+        """True when a branch applies to the AI alone. Galactic Wonders
+        hands Mega-Engineering to AI empires only:
+
+            if = { limit = { is_ai = yes … } add_research_option = … }
+
+        A human player never receives it, so it is not a requirement."""
+        for p in limit.pairs():
+            if p.key == "is_ai" and p.value == "yes":
+                return True
+            if isinstance(p.value, Block) and p.key in ("AND", "and"):
+                if ai_only(p.value):
+                    return True
+        return False
+
+    def collect(block: Block, techs: list) -> None:
+        # An `if` block's grants are conditional on its own `limit`.
+        limit = block.get_last("limit")
+        if isinstance(limit, Block) and ai_only(limit):
+            return
+        for p in block.pairs():
+            if p.key in ("add_research_option", "give_technology") and \
+                    isinstance(p.value, str):
+                if p.value not in techs:
+                    techs.append(p.value)
+            elif p.key == "give_technology" and isinstance(p.value, Block):
+                t = p.value.get_last("tech")
+                if isinstance(t, str) and t not in techs:
+                    techs.append(t)
+            elif isinstance(p.value, Block) and p.key != "limit":
+                collect(p.value, techs)
+
+    for f in sorted(d.glob("*.txt")):
+        try:
+            ast = parse_bytes(f.read_bytes())
+        except (ParseError, LexError):
+            continue
+        for p in ast.pairs():
+            if not isinstance(p.value, Block) or not p.key.startswith("ap_"):
+                continue
+            techs: list = []
+            collect(p.value, techs)
+            for tid in techs:
+                out.setdefault(tid, [])
+                if p.key not in out[tid]:
+                    out[tid].append(p.key)
+    return out
+
+
 def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 loc: LocTable, var_provenance: Optional[VarTable] = None,
                 icon_stems: Optional[set] = None,
                 categories: Optional[dict] = None,
-                ascension_triggers: Optional[dict] = None) -> GraphResult:
+                ascension_triggers: Optional[dict] = None,
+                perk_grants: Optional[dict] = None) -> GraphResult:
     res = GraphResult()
     provenance = var_provenance or vars_
     icon_stems = icon_stems or set()
     categories = categories or {}
     ascension_triggers = ascension_triggers or {}
+    perk_grants = perk_grants or {}
 
     # -- extraction ------------------------------------------------------
     for tid, td in techdefs.items():
@@ -216,8 +312,23 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         pot = b.get_last("potential")
         t.gated = isinstance(pot, Block) and len(pot) > 0
         if isinstance(pot, Block):
+            before = list(t.ascension_perks)
             _collect_ascension_perks(pot, t.ascension_perks,
                                      ascension_triggers)
+            for perk in t.ascension_perks:
+                if perk not in before:
+                    t.perk_reasons[perk] = "potential"
+        # A perk that hands a technology over is a genuine requirement: the
+        # grants that are not player-facing (AI-only branches) are already
+        # excluded when the perk files are read, so no weight test is needed
+        # here — an earlier attempt to use one wrongly dropped Dyson Sphere
+        # and Matter Decompressor.
+        for perk in perk_grants.get(tid, []):
+            if perk not in t.granted_by:
+                t.granted_by.append(perk)
+            if perk not in t.ascension_perks:
+                t.ascension_perks.append(perk)
+                t.perk_reasons[perk] = "granted"
 
         prereq = b.get_last("prerequisites")
         if isinstance(prereq, Block):
@@ -363,6 +474,7 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 if perk not in t.ascension_perks and \
                         perk not in t.inherited_perks:
                     t.inherited_perks.append(perk)
+                    t.perk_reasons.setdefault(perk, f"via {pid}")
 
     # -- tier inversions --------------------------------------------------
     for t in res.techs.values():
@@ -434,6 +546,8 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "gated": t.gated,
             "ascensionPerks": t.ascension_perks,
             "inheritedPerks": t.inherited_perks,
+            "grantedByPerks": t.granted_by,
+            "perkReasons": t.perk_reasons,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
             "source": t.raw.source_id,

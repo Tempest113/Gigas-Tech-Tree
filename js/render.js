@@ -27,12 +27,13 @@ const TEXT_SCALE = 0.38;
 const ICON_SCALE = 0.30;
 
 export class MapView {
-  constructor(stage, worldEl, canvas, model, lay, onSelect) {
+  constructor(stage, worldEl, canvas, model, lay, onSelect, onIsolate) {
     this.stage = stage;
     this.canvas = canvas;
     this.model = model;
     this.lay = lay;
     this.onSelect = onSelect;
+    this.onIsolate = onIsolate ?? (() => {});
     this.tx = 40; this.ty = 20; this.scale = 1;
     this.selected = null;
     this.hovered = null;
@@ -82,7 +83,19 @@ export class MapView {
     const stage = this.stage;
     let panning = false, px = 0, py = 0, moved = false, downId = null;
 
+    // Middle button: show only this technology's chain. Handled on
+    // pointerdown because the browser's autoscroll would otherwise swallow
+    // it, and prevented so no autoscroll cursor appears.
+    stage.addEventListener("auxclick", e => {
+      if (e.button === 1) e.preventDefault();
+    });
     stage.addEventListener("pointerdown", e => {
+      if (e.button === 1) {
+        e.preventDefault();
+        const id = this.pickAt(e.clientX, e.clientY);
+        if (id) { this.select(id); this.onIsolate(id); }
+        return;
+      }
       panning = true; moved = false;
       px = e.clientX; py = e.clientY;
       downId = this.pickAt(e.clientX, e.clientY);
@@ -558,7 +571,11 @@ export class MapView {
       ctx.fillStyle = C.rare;
       // Fitted to the card: perk names such as "Gigastructural Constructs"
       // overflow otherwise.
-      ctx.fillText(fit(ctx, `${perkInherited ? "Via" : "Needs"} ` +
+      // One phrasing on the card. Whether the perk gates the technology or
+      // hands it over, and whether the requirement is this technology's own
+      // or inherited from a prerequisite, are distinctions for the detail
+      // panel — on the card they all mean "not without this perk".
+      ctx.fillText(fit(ctx, "Needs " +
                             apName(perks[0], this.model.perkNames),
                         it.x + CARD_W - 8 - textX),
                    textX, it.y + 56);

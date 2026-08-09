@@ -36,6 +36,8 @@ from tools.pdx.lexer import LexError
 from tools.pdx.values import VarTable, resolve
 from tools.pdx.parser import VarRef
 from tools.loc import LocTable, strip_markup
+from tools.graph import (_collect_ascension_perks, load_ascension_triggers,
+                         load_perk_tech_grants, weight_is_zero)
 
 
 def load_loc(game_dir: Path) -> LocTable:
@@ -57,6 +59,14 @@ def extract(game_dir: Path, game_version: str,
                          f"install (or a folder holding vanilla 'common/')?")
 
     loc = load_loc(game_dir) if include_names else None
+
+    # Vanilla gates plenty of its own technologies behind ascension perks —
+    # Ring World, Dyson Sphere and Matter Decompressor behind Galactic
+    # Wonders, the colossus weapons behind the Colossus Project — either by
+    # naming the perk or through a scripted trigger that wraps one.
+    ap_triggers = load_ascension_triggers(game_dir)
+    # Perks that hand a technology over outright rather than gating it.
+    perk_grants = load_perk_tech_grants(game_dir)
 
     table = VarTable()
     if var_dir.is_dir():
@@ -88,6 +98,15 @@ def extract(game_dir: Path, game_version: str,
             entry_desc = (strip_markup(loc.resolve_substitutions(
                 loc.get(p.key + "_desc") or "")) or None)                 if (loc and include_desc) else None
             explicit_icon = b.get_last("icon")
+            perks: list = []
+            pot = b.get_last("potential")
+            if isinstance(pot, Block):
+                _collect_ascension_perks(pot, perks, ap_triggers)
+            granted = perk_grants.get(p.key, [])
+            if granted and weight_is_zero(b, table):
+                for perk in granted:
+                    if perk not in perks:
+                        perks.append(perk)
             def _resolved_num(key):
                 v = b.get_last(key)
                 if isinstance(v, VarRef):
@@ -104,6 +123,7 @@ def extract(game_dir: Path, game_version: str,
                 "id": p.key,
                 **({"name": entry_name} if entry_name else {}),
                 **({"desc": entry_desc} if entry_desc else {}),
+                **({"ascensionPerks": perks} if perks else {}),
                 **({"icon": str(explicit_icon)}
                    if explicit_icon is not None
                    and not isinstance(explicit_icon, Block) else {}),
@@ -245,6 +265,8 @@ def main() -> None:
         json.dumps(model, sort_keys=True, separators=(",", ":"),
                    ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"vanilla techs : {len(model['technologies'])}")
+    print(f"perk-gated    : "
+          f"{sum(1 for t in model['technologies'] if t.get('ascensionPerks'))}")
     print(f"variables     : {len(model['variables'])}")
     print(f"parse errors  : {len(model['errors'])}")
     print(f"wrote {args.out}")

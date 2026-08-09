@@ -87,6 +87,21 @@ export function lineageOf(techs, id) {
   return keep;
 }
 
+/* Every technology that transitively requires `id` — the descendants of a
+   technology through the prerequisite graph, plus the technology itself. */
+export function descendantsOf(techs, id) {
+  const keep = new Set([id]);
+  const stack = [id];
+  while (stack.length) {
+    const t = techs.get(stack.pop());
+    if (!t) continue;
+    for (const n of t.unlocks ?? []) {
+      if (!keep.has(n)) { keep.add(n); stack.push(n); }
+    }
+  }
+  return keep;
+}
+
 export function clampScale(s) {
   return Math.min(2.5, Math.max(0.05, s));
 }

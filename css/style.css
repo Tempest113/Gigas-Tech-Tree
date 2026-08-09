@@ -29,6 +29,10 @@
 
 * { box-sizing: border-box; }
 
+/* The `hidden` attribute is a UA rule of the lowest specificity, so any
+   class that sets `display` silently defeats it. Make it win outright. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0; height: 100%;
   background: var(--bg); color: var(--text);
@@ -429,3 +433,23 @@ select {
 .legend .sw[data-kind="stub"] {
   border-left-color: var(--rare); border-style: dashed; background: transparent;
 }
+
+/* -- isolate mode -------------------------------------------------------- */
+.isolate-bar {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 10px; font-size: 12.5px;
+  color: var(--text);
+}
+.isolate-bar #isolate-label::before {
+  content: ""; display: inline-block;
+  width: 8px; height: 8px; margin-right: 8px; border-radius: 2px;
+  background: var(--physics); vertical-align: baseline;
+}
+.isolate-bar button {
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 4px;
+  font: inherit; font-size: 11px; padding: 2px 8px; cursor: pointer;
+}
+#req-filter { width: 100%; }

@@ -3,7 +3,7 @@
 
 const $ = id => document.getElementById(id);
 
-import { MISC_CATEGORIES } from "./viewmodel.js";
+import { descendantsOf, lineageOf, MISC_CATEGORIES } from "./viewmodel.js";
 
 export class Panels {
   constructor(model, onFilter, onJump) {
@@ -12,7 +12,10 @@ export class Panels {
     this.onJump = onJump;       // (techId) => void
     this.activeCats = null;     // null = all
     this.query = "";
-    this.sourceFilter = "all";  // all | gigas | vanilla | override | crossmod
+    this.sourceFilter = "all";  // all | gigas | vanilla | crossmod
+    this.reqFilter = "all";     // all | tech:<id> | perk:<id>
+    this.isolated = null;       // technology id, from a middle-click
+    this._reqCache = new Map();
     this._buildSidebar();
     this._bindSearch();
   }
@@ -102,15 +105,31 @@ export class Panels {
       }
     }
 
-    $("show-all").addEventListener("click", () => {
-      host.querySelectorAll("input[type=checkbox]")
-          .forEach(cb => { cb.checked = true; });
-      $("source-filter").value = "all";
-      this.sourceFilter = "all";
+    // Show all / Hide all: hiding everything is the fast way to build up a
+    // narrow view, showing everything the fast way to reset.
+    const showAll = $("show-all");
+    showAll.addEventListener("click", () => {
+      const boxes = [...host.querySelectorAll("input[type=checkbox]")];
+      const anyChecked = boxes.some(cb => cb.checked);
+      boxes.forEach(cb => { cb.checked = !anyChecked; });
+      if (anyChecked) {
+        showAll.textContent = "Show all";
+      } else {
+        showAll.textContent = "Hide all";
+        $("source-filter").value = "all";
+        this.sourceFilter = "all";
+        $("req-filter").value = "all";
+        this.reqFilter = "all";
+        this.isolated = null;
+      }
       this._recompute();
     });
     $("source-filter").addEventListener("change", e => {
       this.sourceFilter = e.target.value;
+      this._recompute();
+    });
+    $("req-filter").addEventListener("change", e => {
+      this.reqFilter = e.target.value;
       this._recompute();
     });
   }
@@ -147,10 +166,48 @@ export class Panels {
     switch (this.sourceFilter) {
       case "gigas": return t.source !== "vanilla";
       case "vanilla": return t.source === "vanilla";
-      case "override": return t.overridesVanilla;
-      case "crossmod": return t.crossModGated;
+      case "crossmod": return t.crossModGated || t.stub;
       default: return true;
     }
+  }
+
+  /* Set of ids satisfying the requirement filter, cached per selection.
+     `tech:` is everything downstream of a technology (so "Requires
+     Mega-Engineering" means it is somewhere in the prerequisite chain);
+     `perk:` is everything needing an ascension perk, directly or through a
+     prerequisite. */
+  _requirementSet() {
+    if (this.reqFilter === "all") return null;
+    if (this._reqCache.has(this.reqFilter))
+      return this._reqCache.get(this.reqFilter);
+
+    const [kind, id] = this.reqFilter.split(":");
+    let set;
+    if (kind === "tech") {
+      set = this.model.techs.has(id)
+        ? descendantsOf(this.model.techs, id) : new Set();
+    } else {
+      set = new Set();
+      for (const t of this.model.techs.values()) {
+        if ((t.ascensionPerks ?? []).includes(id) ||
+            (t.inheritedPerks ?? []).includes(id)) set.add(t.id);
+      }
+    }
+    this._reqCache.set(this.reqFilter, set);
+    return set;
+  }
+
+  isolate(id) {
+    this.isolated = id;
+    const bar = $("isolate-bar");
+    if (id) {
+      $("isolate-label").textContent =
+        `Showing ${this.model.techs.get(id)?.name ?? id} and its chain`;
+      bar.hidden = false;
+    } else {
+      bar.hidden = true;
+    }
+    this._recompute();
   }
 
   _recompute() {
@@ -162,17 +219,27 @@ export class Panels {
       document.querySelectorAll("#sidebar-cats input").length;
     this.activeCats = allChecked ? null : checked;
 
+    const reqSet = this._requirementSet();
+    const isoSet = this.isolated
+      ? lineageOf(this.model.techs, this.isolated) : null;
+
     if (this.activeCats === null && !this.query &&
-        this.sourceFilter === "all") {
+        this.sourceFilter === "all" && !reqSet && !isoSet) {
       this.onFilter(null);
       this.syncUrl();
       return;
     }
     const visible = new Set();
     for (const t of this.model.techs.values()) {
+      if (isoSet && !isoSet.has(t.id)) continue;
+      if (reqSet && !reqSet.has(t.id)) continue;
       const cat = t.categories[0] ?? "~none";
-      if (this.activeCats && !this.activeCats.has(cat)) continue;
-      if (!this._matchesSource(t)) continue;
+      // An isolated chain crosses categories by definition, so category and
+      // source filters step aside while it is active.
+      if (!isoSet) {
+        if (this.activeCats && !this.activeCats.has(cat)) continue;
+        if (!this._matchesSource(t)) continue;
+      }
       if (this.query &&
           !t.name.toLowerCase().includes(this.query) &&
           !t.id.toLowerCase().includes(this.query)) continue;
@@ -195,6 +262,10 @@ export class Panels {
     else p.delete("cats");
     if (this.sourceFilter !== "all") p.set("src", this.sourceFilter);
     else p.delete("src");
+    if (this.reqFilter !== "all") p.set("req", this.reqFilter);
+    else p.delete("req");
+    if (this.isolated) p.set("only", this.isolated);
+    else p.delete("only");
     history.replaceState(null, "",
       p.size ? `?${p}` : location.pathname);
   }
@@ -212,7 +283,11 @@ export class Panels {
     }
     const src = p.get("src");
     if (src) { this.sourceFilter = src; $("source-filter").value = src; }
-    if (q || cats || src) this._recompute();
+    const req = p.get("req");
+    if (req) { this.reqFilter = req; $("req-filter").value = req; }
+    const only = p.get("only");
+    if (only && this.model.techs.has(only)) { this.isolate(only); return p.get("tech"); }
+    if (q || cats || src || req) this._recompute();
     return p.get("tech");
   }
 }

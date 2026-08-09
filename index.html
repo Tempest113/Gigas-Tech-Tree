@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.4.4">
+<link rel="stylesheet" href="css/style.css?v=1.6.4">
 </head>
 <body>
 <header class="app-header">
@@ -42,11 +42,16 @@
       <option value="all">All sources</option>
       <option value="gigas">Gigastructures</option>
       <option value="vanilla">Vanilla</option>
-      <option value="override">Overrides vanilla</option>
       <option value="crossmod">Requires another mod</option>
     </select>
-    <button id="show-all">Show all</button>
+    <button id="show-all">Hide all</button>
   </div>
+  <select id="req-filter" aria-label="Requirement filter">
+    <option value="all">Any requirement</option>
+    <option value="tech:tech_mega_engineering">Requires Mega-Engineering</option>
+    <option value="perk:ap_galactic_wonders">Requires Galactic Wonders</option>
+    <option value="perk:ap_gigastructural_constructs">Requires Gigastructural Constructs</option>
+  </select>
   <div id="sidebar-cats" class="sidebar-cats"></div>
 </aside>
 <div class="stage-wrap">
@@ -67,6 +72,11 @@
     <button id="detail-close" class="detail-close" aria-label="Close details">×</button>
     <div id="detail-body"></div>
   </aside>
+
+  <div id="isolate-bar" class="isolate-bar" hidden>
+    <span id="isolate-label"></span>
+    <button id="isolate-clear">Clear</button>
+  </div>
 
   <div id="status" class="status" role="status">Loading…</div>
 
@@ -100,11 +110,12 @@
     <p><code>T3</code> is the tier. <code>∞</code> marks an unlimited
     repeatable; <code>×40</code> a repeatable capped at 40 levels. A red line
     marks a dangerous technology; a <code>✦</code> badge on the
-    technology's icon marks one that only appears once you have taken a
-    particular ascension perk — a solid ring when the technology itself is
-    gated, a dashed ring when it sits behind one that is. Gigastructures
-    gates most of its content this way, through Galactic Wonders and
-    Gigastructural Constructs. The number under the name is research cost.</p>
+    technology's icon marks one you cannot get without a particular ascension
+    perk, named on the card as "Needs …". A solid ring means this technology
+    itself depends on the perk — either gated behind it or handed over by it;
+    a dashed ring means it sits behind one that does. The detail panel spells
+    out which. Gigastructures gates most of its content this way, through
+    Galactic Wonders and Gigastructural Constructs. The number under the name is research cost.</p>
 
     <h3>Interaction</h3>
     <ul>
@@ -113,8 +124,12 @@
       <li>Hover previews the same highlight when nothing is selected.</li>
       <li>Drag to pan, scroll to zoom, or use the controls bottom-right.</li>
       <li><kbd>F</kbd> search · <kbd>Esc</kbd> deselect · <kbd>Backspace</kbd> back</li>
-      <li>The sidebar filters by category and by source; unchecking a
-      category removes its row entirely.</li>
+      <li>The sidebar filters by category, by source and by requirement;
+      unchecking a category removes its row entirely, and "Hide all" clears
+      every category at once.</li>
+      <li><strong>Middle-click</strong> a technology to show only it, what it
+      needs, and what it leads to — the quickest way to see a route to
+      something. Press <kbd>Esc</kbd> or use Clear to go back.</li>
       <li>The <strong>Explore</strong> tab lists everything as a sortable
       table.</li>
     </ul>
@@ -148,6 +163,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=1.4.4"></script>
+<script type="module" src="js/main.js?v=1.6.4"></script>
 </body>
 </html>
