@@ -105,7 +105,10 @@ export function compose(model, vanilla) {
 
   return {
     tierReqs: vanilla?.tiers ?? {},
-    perkNames: vanilla?.ascensionPerks ?? {},
+    // Mod perk names override vanilla's: a mod may redefine a perk's name,
+    // and several of these perks exist only in the mod.
+    perkNames: { ...(vanilla?.ascensionPerks ?? {}),
+                 ...(model.meta?.perkNames ?? {}) },
     meta: model.meta,
     categories: model.categories,
     health: model.health,

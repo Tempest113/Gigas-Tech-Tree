@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools.graph import build_graph, load_ascension_triggers, to_json_model
 from tools.inline_scripts import InlineScriptLibrary
-from tools.loc import LocEntry, LocTable
+from tools.loc import LocEntry, LocTable, strip_markup
 from tools.merge import MergeResult, Source, merge_sources
 from tools.pdx.parser import Block, parse_bytes
 from tools.pdx.values import VarTable
@@ -172,6 +172,16 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     (out_dir / "needed-icons.json").write_text(
         json.dumps(needed, indent=1) + "\n", encoding="utf-8")
 
+    # Display names for the perks this dataset references. Mod-defined
+    # perks are named in the mod's own localisation; vanilla ones come from
+    # data/vanilla-structural.json and are merged client-side.
+    meta["perkNames"] = {
+        p: strip_markup(loc.name(p) or "") or p
+        for p in sorted({q for t in graph.techs.values()
+                         for q in t.ascension_perks + t.inherited_perks})
+        if loc.get(p)
+    }
+
     model = to_json_model(graph, categories, meta)
 
     n = len(graph.techs)
@@ -200,6 +210,16 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
 
     if icons_out is not None:
         from tools.icons import convert_icons
+        # Gigastructures defines several of its own ascension perks
+        # (Celestial Printing, Gigastructural Constructs, QSO, Supermassive
+        # EHOF, Vast Expanses), so their icons come from the mod, not the
+        # game — the vanilla extractor cannot supply them.
+        ap_src = mod_dir / "gfx" / "interface" / "icons" / "ascension_perks"
+        if ap_src.is_dir():
+            convert_icons(ap_src, icons_out,
+                          icons_out / "mod-ap-atlas.png",
+                          icons_out / "mod-ap-atlas.json",
+                          only=set(needed))
         icon_src = mod_dir / "gfx" / "interface" / "icons" / "technologies"
         if icon_src.is_dir():
             r = convert_icons(icon_src, icons_out,

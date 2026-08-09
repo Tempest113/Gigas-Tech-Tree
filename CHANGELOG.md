@@ -4,6 +4,19 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.4.4
+
+### Fixed
+
+- **Ascension perk icons and names for the mod's own perks.** Five of the
+  seven perks the tree references — A Celestial Armada, Gigastructural
+  Constructs, A Weapon to Pierce the Heavens, Unshackled Transportation and
+  Vast Expanses — are defined by Gigastructures, not the base game, so the
+  vanilla extractor could never supply them. The build now converts perk
+  icons from the mod and takes their names from the mod's own localisation,
+  merging with the vanilla set client-side. This also corrects the names:
+  the mod renames Celestial Printing to "A Celestial Armada".
+
 ## 1.4.2
 
 ### Changed
