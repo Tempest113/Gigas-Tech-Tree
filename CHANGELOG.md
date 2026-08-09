@@ -4,6 +4,47 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.3.5
+
+### Changed
+
+- Quality degradation is now self-tuning. The renderer measures its own draw
+  times and only trades resolution and textures for speed while the view is
+  moving on machines that need it; a GPU-accelerated canvas keeps full
+  fidelity throughout. Hysteresis prevents oscillation.
+- The `?dev` meter reports canvas size, device pixel ratio and whether
+  quality is currently reduced.
+- README gained a troubleshooting section covering the meter and Firefox's
+  `ACCELERATED_CANVAS2D` blocklisting under Software WebRender, which
+  rasterises the whole map on the CPU and was worth roughly a twentyfold
+  difference in draw time between two machines.
+
+## 1.3.4
+
+### Changed
+
+- Canvas pixels are capped by a budget (~4.5 megapixels) as well as by
+  device pixel ratio, so a 4K or ultrawide window cannot ask for several
+  times the fill rate of a smaller one. `?render=<n>` overrides it.
+
+## 1.3.3
+
+### Fixed
+
+- **Draw time when zoomed out.** Two costs had crept back in with the canvas
+  renderer: edge paths were rebuilt every frame (roughly 880 bezier curves)
+  rather than cached as they had been before, and letter-spaced labels were
+  drawn a glyph at a time with a `measureText` call for each — about 1,260
+  measure-and-fill pairs per frame once every section's tier labels were on
+  screen. Edge paths are cached per layout again, labels use the engine's
+  native letter spacing where available with memoised glyph widths
+  otherwise, text measurements and truncations are cached, and the small
+  per-section tier labels are skipped below 30% zoom where they cannot be
+  read anyway.
+- The `?dev` meter now breaks the frame down into background, edges and
+  cards, with the number of cards drawn, so a slow machine can be diagnosed
+  rather than guessed at.
+
 ## 1.3.2
 
 ### Fixed

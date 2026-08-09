@@ -112,6 +112,26 @@ tie-breaks).
   come from a single sprite atlas, and draws are coalesced to one per frame.
   Culling and picking live in `js/viewmodel.js` and are unit-tested.
 
+## Troubleshooting
+
+**The map is sluggish.** Add `?dev` to the URL for a draw-time meter
+(median/worst of the last sixty frames, split into background, edges and
+cards, with the canvas size). Single-digit milliseconds is a
+GPU-accelerated canvas; over a hundred means the browser is rasterising on
+the CPU.
+
+In Firefox, check `about:support` for `ACCELERATED_CANVAS2D`. If it reports
+`Disabled by Software WebRender`, the browser has fallen back to software
+compositing — usually a driver or Wayland issue — and canvas acceleration
+is blocklisted as a consequence. Setting
+`gfx.canvas.accelerated.force-enabled` to `true` in `about:config` restores
+it; fixing the underlying GPU fallback is the better cure and speeds up
+everything else too. Chromium equivalents live in `chrome://gpu`.
+
+The renderer also measures itself and reduces resolution and skips textures
+while the view is moving on machines that need it; `?render=<n>` forces a
+specific device pixel ratio for testing.
+
 ## Adding another mod
 
 The pipeline is source-list based (`tools/merge.py`): add a second

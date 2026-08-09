@@ -149,8 +149,12 @@ function showModel(newModel) {
         const s = [...frames].sort((a, b) => a - b);
         const med = s[s.length >> 1] ?? 0;
         const worst = s[s.length - 1] ?? 0;
+        const p = view._phase;
         meter.textContent =
-          `draw ${med.toFixed(1)}ms med / ${worst.toFixed(1)}ms max`;
+          `draw ${med.toFixed(1)}/${worst.toFixed(1)}ms · ` +
+          `bg ${p.furniture.toFixed(1)} edges ${p.edges.toFixed(1)} ` +
+          `cards ${p.cards.toFixed(1)} (${p.n}) · ` +
+          `${p.px}Mpx @${p.dpr?.toFixed(2)}x${p.degraded ? " (reduced)" : ""}`;
       };
     }
 

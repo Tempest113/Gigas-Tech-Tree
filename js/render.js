@@ -45,6 +45,12 @@ export class MapView {
     this.patterns = {};   // lazily built canvas patterns, keyed by category
     this._raf = 0;
     this._frames = [];        // rolling frame times for the ?dev meter
+    this._edgePaths = null;   // cached; world coords are view-independent
+    this._lineagePath = null;
+    this._phase = { furniture: 0, edges: 0, cards: 0 };
+    this.interacting = false;
+    this.degraded = false;    // set by _updateQuality on slow machines
+    this._idleTimer = 0;
 
     worldEl.replaceChildren();
     worldEl.style.display = "none";   // cards are drawn, not laid out
@@ -100,6 +106,7 @@ export class MapView {
       if (id !== this.hovered) {
         this.hovered = id;
         this.lineage = id ? lineageOf(this.model.techs, id) : null;
+        this._lineagePath = null;
         this.redraw();
       }
     });
@@ -113,7 +120,8 @@ export class MapView {
 
     stage.addEventListener("pointerleave", () => {
       if (!this.selected && this.hovered) {
-        this.hovered = null; this.lineage = null; this.redraw();
+        this.hovered = null; this.lineage = null;
+        this._lineagePath = null; this.redraw();
       }
     });
 
@@ -138,6 +146,8 @@ export class MapView {
     this.lay = lay;
     this.visible = visibleSet;
     this.index = buildIndex(lay, visibleSet);
+    this._edgePaths = null;
+    this._lineagePath = null;
     if (this.selected && !lay.pos.has(this.selected)) {
       this.selected = null;
       this.lineage = null;
@@ -150,6 +160,7 @@ export class MapView {
     this.selected = id;
     this.hovered = null;
     this.lineage = id ? lineageOf(this.model.techs, id) : null;
+    this._lineagePath = null;
     this.redraw();
     this.onSelect(id);
   }
@@ -179,15 +190,42 @@ export class MapView {
     this.applyTransform();
   }
 
+  /* Self-tuning quality: measure our own draw times and only trade fidelity
+     for speed on machines that need it. A GPU-accelerated canvas draws this
+     map in single-digit milliseconds and keeps full resolution and textures
+     throughout; a software-rasterised one (Firefox falling back to Software
+     WebRender, which also blocklists accelerated canvas2d) degrades while
+     the view is moving and restores when it settles. Hysteresis stops it
+     oscillating. */
+  _updateQuality() {
+    const f = this._frames;
+    if (f.length < 12) return;
+    const s = [...f].sort((a, b) => a - b);
+    const med = s[s.length >> 1];
+    if (med > 12) this.degraded = true;
+    else if (med < 6) this.degraded = false;
+  }
+
+  /* Mark the view as moving; restore full fidelity shortly after it stops. */
+  _touch() {
+    this.interacting = true;
+    clearTimeout(this._idleTimer);
+    this._idleTimer = setTimeout(() => {
+      this.interacting = false;
+      this.redraw();
+    }, 160);
+  }
+
   applyTransform() {
+    this._touch();
     const readout = document.getElementById("zoom-readout");
     if (readout) readout.textContent = `${Math.round(this.scale * 100)}%`;
     this.redraw();
   }
 
   resizeCanvas() {
-    const dpr = renderScale();
     const { clientWidth: w, clientHeight: h } = this.stage;
+    const dpr = renderScale(w, h, this.interacting && this.degraded);
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
     this.canvas.style.width = `${w}px`;
@@ -204,6 +242,7 @@ export class MapView {
       const dt = performance.now() - t0;
       this._frames.push(dt);
       if (this._frames.length > 60) this._frames.shift();
+      this._updateQuality();
       if (this.onFrame) this.onFrame(dt, this._frames);
     });
   }
@@ -213,8 +252,17 @@ export class MapView {
   _draw() {
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
-    const dpr = renderScale();
     const w = this.stage.clientWidth, h = this.stage.clientHeight;
+    const dpr = renderScale(w, h, this.interacting && this.degraded);
+    // Resize only when the target actually changes: assigning width/height
+    // clears and reallocates the backing store.
+    const cw = Math.round(w * dpr), chh = Math.round(h * dpr);
+    if (this.canvas.width !== cw || this.canvas.height !== chh) {
+      this.canvas.width = cw;
+      this.canvas.height = chh;
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+    }
     const C = this.colours;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -224,13 +272,20 @@ export class MapView {
     ctx.scale(this.scale, this.scale);
 
     const rect = viewportRect(this.tx, this.ty, this.scale, w, h);
+    const t0 = performance.now();
     this._drawFurniture(ctx, rect, C);
+    const t1 = performance.now();
     this._drawEdges(ctx, rect, C);
+    const t2 = performance.now();
 
     const cards = visibleCards(this.index, rect);
     const withText = this.scale >= TEXT_SCALE;
     const withIcons = this.scale >= ICON_SCALE && this.atlas;
     for (const it of cards) this._drawCard(ctx, it, C, withText, withIcons);
+    const t3 = performance.now();
+    this._phase = { furniture: t1 - t0, edges: t2 - t1, cards: t3 - t2,
+                    n: cards.length, dpr: dpr, degraded: this.degraded,
+                    px: Math.round(cw * chh / 1e6 * 10) / 10 };
 
     ctx.restore();
   }
@@ -250,7 +305,7 @@ export class MapView {
           ctx.fillStyle = withAlpha(accent, 0.09);
           ctx.fill();
           // Signature categories get a texture on top of the wash.
-          if (this.scale > 0.15) {
+          if (this.scale > 0.15 && !(this.interacting && this.degraded)) {
             const pat = this._pattern(ctx, f.cat, accent);
             if (pat) {
               ctx.save();
@@ -276,7 +331,7 @@ export class MapView {
           const accent = C.area[bandKey(f)] ?? C.muted;
           const label = f.text.toUpperCase();
           ctx.font = '600 15px "Chakra Petch", system-ui, sans-serif';
-          const tw = ctx.measureText(label).width + 2.6 * label.length;
+          const tw = measureCached(ctx, label) + 2.6 * label.length;
           const cw = tw + 46;
           ctx.fillStyle = withAlpha(accent, 0.18);
           roundRect(ctx, f.x, f.y, cw, 26, 6);
@@ -294,7 +349,7 @@ export class MapView {
         case "tierlabel": {
           if (f.y + 20 < rect.y0 || f.y > rect.y1) continue;
           if (f.x > rect.x1 || f.x + 300 < rect.x0) continue;
-          if (this.scale < 0.12) continue;
+          if (this.scale < (f.small ? 0.3 : 0.12)) continue;
           ctx.font = f.small
             ? '600 10px "Chakra Petch", system-ui, sans-serif'
             : '600 13px "Chakra Petch", system-ui, sans-serif';
@@ -344,41 +399,61 @@ export class MapView {
     return this.patterns[cat];
   }
 
-  _drawEdges(ctx, rect, C) {
-    const dim = this.lineage ? 0.06 : 1;
-    const near = new Path2D(), far = new Path2D(), lin = new Path2D();
-
-    for (const it of visibleCards(this.index, expand(rect, 2400))) {
+  /* Edge geometry is in world coordinates and does not change as the view
+     moves, so the paths are built once per layout and merely stroked under
+     the canvas transform. Rebuilding them per frame — roughly 880 bezier
+     curves — was the dominant cost when zoomed out. */
+  _buildEdgePaths() {
+    const near = new Path2D(), far = new Path2D();
+    for (const it of this.index.items) {
       const t = this.model.techs.get(it.id);
       if (!t) continue;
-      const p = this.lay.pos.get(it.id);
       for (const pid of t.prerequisites) {
         const pp = this.lay.pos.get(pid);
         if (!pp) continue;
         if (this.visible !== null && !this.visible.has(pid)) continue;
-        if (Math.max(pp.x, p.x) + CARD_W < rect.x0 ||
-            Math.min(pp.x, p.x) > rect.x1) continue;
-        const inLin = this.lineage &&
-          this.lineage.has(it.id) && this.lineage.has(pid);
-        addEdge(inLin ? lin : (Math.abs(pp.y - p.y) < 2200 ? near : far),
-                pp, p);
+        addEdge(Math.abs(pp.y - it.y) < 2200 ? near : far, pp, it);
       }
     }
+    this._edgePaths = { near, far };
+  }
+
+  _buildLineagePath() {
+    const lin = new Path2D();
+    if (this.lineage) {
+      for (const id of this.lineage) {
+        const p = this.lay.pos.get(id);
+        const t = this.model.techs.get(id);
+        if (!p || !t) continue;
+        for (const pid of t.prerequisites) {
+          if (!this.lineage.has(pid)) continue;
+          const pp = this.lay.pos.get(pid);
+          if (pp) addEdge(lin, pp, p);
+        }
+      }
+    }
+    this._lineagePath = lin;
+  }
+
+  _drawEdges(ctx, rect, C) {
+    if (!this._edgePaths) this._buildEdgePaths();
+    if (!this._lineagePath) this._buildLineagePath();
+    const dim = this.lineage ? 0.06 : 1;
 
     ctx.setLineDash([]);
     ctx.lineWidth = 1.25 / this.scale;
     ctx.strokeStyle = C.line;
     ctx.globalAlpha = 0.5 * dim;
-    ctx.stroke(near);
+    ctx.stroke(this._edgePaths.near);
     ctx.globalAlpha = 0.12 * dim;
     ctx.setLineDash([5 / this.scale, 5 / this.scale]);
-    ctx.stroke(far);
+    ctx.stroke(this._edgePaths.far);
     ctx.setLineDash([]);
     if (this.lineage) {
       ctx.strokeStyle = C.accent;
       ctx.globalAlpha = 0.95;
       ctx.lineWidth = 2 / this.scale;
-      ctx.stroke(lin);
+      ctx.stroke(this._lineagePath);
     }
     ctx.globalAlpha = 1;
   }
@@ -436,7 +511,7 @@ export class MapView {
         : t.levels === -1 ? " \u221e" : " \u21bb";
       const badge = (t.tier !== null ? `T${t.tier}` : "") + rep;
       ctx.font = '600 10px "Chakra Petch", system-ui, sans-serif';
-      const bw = ctx.measureText(badge).width;
+      const bw = measureCached(ctx, badge);
       ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 42);
     }
 
@@ -469,12 +544,29 @@ export function apName(id) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
-/* Canvas cost is fill-rate bound, and a 4K display asks for four times the
-   pixels of a 1080p one at the same window size — the likeliest reason a
-   weaker machine on a smaller screen feels smoother. Cap the backing store
-   at 1.5x: past that the gain is invisible on a map of small text. */
-function renderScale() {
-  return Math.min(window.devicePixelRatio || 1, 1.5);
+/* Canvas cost is fill-rate bound: a 4K display asks for four times the
+   pixels of a 1080p one at the same window size, and if the browser is not
+   accelerating canvas2d that difference lands squarely on the CPU.
+
+   Three defences:
+     - cap the device pixel ratio (past 1.5x the gain is invisible here),
+     - cap total pixels, so an ultrawide or 4K window cannot blow the budget,
+     - drop resolution further while the view is actually moving, and
+       restore it once it settles.
+
+   `?render=<n>` overrides the cap for testing. */
+const PIXEL_BUDGET = 4.5e6;          // ~2560x1760 backing store
+const INTERACTIVE_FACTOR = 0.6;
+
+function renderScale(w, h, reduce) {
+  const override = Number(
+    new URLSearchParams(location.search).get("render"));
+  let dpr = Number.isFinite(override) && override > 0
+    ? override : Math.min(window.devicePixelRatio || 1, 1.5);
+  if (reduce) dpr *= INTERACTIVE_FACTOR;
+  const px = w * h * dpr * dpr;
+  if (px > PIXEL_BUDGET) dpr *= Math.sqrt(PIXEL_BUDGET / px);
+  return Math.max(0.4, dpr);
 }
 
 /* Layered wave art: overlapping sine bands in the accent hue, each darker
@@ -525,22 +617,68 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-/* Canvas has no letter-spacing in older engines; draw per glyph so the
-   display face keeps its tracking. */
+/* Tracked text. Per-glyph drawing with a measureText call each was costing
+   well over a thousand measures per frame once labels multiplied; use the
+   native letterSpacing where the engine has it, and memoise glyph widths
+   otherwise. */
+const NATIVE_TRACKING = (() => {
+  try {
+    const c = document.createElement("canvas").getContext("2d");
+    return c && "letterSpacing" in c;
+  } catch { return false; }
+})();
+
+const glyphWidths = new Map();
+
 function drawTracked(ctx, text, x, y, spacing) {
+  if (NATIVE_TRACKING) {
+    const prev = ctx.letterSpacing;
+    ctx.letterSpacing = `${spacing}px`;
+    ctx.fillText(text, x, y);
+    ctx.letterSpacing = prev;
+    return;
+  }
   let cx = x;
   for (const ch of text) {
     ctx.fillText(ch, cx, y);
-    cx += ctx.measureText(ch).width + spacing;
+    const key = ctx.font + ch;
+    let w = glyphWidths.get(key);
+    if (w === undefined) {
+      w = ctx.measureText(ch).width;
+      glyphWidths.set(key, w);
+    }
+    cx += w + spacing;
   }
 }
 
+const textWidths = new Map();
+function measureCached(ctx, text) {
+  const key = ctx.font + "\u0000" + text;
+  let w = textWidths.get(key);
+  if (w === undefined) {
+    w = ctx.measureText(text).width;
+    textWidths.set(key, w);
+  }
+  return w;
+}
+
+const fitCache = new Map();
+
 function fit(ctx, text, maxWidth) {
-  if (ctx.measureText(text).width <= maxWidth) return text;
+  const key = ctx.font + "\u0000" + text + "\u0000" + Math.round(maxWidth);
+  const hit = fitCache.get(key);
+  if (hit !== undefined) return hit;
+  const out = fitUncached(ctx, text, maxWidth);
+  fitCache.set(key, out);
+  return out;
+}
+
+function fitUncached(ctx, text, maxWidth) {
+  if (measureCached(ctx, text) <= maxWidth) return text;
   let lo = 0, hi = text.length;
   while (lo < hi) {
     const mid = (lo + hi + 1) >> 1;
-    if (ctx.measureText(text.slice(0, mid) + "\u2026").width <= maxWidth)
+    if (measureCached(ctx, text.slice(0, mid) + "\u2026") <= maxWidth)
       lo = mid;
     else hi = mid - 1;
   }
