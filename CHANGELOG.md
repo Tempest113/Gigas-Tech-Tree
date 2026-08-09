@@ -4,6 +4,78 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.4.2
+
+### Changed
+
+- The extractor converts only the icons the site actually references. The
+  build writes `data/needed-icons.json` — every technology's resolved icon
+  plus every ascension perk named by a gated technology — and the extractor
+  filters against it, instead of copying the game's icon folders wholesale.
+- Added `tools/prune_icons.py`, which deletes committed icons that are not
+  referenced. Running it removed 223 files (1.3 MB) and took the sprite
+  atlas from 5.8 MB to 4.7 MB.
+
+### Added
+
+- `tools/build_atlas.py`, which rebuilds the sprite atlas from the icons
+  already in the repository. Previously the atlas could only be regenerated
+  as part of a full build, which requires a Gigastructures checkout.
+
+## 1.4.1
+
+### Added
+
+- **Ascension perk names and icons come from the game.** The extractor
+  captures perk display names, so a gated technology reads "Needs Master
+  Builders" rather than a name mangled out of its id ("Qso"), and converts
+  the perk icons alongside the technology icons, so the badge on a gated
+  technology shows the perk's own icon. Both degrade gracefully: without a
+  fresh extraction the badge falls back to `✦` and a derived name.
+
+### Fixed
+
+- Badges are sentence-cased, so "gigas", "rare" and "needs qso via a
+  prerequisite" read properly without every word being capitalised.
+- Source badges name the mod ("Gigastructures") rather than its internal id.
+
+## 1.4.0
+
+### Added
+
+- **Ascension perk requirements now cover the scripted-trigger forms.**
+  Gigastructures gates most of its content on `has_galactic_wonders` and
+  `has_gigastructural_constructs` rather than naming a perk directly; the
+  build resolves scripted triggers to the perk behind them. Marked
+  technologies went from 8 to 30.
+- **Requirements propagate through prerequisites.** A technology behind a
+  Galactic Wonders technology is equally unreachable without the perk, so it
+  carries the requirement too, shown with a dashed badge ring and "Via
+  <perk>" rather than "Needs <perk>", and spelled out in the detail panel.
+  A further 39 technologies are marked this way.
+
+### Fixed
+
+- **Multi-line quoted strings.** Gigastructures passes blocks of script to
+  `inline_script` as a quoted `code` parameter spanning many lines — a legal
+  construct the lexer rejected, silently skipping the whole of
+  `common/scripted_triggers/zzz_overwrites.txt` and with it the Galactic
+  Wonders trigger. Fixed in both the Python parser and its browser port,
+  with tests either side.
+- The ascension perk line no longer overflows the card; long perk names are
+  truncated to fit.
+
+## 1.3.6
+
+### Changed
+
+- Ascension-perk locked technologies are marked with a badge over the
+  technology's icon, not only by a line of small text at the foot of the
+  card, and the card line now reads "Requires <perk>". The marker was
+  drawing correctly before but was too quiet to notice among a thousand
+  cards. Covered by a regression test that inspects what the renderer
+  actually draws.
+
 ## 1.3.5
 
 ### Changed

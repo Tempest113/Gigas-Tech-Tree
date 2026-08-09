@@ -5,7 +5,8 @@ come straight from real Stellaris/Gigastructures files (see
 docs/observed-grammar.md):
 
 - ``#`` comments run to end of line, including trailing comments after values.
-- Quoted strings may contain spaces, ``=``, ``{``/``}``, and ``\\"`` escapes.
+- Quoted strings may contain spaces, ``=``, ``{``/``}``, ``\\"`` escapes, and
+  newlines (used for ``code = "…"`` inline-script parameters).
 - Bare values may contain ``@ . : ' | - /`` etc.; anything up to whitespace,
   a brace, an operator character, or ``#``.
 - Operators: ``= == != < > <= >=``. The lexer emits the exact operator text.
@@ -136,10 +137,11 @@ def tokenize(text: str) -> Iterator[Token]:
                 if ch == '"':
                     bump()
                     break
-                if ch == "\n":
-                    # Real files never contain raw newlines in strings; treat
-                    # as unterminated so the error points at the open quote.
-                    raise LexError("unterminated string", start_line, start_col)
+                # Multi-line strings are legitimate: Gigastructures passes
+                # blocks of script to inline_script as a quoted `code`
+                # parameter spanning many lines. An unterminated string
+                # therefore only surfaces at end of file, still reported
+                # against the opening quote.
                 buf.append(ch)
                 bump()
             yield Token(TokKind.STRING, "".join(buf), start_line, start_col)

@@ -51,7 +51,9 @@ by the maintainer:
 python tools/extract_vanilla.py \
   --game-dir ~/.local/share/Steam/steamapps/common/Stellaris \
   --out data/vanilla-structural.json --game-version 4.5.0 --desc
-# optionally after a game patch adds icons:  --icons vanilla-icons
+# --icons converts vanilla technology and ascension perk icons, restricted
+# to the keys data/needed-icons.json says the site actually uses:
+#   --icons vanilla-icons
 ```
 
 Repo path (maintainer): `/home/Tempest1273/Github/Gigas-Tech-Tree/`.
@@ -112,6 +114,15 @@ tie-breaks).
   come from a single sprite atlas, and draws are coalesced to one per frame.
   Culling and picking live in `js/viewmodel.js` and are unit-tested.
 
+Two maintenance scripts need only the files already in the repo, so they
+work without a Gigastructures checkout:
+
+- `tools/prune_icons.py` — deletes committed icons the site no longer
+  references (dry run by default, `--apply` to delete).
+- `tools/build_atlas.py` — rebuilds `assets/icons/atlas.png` and its
+  coordinate file. **Run this after adding or removing any icon**, since the
+  renderer draws every icon from the atlas.
+
 ## Troubleshooting
 
 **The map is sluggish.** Add `?dev` to the URL for a draw-time meter
@@ -166,4 +177,4 @@ manifest already supports multiple entries.
   used non-commercially under Paradox's tolerance of fan works. Game files
   themselves are never committed. Removed on request.
 - This is an unofficial fan project, not affiliated with Paradox
-  Interactive.
+  Interactive or the Gigastructures team.

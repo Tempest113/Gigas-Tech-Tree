@@ -53,8 +53,13 @@ def _placeholder(size: tuple[int, int] = (52, 52)) -> Image.Image:
 
 
 def convert_icons(src_dir: Path, out_icons: Path, out_atlas_png: Path,
-                  out_atlas_json: Path) -> IconResult:
-    """Convert every ``*.dds`` in ``src_dir``.
+                  out_atlas_json: Path,
+                  only: Optional[set] = None) -> IconResult:
+    """Convert ``*.dds`` files in ``src_dir``.
+
+    ``only`` restricts conversion to those stems (the icon keys the site
+    actually references), so the game's full icon folders are not copied
+    wholesale.
 
     - ``out_icons/<stem>.png`` per icon (detail panel).
     - One atlas PNG + JSON coordinate map ``{stem: {x,y,w,h}}`` (map view).
@@ -62,7 +67,9 @@ def convert_icons(src_dir: Path, out_icons: Path, out_atlas_png: Path,
     res = IconResult()
     out_icons.mkdir(parents=True, exist_ok=True)
 
-    files = sorted(src_dir.glob("*.dds"), key=lambda p: p.name)
+    files = sorted((f for f in src_dir.glob("*.dds")
+                    if only is None or f.stem in only),
+                   key=lambda p: p.name)
     images: list[tuple[str, Image.Image]] = []
     for f in files:
         stem = f.stem

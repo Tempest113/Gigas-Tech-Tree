@@ -105,6 +105,7 @@ export function compose(model, vanilla) {
 
   return {
     tierReqs: vanilla?.tiers ?? {},
+    perkNames: vanilla?.ascensionPerks ?? {},
     meta: model.meta,
     categories: model.categories,
     health: model.health,

@@ -275,9 +275,12 @@ select {
 .tech-link { cursor: pointer; color: var(--physics); text-decoration: underline; }
 .badge {
   display: inline-block; font-size: 10px; padding: 1px 6px;
+  /* Sentence case: capitalising every word would mangle names and
+     phrases ("Needs Qso Via A Prerequisite"). */
   border-radius: 3px; border: 1px solid var(--line);
   font-family: var(--font-data); color: var(--muted); margin-right: 4px;
 }
+.badge::first-letter { text-transform: uppercase; }
 .badge.override { color: var(--engineering); border-color: var(--engineering); }
 .badge.crossmod { color: var(--rare); border-color: var(--rare); }
 

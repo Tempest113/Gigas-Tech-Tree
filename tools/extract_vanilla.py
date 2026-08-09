@@ -179,7 +179,13 @@ def main() -> None:
                     help="JSON list of loc keys the mod couldn't resolve; "
                          "their vanilla values are captured into locExtra")
     ap.add_argument("--icons", type=Path, default=None, metavar="OUTDIR",
-                    help="convert vanilla tech icons (.dds) to PNG in OUTDIR")
+                    help="convert referenced vanilla icons (.dds) to PNG "
+                         "in OUTDIR")
+    ap.add_argument("--needed-icons", type=Path,
+                    default=Path("data/needed-icons.json"),
+                    help="JSON list of icon keys the site actually uses; "
+                         "only these are converted. Pass a missing path to "
+                         "convert everything.")
     args = ap.parse_args()
 
     model = extract(args.game_dir, args.game_version,
@@ -198,14 +204,42 @@ def main() -> None:
                 extra[k] = v
         model["locExtra"] = dict(sorted(extra.items()))
         print(f"loc keys filled: {len(extra)}/{len(wanted)}")
+
+    # Ascension perk display names, so gated technologies can name the perk
+    # properly ("Master Builders", not "Qso"). Names only, no descriptions.
+    loc_all = load_loc(args.game_dir)
+    perks = {}
+    for key, entry in loc_all.entries.items():
+        if key.startswith("ap_") and not key.endswith("_desc"):
+            name = strip_markup(loc_all.resolve_substitutions(entry.value))
+            if name:
+                perks[key] = name
+    model["ascensionPerks"] = dict(sorted(perks.items()))
+    print(f"perk names    : {len(perks)}")
     if args.icons:
         from tools.icons import convert_icons
+        wanted = None
+        if args.needed_icons and args.needed_icons.is_file():
+            wanted = set(json.loads(
+                args.needed_icons.read_text(encoding="utf-8")))
+            print(f"icon filter   : {len(wanted)} keys referenced")
         icon_src = (args.game_dir / "gfx" / "interface" / "icons"
                     / "technologies")
         r = convert_icons(icon_src, args.icons,
-                          args.icons / "atlas.png", args.icons / "atlas.json")
+                          args.icons / "atlas.png", args.icons / "atlas.json",
+                          only=wanted)
         print(f"icons         : {len(r.converted)} converted, "
               f"{len(r.warnings)} failed")
+        # Ascension perk icons land in the same directory, so the build's
+        # atlas covers them and the viewer can draw a perk's own icon on a
+        # gated technology.
+        ap_src = (args.game_dir / "gfx" / "interface" / "icons"
+                  / "ascension_perks")
+        if ap_src.is_dir():
+            ra = convert_icons(ap_src, args.icons,
+                               args.icons / "ap-atlas.png",
+                               args.icons / "ap-atlas.json", only=wanted)
+            print(f"perk icons    : {len(ra.converted)} converted")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps(model, sort_keys=True, separators=(",", ":"),

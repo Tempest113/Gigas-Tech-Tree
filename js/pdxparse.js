@@ -65,8 +65,8 @@ function* tokenize(text) {
       bump();
       let buf = "";
       for (;;) {
-        if (i >= n || text[i] === "\n")
-          throw new PdxError("unterminated string", sl, sc);
+        // Multi-line strings are legitimate (inline_script `code` params).
+        if (i >= n) throw new PdxError("unterminated string", sl, sc);
         if (text[i] === "\\" && (text[i + 1] === '"' || text[i + 1] === "\\")) {
           buf += text[i + 1]; bump(2); continue;
         }

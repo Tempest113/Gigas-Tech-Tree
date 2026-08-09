@@ -28,11 +28,14 @@ globalThis.Image = class { set src(_v) { setTimeout(() => this.onerror?.(), 0); 
 const noop = new Proxy({}, { get: () => () => noop, set: () => true });
 // jsdom has no canvas engine. Stub the 2d context faithfully enough that
 // renderer bugs surface as errors instead of being swallowed.
+globalThis.__drawnText = [];
 window.HTMLCanvasElement.prototype.getContext = () => ({
   measureText: t => ({ width: String(t).length * 6 }),
+  fillText: (t, x, y) => globalThis.__drawnText.push({ t: String(t), x, y }),
+  clip(){}, arc(){}, createPattern: () => ({}),
   setTransform(){}, clearRect(){}, translate(){}, scale(){}, save(){},
   restore(){}, beginPath(){}, moveTo(){}, lineTo(){}, arcTo(){}, closePath(){},
-  bezierCurveTo(){}, fill(){}, stroke(){}, fillRect(){}, fillText(){},
+  bezierCurveTo(){}, fill(){}, stroke(){}, fillRect(){},
   setLineDash(){}, drawImage(){},
   canvas: { width: 0, height: 0 },
 });
@@ -70,6 +73,25 @@ try {
   if (!view.lineage?.has(firstId)) fail2("selection did not build a lineage");
   view.select(null);
   if (view.lineage !== null) fail2("clearing selection left a lineage");
+
+  // ascension-perk locked technologies must be marked on the map
+  {
+    const apTech = [...view.model.techs.values()]
+      .find(t => t.ascensionPerks?.length);
+    if (!apTech) fail2("no ascension-perk technology in the dataset");
+    view.centreOn(apTech.id);
+    await new Promise(r => setTimeout(r, 60));
+    globalThis.__drawnText.length = 0;
+    view.redraw();
+    await new Promise(r => setTimeout(r, 60));
+    const texts = globalThis.__drawnText.map(d => d.t);
+    console.log("AP tech marked:", apTech.id,
+      "badge:", texts.includes("\u2726"),
+      "label:", texts.some(t => /^(Needs|Via) /.test(t)));
+    if (!texts.includes("\u2726")) fail2("ascension perk badge not drawn");
+    if (!texts.some(t => /^(Needs|Via) /.test(t)))
+      fail2("ascension perk label not drawn");
+  }
 
   // unchecking a category must remove its band and cards from the DOM
   {

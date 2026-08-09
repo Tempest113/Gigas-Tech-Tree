@@ -83,6 +83,15 @@ def test_escaped_quotes():
     assert ast.get("desc") == 'she said "hi" twice'
 
 
+def test_multiline_string():
+    """`code = "…"` inline-script parameters span lines (real construct in
+    common/scripted_triggers/zzz_overwrites.txt)."""
+    ast = parse('inline_script = {\n  script = x\n  code = "\n'
+                '    has_building = a\n    has_building = b\n  "\n}\n')
+    code = ast.get("inline_script").get("code")
+    assert "has_building = a" in code and "has_building = b" in code
+
+
 def test_unterminated_string_reports_open_quote_position():
     with pytest.raises(LexError) as ei:
         parse('a = "never closed\nb = 1')

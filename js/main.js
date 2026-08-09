@@ -325,12 +325,18 @@ function showDetail(id) {
     b.textContent = text;
     badges.appendChild(b);
   };
-  addBadge(t.stub ? "external mod (not in Gigas or vanilla)" : t.source,
+  const SOURCE_LABEL = { gigas: "Gigastructures", vanilla: "Vanilla",
+                         local: "Local mod" };
+  addBadge(t.stub ? "external mod (not in Gigastructures or vanilla)"
+                  : (t.sourceLabel ?? SOURCE_LABEL[t.source] ?? t.source),
            t.stub ? "crossmod" : "");
   if (t.overridesVanilla) addBadge("overrides vanilla", "override");
   if (t.crossModGated) addBadge("requires another mod", "crossmod");
   for (const ap of t.ascensionPerks ?? [])
-    addBadge(`requires ascension perk: ${apName(ap)}`, "ap");
+    addBadge(`requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
+  for (const ap of t.inheritedPerks ?? [])
+    if (!(t.ascensionPerks ?? []).includes(ap))
+      addBadge(`needs ${apName(ap, model.perkNames)} via a prerequisite`, "ap");
   if (t.isRare) addBadge("rare");
   if (t.isDangerous) addBadge("dangerous");
   if (t.isRepeatable) {

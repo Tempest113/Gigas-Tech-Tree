@@ -28,16 +28,59 @@ SYNTHETIC_CATEGORIES = (
 )
 
 
-def _collect_ascension_perks(block: Block, out: list) -> None:
-    """Ascension perks named anywhere inside a `potential` block, including
-    nested boolean groups. `NOT = { has_ascension_perk = x }` is skipped —
-    that gates the tech *out*, not in."""
+def _collect_ascension_perks(block: Block, out: list,
+                             triggers: Optional[dict] = None) -> None:
+    """Ascension perks required anywhere inside a `potential` block.
+
+    Two forms occur: `has_ascension_perk = ap_x` directly, and scripted
+    triggers that wrap one — Gigastructures gates most of its content on
+    `has_galactic_wonders = yes` and `has_gigastructural_constructs = yes`,
+    which resolve to `ap_galactic_wonders` and `ap_gigastructural_constructs`
+    (plus the legacy DLC variants, which name the same perk).
+
+    `NOT`/`NOR` groups are skipped: those gate a technology *out*.
+    """
+    triggers = triggers or {}
     for p in block.pairs():
         if p.key == "has_ascension_perk" and isinstance(p.value, str):
             if p.value not in out:
                 out.append(p.value)
+        elif p.key in triggers and p.value == "yes":
+            perk = triggers[p.key]
+            if perk and perk not in out:
+                out.append(perk)
         elif isinstance(p.value, Block) and p.key not in ("NOT", "NOR"):
-            _collect_ascension_perks(p.value, out)
+            _collect_ascension_perks(p.value, out, triggers)
+
+
+def load_ascension_triggers(mod_dir) -> dict:
+    """Map scripted-trigger name -> the ascension perk it requires.
+
+    Only triggers whose whole purpose is an ascension-perk check are useful
+    here; the first perk named wins, since the alternatives in these triggers
+    are legacy DLC variants of the same perk.
+    """
+    from pathlib import Path
+    from .pdx.parser import parse_bytes, ParseError
+    from .pdx.lexer import LexError
+
+    out: dict = {}
+    d = Path(mod_dir) / "common" / "scripted_triggers"
+    if not d.is_dir():
+        return out
+    for f in sorted(d.glob("*.txt")):
+        try:
+            ast = parse_bytes(f.read_bytes())
+        except (ParseError, LexError):
+            continue
+        for p in ast.pairs():
+            if not isinstance(p.value, Block):
+                continue
+            perks: list = []
+            _collect_ascension_perks(p.value, perks)
+            if perks:
+                out[p.key] = perks[0]
+    return out
 
 
 @dataclass
@@ -67,6 +110,8 @@ class Tech:
     icon: Optional[str] = None
     gated: bool = False  # has a non-trivial `potential` block
     ascension_perks: list[str] = field(default_factory=list)
+    #: perks required only via a prerequisite, not by this tech's own script
+    inherited_perks: list[str] = field(default_factory=list)
     cross_mod_gated: bool = False
     cross_mod_reason: Optional[str] = None
 
@@ -114,11 +159,13 @@ def _cond_text(block: Block) -> str:
 def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 loc: LocTable, var_provenance: Optional[VarTable] = None,
                 icon_stems: Optional[set] = None,
-                categories: Optional[dict] = None) -> GraphResult:
+                categories: Optional[dict] = None,
+                ascension_triggers: Optional[dict] = None) -> GraphResult:
     res = GraphResult()
     provenance = var_provenance or vars_
     icon_stems = icon_stems or set()
     categories = categories or {}
+    ascension_triggers = ascension_triggers or {}
 
     # -- extraction ------------------------------------------------------
     for tid, td in techdefs.items():
@@ -169,7 +216,8 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         pot = b.get_last("potential")
         t.gated = isinstance(pot, Block) and len(pot) > 0
         if isinstance(pot, Block):
-            _collect_ascension_perks(pot, t.ascension_perks)
+            _collect_ascension_perks(pot, t.ascension_perks,
+                                     ascension_triggers)
 
         prereq = b.get_last("prerequisites")
         if isinstance(prereq, Block):
@@ -284,6 +332,38 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 colour[node] = BLACK
                 path.pop()
 
+    # -- ascension perks inherited through prerequisites -------------------
+    # A technology behind a Galactic Wonders tech is just as unreachable
+    # without the perk, so the requirement propagates down the graph.
+    order: list[str] = []
+    seen: set = set()
+
+    def visit(tid: str) -> None:
+        if tid in seen:
+            return
+        seen.add(tid)
+        t = res.techs.get(tid)
+        if t:
+            for pid in t.prerequisites:
+                visit(pid)
+        order.append(tid)
+
+    for tid in sorted(res.techs):
+        visit(tid)
+
+    for tid in order:
+        t = res.techs.get(tid)
+        if not t:
+            continue
+        for pid in t.prerequisites:
+            p = res.techs.get(pid)
+            if not p:
+                continue
+            for perk in p.ascension_perks + p.inherited_perks:
+                if perk not in t.ascension_perks and \
+                        perk not in t.inherited_perks:
+                    t.inherited_perks.append(perk)
+
     # -- tier inversions --------------------------------------------------
     for t in res.techs.values():
         if t.tier is None:
@@ -353,6 +433,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "icon": t.icon,
             "gated": t.gated,
             "ascensionPerks": t.ascension_perks,
+            "inheritedPerks": t.inherited_perks,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
             "source": t.raw.source_id,

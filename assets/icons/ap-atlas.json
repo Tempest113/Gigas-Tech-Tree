@@ -1,0 +1,21 @@
+{
+"cell": {
+"h": 60,
+"w": 52
+},
+"columns": 2,
+"icons": {
+"ap_galactic_wonders": {
+"h": 60,
+"w": 52,
+"x": 0,
+"y": 0
+},
+"ap_mechromancy": {
+"h": 60,
+"w": 52,
+"x": 52,
+"y": 0
+}
+}
+}

@@ -67,6 +67,10 @@ const ok = (cond, msg) => {
   const [v, err] = resolve(new VarRef("nope"), t);
   ok(v instanceof VarRef && err.includes("nope"), "unresolved stays symbolic");
 
+  const ml = parse('inline_script = {\n script = x\n code = "\n  a = b\n "\n}\n');
+  ok(ml.get("inline_script").get("code").includes("a = b"),
+     "multi-line string parameter");
+
   const bom = new Uint8Array([0xef, 0xbb, 0xbf, ...new TextEncoder().encode("a = 1\n")]);
   ok(parseBytes(bom.buffer).get("a") === "1", "BOM stripped");
   const cp = new Uint8Array([...new TextEncoder().encode('n = "it'), 0x92,

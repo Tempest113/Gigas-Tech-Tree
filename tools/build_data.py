@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tools.graph import build_graph, to_json_model
+from tools.graph import build_graph, load_ascension_triggers, to_json_model
 from tools.inline_scripts import InlineScriptLibrary
 from tools.loc import LocEntry, LocTable
 from tools.merge import MergeResult, Source, merge_sources
@@ -118,7 +118,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         td.body = lib.expand_block(td.body, context=td.id)
 
     graph = build_graph(merged.techs, vars_, loc,
-                        icon_stems=icon_stems, categories=categories)
+                        icon_stems=icon_stems, categories=categories,
+                        ascension_triggers=load_ascension_triggers(mod_dir))
 
     meta = {
         "schemaVersion": SCHEMA_VERSION,
@@ -153,6 +154,23 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     (out_dir if out_dir.is_dir() else Path(".")).mkdir(parents=True, exist_ok=True)
     (out_dir / "unresolved-loc-keys.json").write_text(
         json.dumps(unresolved, indent=1) + "\n", encoding="utf-8")
+
+    # The exact icon keys the site references: every technology's resolved
+    # icon plus every ascension perk named by a gated technology. The
+    # extractor reads this so it converts only what is needed, rather than
+    # every icon in the game's folders.
+    needed = {t.icon for t in graph.techs.values() if t.icon}
+    needed |= {p for t in graph.techs.values()
+               for p in t.ascension_perks + t.inherited_perks}
+    # Vanilla technologies are composed into the map client-side, so their
+    # icons are referenced too even though they are not in this dataset.
+    if vanilla_path and vanilla_path.is_file():
+        vdoc = json.loads(vanilla_path.read_text(encoding="utf-8"))
+        for v in vdoc.get("technologies", []):
+            needed.add(v.get("icon") or v["id"])
+    needed = sorted(needed)
+    (out_dir / "needed-icons.json").write_text(
+        json.dumps(needed, indent=1) + "\n", encoding="utf-8")
 
     model = to_json_model(graph, categories, meta)
 

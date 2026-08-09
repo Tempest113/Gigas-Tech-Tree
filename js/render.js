@@ -485,11 +485,49 @@ export class MapView {
     ctx.fill();
 
     let textX = it.x + 12;
+    let iconBox = null;
     if (withIcons && t.icon && this.atlasMap?.[t.icon]) {
       const s = this.atlasMap[t.icon];
+      iconBox = { x: it.x + 9, y: it.y + 12, w: 40, h: 40 };
       ctx.drawImage(this.atlas, s.x, s.y, s.w, s.h,
-                    it.x + 9, it.y + 12, 40, 40);
+                    iconBox.x, iconBox.y, iconBox.w, iconBox.h);
       textX = it.x + 57;
+    }
+
+    // Ascension perk lock: a badge over the icon's corner, so the marker is
+    // visible at a glance rather than buried in the card's last line.
+    const perks = (t.ascensionPerks?.length ? t.ascensionPerks
+                   : t.inheritedPerks) ?? [];
+    const perkInherited = !t.ascensionPerks?.length && perks.length > 0;
+
+    if (perks.length && this.scale >= ICON_SCALE) {
+      const bx = iconBox ? iconBox.x + iconBox.w - 4 : it.x + 16;
+      const by = iconBox ? iconBox.y + iconBox.h - 4 : it.y + 18;
+      ctx.beginPath();
+      ctx.arc(bx, by, 9, 0, Math.PI * 2);
+      ctx.fillStyle = C.bg;
+      ctx.fill();
+      ctx.lineWidth = 1.5 / this.scale;
+      ctx.strokeStyle = C.rare;
+      if (perkInherited) ctx.setLineDash([3 / this.scale, 2 / this.scale]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      const icon = this.atlasMap?.[perks[0]];
+      if (icon) {
+        // The perk's own icon, clipped into the badge disc.
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(bx, by, 7.5, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(this.atlas, icon.x, icon.y, icon.w, icon.h,
+                      bx - 8, by - 8, 16, 16);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = C.rare;
+        ctx.font = '700 12px "Chakra Petch", system-ui, sans-serif';
+        const gw = measureCached(ctx, "\u2726");
+        ctx.fillText("\u2726", bx - gw / 2, by + 4.5);
+      }
     }
 
     if (!withText) { ctx.globalAlpha = 1; return; }
@@ -515,10 +553,15 @@ export class MapView {
       ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 42);
     }
 
-    if (t.ascensionPerks?.length) {
+    if (perks.length) {
       ctx.font = FONT_DATA;
       ctx.fillStyle = C.rare;
-      ctx.fillText(`\u2726 ${apName(t.ascensionPerks[0])}`, textX, it.y + 56);
+      // Fitted to the card: perk names such as "Gigastructural Constructs"
+      // overflow otherwise.
+      ctx.fillText(fit(ctx, `${perkInherited ? "Via" : "Needs"} ` +
+                            apName(perks[0], this.model.perkNames),
+                        it.x + CARD_W - 8 - textX),
+                   textX, it.y + 56);
     } else if (t.isDangerous) {
       ctx.font = FONT_DATA;
       ctx.fillStyle = C.danger;
@@ -538,8 +581,12 @@ function addEdge(path, from, to) {
   path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
 }
 
-/* ap_celestial_printing -> "Celestial Printing" */
-export function apName(id) {
+/* Prefer the game's own name for a perk ("Master Builders"); fall back to
+   deriving one from the id, which mangles initialisms ("Qso"). Names come
+   from data/vanilla-structural.json when the extractor has captured them. */
+export function apName(id, names) {
+  const real = names?.[id];
+  if (real) return real;
   return String(id).replace(/^ap_/, "").replace(/_/g, " ")
     .replace(/\b\w/g, c => c.toUpperCase());
 }
