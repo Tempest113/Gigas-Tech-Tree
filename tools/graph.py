@@ -28,6 +28,64 @@ SYNTHETIC_CATEGORIES = (
 )
 
 
+def _collect_perk_groups(block: Block, groups: list,
+                         triggers: Optional[dict] = None,
+                         inside_or: bool = False) -> None:
+    """Ascension perk requirements as *alternative groups*.
+
+    `OR = { has_ascension_perk = ap_a  has_ascension_perk = ap_b }` is one
+    requirement satisfied either way, not two requirements — Gargantuan
+    Cloning Facilities needs Genetic Ascension *or* Mechromancy depending on
+    the empire. Each group is a list of interchangeable perks; separate
+    groups must all be satisfied.
+    """
+    triggers = triggers or {}
+    local: list = []
+    other = False        # non-perk alternatives seen at this level
+    for p in block.pairs():
+        if p.key == "has_ascension_perk" and isinstance(p.value, str):
+            local.append(p.value)
+        elif p.key in triggers and p.value == "yes" and triggers[p.key]:
+            local.append(triggers[p.key])
+        elif isinstance(p.value, Block) and p.key not in ("NOT", "NOR"):
+            if p.key in ("OR", "or"):
+                sub: list = []
+                _collect_perk_groups(p.value, sub, triggers, inside_or=True)
+                perks = [x for grp in sub for x in grp["perks"]]
+                # An OR may offer routes that are not perks at all — The Vat
+                # accepts genetic ascension, a tradition, or Mechromancy. The
+                # perk is then one option among several, not a requirement.
+                has_other = any(grp["other"] for grp in sub) or \
+                    _has_non_perk_option(p.value, triggers)
+                if perks:
+                    groups.append({"perks": sorted(set(perks),
+                                                   key=perks.index),
+                                   "other": has_other})
+            else:
+                _collect_perk_groups(p.value, groups, triggers, inside_or)
+        elif inside_or:
+            other = True
+    if local:
+        if inside_or:
+            groups.append({"perks": local, "other": other})
+        else:
+            for perk in local:
+                groups.append({"perks": [perk], "other": False})
+    elif inside_or and other and not groups:
+        groups.append({"perks": [], "other": True})
+
+
+def _has_non_perk_option(block: Block, triggers: dict) -> bool:
+    """True when an OR offers a route that is not an ascension perk."""
+    for p in block.pairs():
+        if p.key == "has_ascension_perk":
+            continue
+        if p.key in triggers and p.value == "yes":
+            continue
+        return True
+    return False
+
+
 def _collect_ascension_perks(block: Block, out: list,
                              triggers: Optional[dict] = None) -> None:
     """Ascension perks required anywhere inside a `potential` block.
@@ -114,6 +172,9 @@ class Tech:
     inherited_perks: list[str] = field(default_factory=list)
     #: perks that hand this technology to the player outright
     granted_by: list[str] = field(default_factory=list)
+    #: alternative requirement groups: each inner list is satisfied by any
+    #: one of its perks; every group must be satisfied
+    perk_groups: list = field(default_factory=list)
     #: why each perk is attached: perk id -> "potential" | "granted" |
     #: "via <tech id>". Written to data/perk-audit.json for review.
     perk_reasons: dict = field(default_factory=dict)
@@ -313,11 +374,16 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         t.gated = isinstance(pot, Block) and len(pot) > 0
         if isinstance(pot, Block):
             before = list(t.ascension_perks)
-            _collect_ascension_perks(pot, t.ascension_perks,
-                                     ascension_triggers)
-            for perk in t.ascension_perks:
-                if perk not in before:
-                    t.perk_reasons[perk] = "potential"
+            _collect_perk_groups(pot, t.perk_groups, ascension_triggers)
+            # Only a group with exactly one perk and no other route is a
+            # requirement; anything else is an alternative and must not
+            # propagate to dependent technologies.
+            for grp in t.perk_groups:
+                if len(grp["perks"]) == 1 and not grp["other"]:
+                    perk = grp["perks"][0]
+                    if perk not in t.ascension_perks:
+                        t.ascension_perks.append(perk)
+                        t.perk_reasons[perk] = "potential"
         # A perk that hands a technology over is a genuine requirement: the
         # grants that are not player-facing (AI-only branches) are already
         # excluded when the perk files are read, so no weight test is needed
@@ -329,6 +395,8 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
             if perk not in t.ascension_perks:
                 t.ascension_perks.append(perk)
                 t.perk_reasons[perk] = "granted"
+            if not any(grp["perks"] == [perk] for grp in t.perk_groups):
+                t.perk_groups.append({"perks": [perk], "other": False})
 
         prereq = b.get_last("prerequisites")
         if isinstance(prereq, Block):
@@ -548,6 +616,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "inheritedPerks": t.inherited_perks,
             "grantedByPerks": t.granted_by,
             "perkReasons": t.perk_reasons,
+            "perkGroups": t.perk_groups,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
             "source": t.raw.source_id,

@@ -4,6 +4,62 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.7.2
+
+### Added
+
+- **`data/manual-perk-grants.json`** for requirements that cannot be derived
+  from script. The Colossus is granted by a special project which the
+  Colossus Project perk enables — a chain the build does not follow — so it
+  is declared there, and the weapon technologies inherit it through their
+  prerequisites as usual. Manual entries are labelled "manual" in the perk
+  audit, so they are never mistaken for something read from the files.
+
+## 1.7.1
+
+### Fixed
+
+- Ascension gate mode interleaved its bands — "No gate" and "Gigastructural
+  Constructs" each appeared twice, and Dyson Sphere sat under
+  Mega-Engineering — because the offset computed for each gate was being
+  overwritten before it was used. Each gate now owns a disjoint range of
+  columns, verified at zero columns holding more than one gate.
+- Repeatables were seeded on a different scale from the tiers, so they
+  appeared between Tier 1 and Tier 2 instead of after every tier.
+- Band labels are asserted unique in the smoke test, in both modes.
+
+## 1.7.0
+
+### Changed
+
+- **Columns are assigned by dependency, not by tier number.** Every
+  technology starts at a seed column and is pushed right until it sits
+  strictly right of all its prerequisites, so a technology can no longer
+  appear ahead of something it needs — Exodus Jump Coordinator sat left of
+  Jump Drives because their tiers disagreed with their prerequisites.
+  Verified at zero violations across the whole tree in both modes, and
+  asserted in the smoke test.
+- **Gated technologies sit beyond ungated ones.** Within a tier, a
+  technology behind Mega-Engineering sits right of one behind nothing,
+  Galactic Wonders right of that, and Gigastructural Constructs right again,
+  so perk progression reads left to right.
+
+### Added
+
+- **Ascension gate column mode**, chosen in the header (`?cols=gate`):
+  columns become the perk progression itself — no gate, Mega-Engineering,
+  Galactic Wonders, Gigastructural Constructs — instead of research tiers.
+
+### Fixed
+
+- **Either/or requirements.** The Vat needs Galactic Wonders and *either*
+  genetic ascension, a genetics tradition, *or* Mechromancy; it was listed
+  as requiring Mechromancy outright. Alternatives inside an `OR` are now
+  modelled as a group, and only a group with a single perk and no other
+  route counts as a requirement — so alternatives no longer propagate to
+  dependent technologies either. The detail panel lists the alternatives,
+  including "another qualifying condition" where a route is not a perk.
+
 ## 1.6.4
 
 ### Fixed

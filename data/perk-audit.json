@@ -32,7 +32,7 @@
   "techId": "giga_tech_birch_world_1",
   "name": "The Birch World",
   "perks": {
-   "ap_vast_expanses": "potential"
+   "ap_vast_expanses": "granted"
   },
   "weightZero": true,
   "source": "common/technology/giga_05_weightless.txt#L154"
@@ -314,15 +314,6 @@
   "source": "common/technology/giga_12_asteroid_artillery.txt#L159"
  },
  {
-  "techId": "giga_tech_repeatable_dimensional_storage",
-  "name": "Hyperdimensional Storage Applications",
-  "perks": {
-   "ap_gigastructural_constructs": "via giga_tech_tetradimensional_engineering"
-  },
-  "weightZero": false,
-  "source": "common/technology/giga_04_repeatables.txt#L4"
- },
- {
   "techId": "giga_tech_repeatable_gigaforge_cap",
   "name": "Neutronium Gigaforge Management Protocols",
   "perks": {
@@ -407,8 +398,7 @@
   "techId": "giga_tech_repeatable_the_vat_cap",
   "name": "The Vat Management Protocols",
   "perks": {
-   "ap_galactic_wonders": "via giga_tech_the_vat",
-   "ap_mechromancy": "via giga_tech_the_vat"
+   "ap_galactic_wonders": "via giga_tech_the_vat"
   },
   "weightZero": false,
   "source": "common/technology/giga_07_repeatables_megastructures.txt#L565"
@@ -517,20 +507,10 @@
   "source": "common/technology/giga_05_weightless.txt#L230"
  },
  {
-  "techId": "giga_tech_tetradimensional_engineering",
-  "name": "Tetradimensional Engineering",
-  "perks": {
-   "ap_gigastructural_constructs": "potential"
-  },
-  "weightZero": false,
-  "source": "common/technology/giga_01_physics.txt#L190"
- },
- {
   "techId": "giga_tech_the_vat",
   "name": "Gargantuan Cloning Facilities",
   "perks": {
-   "ap_galactic_wonders": "potential",
-   "ap_mechromancy": "potential"
+   "ap_galactic_wonders": "potential"
   },
   "weightZero": false,
   "source": "common/technology/giga_02_society.txt#L300"

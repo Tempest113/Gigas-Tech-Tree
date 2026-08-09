@@ -1,88 +1,209 @@
-/* layout.js — spec §8, revised after first-look feedback.
+/* layout.js — column assignment and section placement.
 
-   Columns = tier, but each tier is subdivided into dependency *sub-columns*:
-   a tech's sub-rank is the longest chain of same-tier prerequisites feeding
-   it, so a T5 tech that needs two other T5 techs sits two sub-columns right
-   of the tier's left edge — a flowchart within the tier instead of one tall
-   stack.
+   The x axis was tier index, with dependency ordering applied only within a
+   tier. That let a technology sit left of a prerequisite whenever the two
+   disagreed with the tier numbers (Exodus Jump Coordinator ahead of Jump
+   Drives), and it could not express progression through ascension perks.
 
-   Sections = category (deduplicated across areas; a category appears once).
-   Ordered by the area owning most of its techs, then name. Node order within
-   each cell via barycentre sweeps, alphabetical tie-breaks. Deterministic. */
+   Columns are now assigned by relaxation: every technology starts at a seed
+   column and is then pushed right until it sits strictly right of every one
+   of its prerequisites. Two seeds are available:
 
-export const CARD_W = 208, CARD_H = 64;
-const SUBCOL_GAP = 44;        // between sub-columns inside a tier
-const TIER_GAP = 140;         // between tiers
-const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
-const MAX_ROWS = 8;           // wrap taller stacks into extra columns
+     "tier"  seed = the technology's tier, nudged right by its ascension
+             gate, so tier progression reads left to right and gated
+             technologies sit beyond ungated ones of the same tier;
+     "gate"  seed = the ascension gate alone — no gate, Mega-Engineering,
+             Galactic Wonders, Gigastructural Constructs — for reading
+             progression through the perks.
+
+   Because relaxation only ever moves a technology right, the invariant
+   "every prerequisite is to the left" holds in both modes. */
+
 import { MISC_CATEGORIES } from "./viewmodel.js";
 
+export const CARD_W = 208, CARD_H = 64;
+const COL_GAP = 56;
+const GROUP_GAP = 120;        // extra space at a tier/gate boundary
+const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
+const MAX_ROWS = 8;
 const AREA_ORDER = ["physics", "society", "engineering", null];
 
-export function layout(techs, visible = null) {
-  // `visible` (a Set of ids, or null) lets the caller lay out only the
-  // filtered subset, so hidden categories collapse their row entirely
-  // rather than leaving an empty band.
+export const GATES = [
+  { id: "none", label: "No gate" },
+  { id: "mega", label: "Mega-Engineering", tech: "tech_mega_engineering" },
+  { id: "galwon", label: "Galactic Wonders", perk: "ap_galactic_wonders" },
+  { id: "gigacon", label: "Gigastructural Constructs",
+    perk: "ap_gigastructural_constructs" },
+];
+
+/* Highest gate a technology sits behind. Perks are checked first because
+   they are the stronger statement; Mega-Engineering counts when it is
+   somewhere in the prerequisite chain. */
+function gateRank(t, needsMega) {
+  const perks = [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? [])];
+  if (perks.includes("ap_gigastructural_constructs")) return 3;
+  if (perks.includes("ap_galactic_wonders")) return 2;
+  if (needsMega.has(t.id)) return 1;
+  return 0;
+}
+
+function megaDescendants(techs) {
+  const out = new Set();
+  const start = techs.get("tech_mega_engineering");
+  if (!start) return out;
+  const stack = ["tech_mega_engineering"];
+  while (stack.length) {
+    const t = techs.get(stack.pop());
+    if (!t) continue;
+    for (const n of t.unlocks ?? []) {
+      if (!out.has(n)) { out.add(n); stack.push(n); }
+    }
+  }
+  return out;
+}
+
+export function layout(techs, visible = null, mode = "tier") {
   const nodes = [...techs.values()]
     .filter(t => visible === null || visible.has(t.id));
   if (!nodes.length) {
-    return { pos: new Map(), furniture: [], width: 0, height: 0 };
+    return { pos: new Map(), furniture: [], width: 0, height: 0, mode };
   }
+
+  const present = new Set(nodes.map(t => t.id));
+  const needsMega = megaDescendants(techs);
 
   const tiers = [...new Set(nodes.filter(t => !t.isRepeatable)
     .map(t => t.tier).filter(t => t !== null))].sort((a, b) => a - b);
-  const tierIndex = new Map(tiers.map((t, i) => [t, i + 1])); // 0 = untiered
-  // Column slots: [untiered] [tier…] [repeatables]. Repeatables live in
-  // their own trailing column regardless of numeric tier (their tier still
-  // shows on the card badge).
-  const nTiers = tiers.length + 2;
-  const REP = nTiers - 1;
-  const tierOf = t => t.isRepeatable ? REP
-    : (t.tier === null || !tierIndex.has(t.tier)) ? 0
-    : tierIndex.get(t.tier);
+  const tierIndex = new Map(tiers.map((t, i) => [t, i + 1]));
 
-  // -- within-tier sub-rank: longest same-tier prerequisite chain ---------
-  const subRank = new Map();
-  const visiting = new Set();
-  const rankOf = t => {
-    if (subRank.has(t.id)) return subRank.get(t.id);
-    if (visiting.has(t.id)) return 0;          // cycle guard
-    visiting.add(t.id);
-    let r = 0;
-    for (const pid of t.prerequisites) {
-      const p = techs.get(pid);
-      if (p && tierOf(p) === tierOf(t)) {
-        r = Math.max(r, rankOf(p) + 1);
-      }
-    }
-    visiting.delete(t.id);
-    subRank.set(t.id, r);
-    return r;
+  // -- seeds ------------------------------------------------------------
+  const seedOf = t => {
+    const gate = gateRank(t, needsMega);
+    if (mode === "gate") return gate;
+    // Same scale as the tier seeds below, or repeatables land among the
+    // early tiers instead of after them.
+    if (t.isRepeatable) return (tiers.length + 1) * 4;
+    const base = t.tier === null || !tierIndex.has(t.tier)
+      ? 0 : tierIndex.get(t.tier);
+    // Within the same tier, a gated technology sits right of an ungated one.
+    return base * 4 + gate;
   };
-  for (const t of nodes) rankOf(t);
 
-  // Per-(section, tier) cells: sub-ranks are compressed to the ranks
-  // actually used in that cell (a cell whose techs are all rank 0 is one
-  // column wide even if another section's chains reach rank 5), and stacks
-  // taller than MAX_ROWS wrap into extra columns. Global tier width = the
-  // widest cell in that tier, so tier bands still align vertically without
-  // every band paying for the deepest chain anywhere in the tree.
+  const col = new Map();
+  for (const t of nodes) col.set(t.id, seedOf(t));
 
-  // -- sections: one per category, area-independent -----------------------
-  const sections = new Map();
-  const sectionArea = new Map();  // category -> area counts
-  for (const t of nodes) {
-    const cat = t.categories[0] ?? "~none";
-    if (!sections.has(cat)) {
-      sections.set(cat, []);
-      sectionArea.set(cat, new Map());
+  /* Gate mode assigns each gate a disjoint range of columns: every
+     technology behind Galactic Wonders sits right of every technology that
+     needs only Mega-Engineering, and so on. This is sound because a gate is
+     inherited by everything downstream, so no technology can depend on one
+     with a higher gate. Without it, relaxation spread long ungated chains
+     across the whole map and the bands interleaved. */
+  const gateOf = new Map(nodes.map(t => [t.id, gateRank(t, needsMega)]));
+  const gateBase = [0, 0, 0, 0];
+
+  // -- relaxation: strictly right of every prerequisite -----------------
+  // Longest-path order via depth-first post-order, cycle-safe.
+  const order = [];
+  const seen = new Set(), busy = new Set();
+  const visit = id => {
+    if (seen.has(id) || busy.has(id)) return;
+    busy.add(id);
+    const t = techs.get(id);
+    if (t) for (const p of t.prerequisites) if (present.has(p)) visit(p);
+    busy.delete(id);
+    seen.add(id);
+    order.push(id);
+  };
+  for (const t of nodes) visit(t.id);
+
+  if (mode === "gate") {
+    // One gate at a time, each starting past the last column the previous
+    // gate used.
+    for (let g = 0; g < GATES.length; g++) {
+      // gateBase[g] was set when the previous gate finished; overwriting it
+      // here would discard the offset and let the bands interleave.
+      for (const id of order) {
+        if (gateOf.get(id) !== g) continue;
+        const t = techs.get(id);
+        let c = gateBase[g];
+        for (const p of t.prerequisites ?? []) {
+          if (present.has(p)) c = Math.max(c, col.get(p) + 1);
+        }
+        col.set(id, c);
+      }
+      let maxCol = gateBase[g];
+      for (const id of order) {
+        if (gateOf.get(id) === g) maxCol = Math.max(maxCol, col.get(id));
+      }
+      if (g + 1 < GATES.length) gateBase[g + 1] = maxCol + 1;
     }
+  } else {
+    for (const id of order) {
+      const t = techs.get(id);
+      if (!t) continue;
+      let c = col.get(id);
+      for (const p of t.prerequisites) {
+        if (!present.has(p)) continue;
+        c = Math.max(c, col.get(p) + 1);
+      }
+      col.set(id, c);
+    }
+  }
+
+  // Compact unused columns so the map has no empty stripes.
+  const used = [...new Set([...col.values()])].sort((a, b) => a - b);
+  const compact = new Map(used.map((c, i) => [c, i]));
+  for (const [id, c] of col) col.set(id, compact.get(c));
+  const nCols = used.length;
+
+  // -- column x positions, with a wider gap at group boundaries ---------
+  // A boundary is where the dominant tier (or gate) of the column changes.
+  const colLabel = new Array(nCols).fill(null);
+  for (const t of nodes) {
+    const c = col.get(t.id);
+    const key = mode === "gate"
+      ? GATES[gateRank(t, needsMega)].label
+      : t.isRepeatable ? "Repeatables"
+      : t.tier === null ? "Untiered" : `Tier ${t.tier}`;
+    if (!colLabel[c]) colLabel[c] = new Map();
+    colLabel[c].set(key, (colLabel[c].get(key) ?? 0) + 1);
+  }
+  /* One label per column: whichever group most of its technologies belong
+     to. Gate mode gives pure bands by construction (each gate owns a
+     disjoint column range), so this is exact there. In tier mode a long
+     chain can carry a low tier into later columns, so a label describes the
+     bulk of a column rather than all of it. */
+  const labels = new Array(nCols).fill("");
+  for (let c = 0; c < nCols; c++) {
+    let best = "", n = -1;
+    for (const [k, v] of (colLabel[c] ?? [])) if (v > n) { best = k; n = v; }
+    labels[c] = best;
+  }
+  const dominant = c => labels[c];
+
+  const colX = new Array(nCols);
+  {
+    let x = 0, prev = null;
+    for (let c = 0; c < nCols; c++) {
+      const label = dominant(c);
+      if (prev !== null && label !== prev) x += GROUP_GAP;
+      colX[c] = x;
+      x += CARD_W + COL_GAP;
+      prev = label;
+    }
+  }
+  const worldW = colX[nCols - 1] + CARD_W;
+
+  // -- sections ---------------------------------------------------------
+  const sections = new Map();
+  const sectionArea = new Map();
+  for (const t of nodes) {
+    const cat = t.categories?.[0] ?? "~none";
+    if (!sections.has(cat)) { sections.set(cat, []); sectionArea.set(cat, new Map()); }
     sections.get(cat).push(t);
     const ac = sectionArea.get(cat);
     ac.set(t.area, (ac.get(t.area) ?? 0) + 1);
   }
-  // Matches panels.js: a category spread across areas is not filed under
-  // any single one.
   const dominantArea = cat => {
     if (MISC_CATEGORIES.includes(cat)) return null;
     const m = sectionArea.get(cat);
@@ -107,61 +228,6 @@ export function layout(techs, visible = null) {
     return a < b ? -1 : a > b ? 1 : 0;
   });
 
-  // Globally used ranks per tier (sorted) — the shared column skeleton.
-  const tierRanks = Array.from({ length: nTiers }, () => new Set());
-  for (const t of nodes) tierRanks[tierOf(t)].add(subRank.get(t.id));
-  const tierRanksSorted = tierRanks.map(s => [...s].sort((a, b) => a - b));
-  for (let i = 0; i < nTiers; i++) tierRanks[i] = tierRanksSorted[i];
-
-  // Pass 1: build every section's cells, measure tier widths.
-  const sectionCells = new Map();   // key -> cells[tier] = [col][row of techs]
-  const tierColsMax = new Array(nTiers).fill(1);
-
-  for (const key of sectionKeys) {
-    const members = sections.get(key);
-    const byTier = Array.from({ length: nTiers }, () => new Map());
-    for (const t of members) {
-      const m = byTier[tierOf(t)];
-      const r = subRank.get(t.id);
-      if (!m.has(r)) m.set(r, []);
-      m.get(r).push(t);
-    }
-    const cells = byTier.map((m, ti) => {
-      // Columns follow the tier's *globally used* rank list so a tech is
-      // never left of a same-tier prerequisite in another section
-      // ("techs ahead of their prerequisites"); ranks this section doesn't
-      // use become empty columns (cheap: width only, no cards). Over-tall
-      // ranks wrap into extra columns, which only ever push later ranks
-      // right — still forward.
-      const globalRanks = tierRanks[ti];
-      const out = [];
-      for (const r of globalRanks) {
-        const col = m.get(r);
-        if (!col) { out.push([]); continue; }
-        col.sort((a, b) => (a.id < b.id ? -1 : 1));
-        for (let i = 0; i < col.length; i += MAX_ROWS)
-          out.push(col.slice(i, i + MAX_ROWS));
-      }
-      return out.length ? out : [[]];
-    });
-    cells.forEach((c, ti) => {
-      tierColsMax[ti] = Math.max(tierColsMax[ti], c.length);
-    });
-    sectionCells.set(key, cells);
-  }
-
-  const tierX = new Array(nTiers);
-  const tierW = new Array(nTiers);
-  {
-    let x = 0;
-    for (let i = 0; i < nTiers; i++) {
-      tierX[i] = x;
-      tierW[i] = tierColsMax[i] * CARD_W + (tierColsMax[i] - 1) * SUBCOL_GAP;
-      x += tierW[i] + TIER_GAP;
-    }
-  }
-  const worldW = tierX[nTiers - 1] + tierW[nTiers - 1];
-
   const pos = new Map();
   const furniture = [];
   const sectionTops = [];
@@ -169,71 +235,72 @@ export function layout(techs, visible = null) {
 
   for (const key of sectionKeys) {
     sectionTops.push(yCursor);
-    const cells = sectionCells.get(key);
-    const flatCols = [];
-    for (const tierCols of cells) for (const c of tierCols) flatCols.push(c);
-    orderByBarycentre(flatCols);
+    const cells = Array.from({ length: nCols }, () => []);
+    for (const t of sections.get(key)) cells[col.get(t.id)].push(t);
 
-    const rows = Math.max(1, ...flatCols.map(c => c.length));
-    const sectionH = rows * (CARD_H + ROW_GAP);
+    // Wrap over-tall stacks into extra rows within the same column.
+    const columns = cells.map(c => {
+      c.sort((a, b) => (a.id < b.id ? -1 : 1));
+      return c;
+    });
+    orderByBarycentre(columns, techs, col, present);
 
-    {
-      const label = key === "~none" ? "uncategorised"
-        : key.replace(/_/g, " ");
-      const area = dominantArea(key);
-      const count = sections.get(key).length;
-      furniture.push({ kind: "band", x: -24, y: yCursor - 46,
-                       w: worldW + 48, h: sectionH + 58, area, cat: key });
-      furniture.push({ kind: "header", text: label, count,
-                       x: -8, y: yCursor - 40, area, cat: key });
-    }
+    const rows = Math.max(1, ...columns.map(c => Math.min(c.length, MAX_ROWS) ||
+                                                 c.length));
+    const tallest = Math.max(1, ...columns.map(c => c.length));
+    const sectionH = Math.max(1, tallest) * (CARD_H + ROW_GAP);
 
-    for (let ti = 0; ti < nTiers; ti++) {
-      cells[ti].forEach((col, si) => {
-        const x = tierX[ti] + si * (CARD_W + SUBCOL_GAP);
-        col.forEach((t, ri) => {
-          pos.set(t.id, { x, y: yCursor + ri * (CARD_H + ROW_GAP) });
-        });
+    columns.forEach((c, ci) => {
+      c.forEach((t, ri) => {
+        pos.set(t.id, { x: colX[ci], y: yCursor + ri * (CARD_H + ROW_GAP) });
       });
-    }
+    });
+
+    furniture.push({
+      kind: "band", x: -24, y: yCursor - 46,
+      w: worldW + 48, h: sectionH + 58,
+      area: dominantArea(key), cat: key,
+    });
+    furniture.push({
+      kind: "header",
+      text: key === "~none" ? "uncategorised" : key.replace(/_/g, " "),
+      count: sections.get(key).length,
+      x: -8, y: yCursor - 40, area: dominantArea(key), cat: key,
+    });
     yCursor += sectionH + SECTION_GAP;
   }
 
-  // Tier columns: a full-height wash alternating in brightness so tier
-  // boundaries read at any zoom, plus labels repeated above every section
-  // (not just at the top of the world).
-  const colLabel = i =>
-    i === 0 ? "Untiered" : i === REP ? "Repeatables" : `Tier ${tiers[i - 1]}`;
-  for (let i = 0; i < nTiers; i++) {
-    furniture.push({
-      kind: "tiercolumn", index: i, parity: i % 2,
-      x: tierX[i] - TIER_GAP / 2, y: 0,
-      w: tierW[i] + TIER_GAP, h: yCursor,
-    });
-    furniture.push({ kind: "tierlabel", text: colLabel(i), x: tierX[i], y: 14 });
+  // -- column labels, once at the top and again above every section ------
+  let prev = null;
+  for (let c = 0; c < nCols; c++) {
+    const label = dominant(c);
+    if (label === prev) continue;      // label each group once
+    prev = label;
+    furniture.push({ kind: "tierlabel", text: label, x: colX[c], y: 14 });
     for (const y of sectionTops) {
-      // Sit in the gap above the band, clear of the category chip which
-      // occupies the band's top-left corner.
-      furniture.push({ kind: "tierlabel", text: colLabel(i),
-                       x: tierX[i], y: y - 66, small: true });
+      furniture.push({ kind: "tierlabel", text: label, x: colX[c],
+                       y: y - 66, small: true });
+    }
+    if (c > 0) {
+      furniture.push({ kind: "tierdivider", x: colX[c] - GROUP_GAP / 2,
+                       y: 0, h: yCursor });
     }
   }
 
-  return { pos, furniture, width: worldW, height: yCursor };
+  return { pos, furniture, width: worldW, height: yCursor, mode };
 }
 
-function orderByBarycentre(cols) {
+function orderByBarycentre(cols, techs, col, present) {
   const rowOf = new Map();
-  const reindex = () =>
-    cols.forEach(c => c.forEach((t, i) => rowOf.set(t.id, i)));
+  const reindex = () => cols.forEach(c => c.forEach((t, i) => rowOf.set(t.id, i)));
   reindex();
 
-  const neighboursIn = (t, colSet) => {
+  const neighbours = (t, refSet) => {
     const out = [];
-    for (const pid of t.prerequisites)
-      if (colSet.has(pid)) out.push(rowOf.get(pid));
-    for (const uid of t.unlocks)
-      if (colSet.has(uid)) out.push(rowOf.get(uid));
+    for (const pid of t.prerequisites ?? [])
+      if (refSet.has(pid)) out.push(rowOf.get(pid));
+    for (const uid of t.unlocks ?? [])
+      if (refSet.has(uid)) out.push(rowOf.get(uid));
     return out;
   };
 
@@ -247,7 +314,7 @@ function orderByBarycentre(cols) {
       if (!ref.length || !cols[ci].length) continue;
       const refSet = new Set(ref.map(t => t.id));
       cols[ci].sort((a, b) => {
-        const na = neighboursIn(a, refSet), nb = neighboursIn(b, refSet);
+        const na = neighbours(a, refSet), nb = neighbours(b, refSet);
         const ba = na.length ? na.reduce((s, v) => s + v, 0) / na.length : rowOf.get(a.id);
         const bb = nb.length ? nb.reduce((s, v) => s + v, 0) / nb.length : rowOf.get(b.id);
         if (ba !== bb) return ba - bb;

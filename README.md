@@ -123,6 +123,20 @@ work without a Gigastructures checkout:
   coordinate file. **Run this after adding or removing any icon**, since the
   renderer draws every icon from the atlas.
 
+### Ascension perk requirements
+
+Requirements are read from script: a technology's own `potential` block,
+scripted triggers that wrap `has_ascension_perk`, and perks that hand a
+technology over with `add_research_option` (AI-only branches excluded).
+They then propagate to dependent technologies.
+
+A few technologies are granted through a chain the build does not follow — a
+perk enables a special project, and the project grants the technology on
+completion, which is how the Colossus works. Those live in
+`data/manual-perk-grants.json`; add the entry point of a chain and dependent
+technologies inherit it. Every marking, derived or manual, is listed with its
+provenance in `data/perk-audit.json` and in the health panel under `?dev`.
+
 ## Troubleshooting
 
 **The map is sluggish.** Add `?dev` to the URL for a draw-time meter

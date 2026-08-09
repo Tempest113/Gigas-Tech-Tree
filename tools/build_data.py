@@ -158,6 +158,18 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     (out_dir / "unresolved-loc-keys.json").write_text(
         json.dumps(unresolved, indent=1) + "\n", encoding="utf-8")
 
+    perk_grants = load_perk_tech_grants(mod_dir)
+    manual_path = out_dir / "manual-perk-grants.json"
+    manual = {}
+    if manual_path.is_file():
+        manual = (json.loads(manual_path.read_text(encoding="utf-8"))
+                  .get("grants") or {})
+        for tid, perks in manual.items():
+            merged_perks = perk_grants.setdefault(tid, [])
+            for p in perks:
+                if p not in merged_perks:
+                    merged_perks.append(p)
+
     # The exact icon keys the site references: every technology's resolved
     # icon plus every ascension perk named by a gated technology. The
     # extractor reads this so it converts only what is needed, rather than
@@ -165,6 +177,7 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     needed = {t.icon for t in graph.techs.values() if t.icon}
     needed |= {p for t in graph.techs.values()
                for p in t.ascension_perks + t.inherited_perks}
+    needed |= {p for perks in perk_grants.values() for p in perks}
     # Vanilla technologies are composed into the map client-side, so their
     # icons are referenced too even though they are not in this dataset.
     if vanilla_path and vanilla_path.is_file():
@@ -184,8 +197,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     # Wonders hands over Ring World, Dyson Sphere and Matter Decompressor).
     # Those are vanilla technologies, composed client-side, so the map has
     # to travel with the dataset.
-    meta["perkGrants"] = {k: v for k, v in
-                          sorted(load_perk_tech_grants(mod_dir).items())}
+    meta["perkGrants"] = {k: sorted(v) for k, v in sorted(perk_grants.items())}
+    meta["manualPerkGrants"] = manual
 
     meta["perkNames"] = {
         p: strip_markup(loc.name(p) or "") or p
@@ -206,7 +219,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         audit.append({
             "techId": tid,
             "name": t.name or tid,
-            "perks": {p: t.perk_reasons.get(p, "?")
+            "perks": {p: ("manual" if p in manual.get(tid, [])
+                          else t.perk_reasons.get(p, "?"))
                       for p in t.ascension_perks + t.inherited_perks},
             "weightZero": weight_is_zero(td_bodies[tid], vars_),
             "source": f"common/technology/{t.raw.source_file}#L{t.raw.line}",

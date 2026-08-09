@@ -98,6 +98,10 @@ try {
     mustNot("tech_mega_engineering", "ap_galactic_wonders");
     // Must not inherit the requirement through Mega-Engineering.
     mustNot("tech_gateway_construction", "ap_galactic_wonders");
+    // Granted through a special project the perk enables; declared in
+    // data/manual-perk-grants.json and inherited by the weapon techs.
+    must("tech_colossus", "ap_colossus");
+    must("tech_pk_cracker", "ap_colossus");
     console.log("perk markings: ring/dyson/decompressor set, "
       + "mega-eng and gateway clear");
   }
@@ -121,6 +125,32 @@ try {
       fail2("ascension perk label not drawn");
     if (texts.some(t => /^(Via|From) /.test(t)))
       fail2("card uses more than one phrasing for perk requirements");
+  }
+
+  // every technology must sit right of its prerequisites, in both modes
+  {
+    const { layout } = await import(pathToFileURL("js/layout.js").href);
+    for (const mode of ["tier", "gate"]) {
+      const lay = layout(view.model.techs, null, mode);
+      let bad = 0, example = null;
+      for (const t of view.model.techs.values()) {
+        const c = lay.pos.get(t.id);
+        if (!c) continue;
+        for (const p of t.prerequisites) {
+          const pc = lay.pos.get(p);
+          if (pc && pc.x >= c.x) { bad++; example ??= `${t.id} <- ${p}`; }
+        }
+      }
+      const labels = lay.furniture
+        .filter(f => f.kind === "tierlabel" && !f.small).map(f => f.text);
+      const repeats = labels.filter((l, i) => labels.indexOf(l) !== i);
+      console.log(`${mode} mode: ${bad} ordering violations, `
+        + `bands ${labels.join(" | ")}`);
+      if (bad) fail2(`${mode} mode places ${bad} technologies left of a `
+                     + `prerequisite (e.g. ${example})`);
+      if (repeats.length)
+        fail2(`${mode} mode repeats a band label: ${repeats.join(", ")}`);
+    }
   }
 
   // requirement filters, hide/show all, and middle-click isolate

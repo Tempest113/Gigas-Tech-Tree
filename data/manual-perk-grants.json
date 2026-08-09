@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "Ascension perk requirements the build cannot derive from script.",
+    "Everything else is read from the files: a technology's own `potential`,",
+    "scripted triggers that wrap `has_ascension_perk`, and perks that grant a",
+    "technology via `add_research_option`. Some technologies are handed over",
+    "through a chain the build does not follow — a perk enables a special",
+    "project, and the project grants the technology on completion — so they",
+    "are listed here instead.",
+    "",
+    "Format: technology id -> list of ascension perk ids. Dependent",
+    "technologies inherit the requirement automatically; list only the entry",
+    "point of a chain.",
+    "",
+    "These appear in data/perk-audit.json with reason \"manual\", so they can",
+    "be told apart from requirements found in script."
+  ],
+  "grants": {
+    "tech_colossus": ["ap_colossus"]
+  }
+}

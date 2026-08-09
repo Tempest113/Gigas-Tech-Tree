@@ -65,6 +65,7 @@ export function compose(model, vanilla) {
         ascensionPerks: v.ascensionPerks ?? [], inheritedPerks: [],
         grantedByPerks: v.grantedByPerks ?? [],
         perkReasons: v.perkReasons ?? {},
+        perkGroups: v.perkGroups ?? [],
         unlockText: [], weightModifiers: [], swaps: [],
         crossModGated: false, source: "vanilla", overridesVanilla: false,
         sourceFile: null, stub: false, vanillaStructural: true,
@@ -94,10 +95,11 @@ export function compose(model, vanilla) {
     if (!t) continue;
     t.grantedByPerks = [...new Set([...(t.grantedByPerks ?? []), ...perks])];
     t.perkReasons = { ...(t.perkReasons ?? {}) };
+    const manual = model.meta?.manualPerkGrants?.[techId] ?? [];
     for (const p of perks) {
       if (!(t.ascensionPerks ?? []).includes(p)) {
         t.ascensionPerks = [...(t.ascensionPerks ?? []), p];
-        t.perkReasons[p] = "granted";
+        t.perkReasons[p] = manual.includes(p) ? "manual" : "granted";
       }
     }
   }

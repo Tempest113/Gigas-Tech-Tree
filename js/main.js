@@ -14,6 +14,8 @@ let view = null;
 let model = null;
 let panels = null;
 let explore = null;
+let colMode = new URLSearchParams(location.search).get("cols") === "gate"
+  ? "gate" : "tier";
 let modSources = [];   // dev: ordered list of locally-loaded mod folders
 
 const DEV = new URLSearchParams(location.search).has("dev");
@@ -130,7 +132,7 @@ function showModel(newModel) {
   $("explore-tab").replaceChildren();
   $("health-body").replaceChildren();
   {
-    const lay = layout(model.techs);
+    const lay = layout(model.techs, null, colMode);
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
                        model, lay, showDetail,
                        id => panels?.isolate(id));
@@ -167,7 +169,7 @@ function showModel(newModel) {
     };
     panels = new Panels(model,
       visible => {
-        view.relayout(layout(model.techs, visible), visible);
+        view.relayout(layout(model.techs, visible, colMode), visible);
         explore?.setFilter(visible);
       },
       jump);
@@ -202,6 +204,16 @@ function bindChrome(jump) {
     b.onclick = () => setTab(b.dataset.tab);
   for (const x of document.querySelectorAll("[data-close]"))
     x.onclick = () => { $(x.dataset.close).hidden = true; };
+
+  const modeSel = $("mode-select");
+  modeSel.value = colMode;
+  modeSel.onchange = () => {
+    colMode = modeSel.value;
+    const p = new URLSearchParams(location.search);
+    if (colMode === "gate") p.set("cols", "gate"); else p.delete("cols");
+    history.replaceState(null, "", p.size ? `?${p}` : location.pathname);
+    view.relayout(layout(model.techs, view.visible, colMode), view.visible);
+  };
 
   $("guide-btn").onclick = e => {
     e.stopPropagation();
@@ -339,6 +351,14 @@ function showDetail(id) {
     addBadge(t.grantedByPerks?.includes(ap)
       ? `granted by ascension perk: ${apName(ap, model.perkNames)}`
       : `requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
+  for (const grp of t.perkGroups ?? []) {
+    if (grp.perks.length > 1 || grp.other) {
+      const names = grp.perks.map(p => apName(p, model.perkNames));
+      const alts = grp.other ? [...names, "another qualifying condition"]
+                             : names;
+      addBadge(`or: ${alts.join(" or ")}`, "ap");
+    }
+  }
   for (const ap of t.inheritedPerks ?? [])
     if (!(t.ascensionPerks ?? []).includes(ap))
       addBadge(`needs ${apName(ap, model.perkNames)}, via a prerequisite`,

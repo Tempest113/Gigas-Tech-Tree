@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.6.4">
+<link rel="stylesheet" href="css/style.css?v=1.7.2">
 </head>
 <body>
 <header class="app-header">
@@ -23,6 +23,13 @@
     <input id="localmod-input" type="file" webkitdirectory multiple hidden>
     <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
     <button id="modlist-btn" class="header-btn" hidden>Mods</button>
+    <label class="diff-toggle" title="Columns by research tier, or by ascension perk gate">
+      <span>Columns</span>
+      <select id="mode-select" aria-label="Column mode">
+        <option value="tier">Tier</option>
+        <option value="gate">Ascension gate</option>
+      </select>
+    </label>
     <button id="guide-btn" class="header-btn" title="How to read this tree">Guide</button>
     <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
     <span id="build-info" class="build-info" title="Upstream commit"></span>
@@ -87,11 +94,13 @@
     <h2>Reading the tree</h2>
 
     <h3>Layout</h3>
-    <p>Columns are research tiers, left to right, with repeatables in their
-    own column at the far right. Within a tier, a technology sits one column
-    further right for each same-tier prerequisite in its chain, so short
-    flows read left to right. Rows are grouped into categories; each band is
-    tinted by its research area.</p>
+    <p>Columns run left to right, and a technology is always to the right of
+    everything it needs. In <strong>Tier</strong> mode columns follow research
+    tiers, with gated technologies sitting beyond ungated ones of the same
+    tier and repeatables at the far right. In <strong>Ascension gate</strong>
+    mode columns are the perk progression itself: no gate, then
+    Mega-Engineering, Galactic Wonders and Gigastructural Constructs. Rows
+    are grouped into categories; each band is tinted by its research area.</p>
     <p>In game, a tier is only available once you have researched
     <strong>six technologies of the previous tier in the same area</strong>
     (physics, society, engineering counted separately). Tier 1 has no such
@@ -163,6 +172,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=1.6.4"></script>
+<script type="module" src="js/main.js?v=1.7.2"></script>
 </body>
 </html>
