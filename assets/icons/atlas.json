@@ -11,5824 +11,5854 @@
 "x": 0,
 "y": 0
 },
-"ap_galactic_wonders": {
+"ap_celestial_printing": {
 "h": 60,
 "w": 52,
 "x": 130,
+"y": 0
+},
+"ap_galactic_wonders": {
+"h": 60,
+"w": 52,
+"x": 234,
+"y": 0
+},
+"ap_gigastructural_constructs": {
+"h": 60,
+"w": 52,
+"x": 338,
 "y": 0
 },
 "ap_mechromancy": {
 "h": 60,
 "w": 52,
-"x": 234,
+"x": 442,
+"y": 0
+},
+"ap_qso": {
+"h": 60,
+"w": 52,
+"x": 546,
+"y": 0
+},
+"ap_supermassive_ehof": {
+"h": 60,
+"w": 52,
+"x": 650,
+"y": 0
+},
+"ap_vast_expanses": {
+"h": 60,
+"w": 52,
+"x": 754,
 "y": 0
 },
 "giga_tech_aeternite_armor": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 4
 },
 "giga_tech_aeternite_planetcraft": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 4
 },
 "giga_tech_aeternite_weaponry": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 4
 },
 "giga_tech_alderson_disk": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 4
 },
 "giga_tech_amb_living_metal_infusion": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 4
 },
 "giga_tech_amb_sentient_metal_molecular_foundries": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 4
 },
 "giga_tech_amb_supertensiles": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 4
 },
 "giga_tech_amb_supertensiles_acot_alpha": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 4
 },
 "giga_tech_amb_supertensiles_acot_delta": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 4
 },
 "giga_tech_amb_supertensiles_acot_phanon": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 4
 },
 "giga_tech_amb_supertensiles_acot_sigma": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 4
 },
 "giga_tech_asteroid_artillery": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 4
 },
 "giga_tech_asteroid_artillery_damage_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 4
 },
 "giga_tech_asteroid_artillery_health_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 4
 },
 "giga_tech_asteroid_artillery_pen_shots": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 4
 },
 "giga_tech_asteroid_artillery_planetcraft_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 4
 },
 "giga_tech_asteroid_manufactory": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 4
 },
 "giga_tech_automated_stripmine_2": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 4
 },
 "giga_tech_birch_world_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 4
 },
 "giga_tech_blokkat_afterburner": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 4
 },
 "giga_tech_blokkat_armor": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 4
 },
 "giga_tech_blokkat_armor_study": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 4
 },
 "giga_tech_blokkat_blokkwork_power_node": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 4
 },
 "giga_tech_blokkat_booster": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 4
 },
 "giga_tech_blokkat_computer": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 4
+"x": 26,
+"y": 64
 },
 "giga_tech_blokkat_dimension_study": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 4
+"x": 130,
+"y": 64
 },
 "giga_tech_blokkat_emitter": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 4
+"x": 234,
+"y": 64
 },
 "giga_tech_blokkat_energy_transfer": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 4
+"x": 338,
+"y": 64
 },
 "giga_tech_blokkat_engineering_repeatable": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 4
+"x": 442,
+"y": 64
 },
 "giga_tech_blokkat_fix_systems": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 64
 },
 "giga_tech_blokkat_ftl": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 64
 },
 "giga_tech_blokkat_gigarelay_core": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 64
 },
 "giga_tech_blokkat_gigarelay_frame": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 64
 },
 "giga_tech_blokkat_history": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 64
 },
 "giga_tech_blokkat_hullrepair": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 64
 },
 "giga_tech_blokkat_intergalactic_logistics": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 64
 },
 "giga_tech_blokkat_laser": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 64
 },
 "giga_tech_blokkat_mega_stage_0": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 64
 },
 "giga_tech_blokkat_mega_stage_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 64
 },
 "giga_tech_blokkat_mega_stage_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 64
 },
 "giga_tech_blokkat_mega_stage_3": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 64
 },
 "giga_tech_blokkat_mega_stage_4": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 64
 },
 "giga_tech_blokkat_missile": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 64
 },
 "giga_tech_blokkat_obliterator": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 64
 },
 "giga_tech_blokkat_pd": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 64
 },
 "giga_tech_blokkat_physics_repeatable": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 64
 },
 "giga_tech_blokkat_plasma": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 64
 },
 "giga_tech_blokkat_reactor": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 64
 },
 "giga_tech_blokkat_reprogram": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 64
 },
 "giga_tech_blokkat_scrap_damage": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 64
 },
 "giga_tech_blokkat_scrap_research": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 64
 },
 "giga_tech_blokkat_scrap_uses": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 64
 },
 "giga_tech_blokkat_sensors": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 64
 },
 "giga_tech_blokkat_shield": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 64
 },
 "giga_tech_blokkat_snare": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 64
 },
 "giga_tech_blokkat_society_repeatable": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 64
 },
 "giga_tech_blokkat_sociology_study": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 64
+"x": 26,
+"y": 124
 },
 "giga_tech_blokkat_strikecraft": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 64
+"x": 130,
+"y": 124
 },
 "giga_tech_blokkat_subplanck_engineering": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 64
+"x": 234,
+"y": 124
 },
 "giga_tech_blokkat_timetravel": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 64
+"x": 338,
+"y": 124
 },
 "giga_tech_brain_o_star": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 64
+"x": 442,
+"y": 124
 },
 "giga_tech_crystal_megabore": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 124
 },
 "giga_tech_defense_nexus_capacity_1": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 124
 },
 "giga_tech_defense_nexus_capacity_2": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 124
 },
 "giga_tech_defense_nexus_damage_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 124
 },
 "giga_tech_defense_nexus_damage_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 124
 },
 "giga_tech_defense_nexus_production_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 124
 },
 "giga_tech_defense_nexus_production_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 124
 },
 "giga_tech_disco_moon": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 124
 },
 "giga_tech_dyson_o_star": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 124
 },
 "giga_tech_eawaf_disenchanter_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 124
 },
 "giga_tech_eawaf_disenchanter_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 124
 },
 "giga_tech_eawaf_disenchanter_3": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 124
 },
 "giga_tech_eawaf_disenchanter_4": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 124
 },
 "giga_tech_eawaf_psifusion": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 124
 },
 "giga_tech_eawaf_sirens_artillery": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 124
 },
 "giga_tech_eawaf_sirens_autocannon": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 124
 },
 "giga_tech_eawaf_sirens_impactor": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 124
 },
 "giga_tech_eawaf_sirens_missile": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 124
 },
 "giga_tech_eawaf_sirens_secret": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 124
 },
 "giga_tech_eawaf_sirens_strike_craft": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 124
 },
 "giga_tech_eawaf_sirens_voidbeam": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 124
 },
 "giga_tech_eawaf_weapons_repeatable": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 124
 },
 "giga_tech_engineering_test_site": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 124
 },
 "giga_tech_equatorial_shipyard": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 124
 },
 "giga_tech_event_exotic_lab_data": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 124
 },
 "giga_tech_event_pouchkinn_lifespan": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 124
 },
 "giga_tech_event_squareworld": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 124
 },
 "giga_tech_fe_megaworkshop_1": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 124
+"x": 26,
+"y": 184
 },
 "giga_tech_fe_megaworkshop_2": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 124
+"x": 130,
+"y": 184
 },
 "giga_tech_fusion_suppressor": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 124
+"x": 234,
+"y": 184
 },
 "giga_tech_hrae_mc": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 124
+"x": 338,
+"y": 184
 },
 "giga_tech_hyperstructural_ass": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 124
+"x": 442,
+"y": 184
 },
 "giga_tech_interstellar_habitat": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 184
 },
 "giga_tech_interstellar_ringworld": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 184
 },
 "giga_tech_kaiser_moon": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 184
 },
 "giga_tech_katzen_panzers": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 184
 },
 "giga_tech_kugelblitz": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 184
 },
 "giga_tech_lifter_o_star": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 184
 },
 "giga_tech_lunar_assembly": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 184
 },
 "giga_tech_macro_scale_weather_manipulation": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 184
 },
 "giga_tech_maginot_firepower_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 184
 },
 "giga_tech_maginot_planetcraft_upgrade": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 184
 },
 "giga_tech_maginot_systemcraft_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 184
 },
 "giga_tech_maginot_world": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 184
 },
 "giga_tech_matrioshka_brain_1": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 184
 },
 "giga_tech_ndb_1": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 184
 },
 "giga_tech_ndb_2": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 184
 },
 "giga_tech_ndb_3": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 184
 },
 "giga_tech_ndb_4": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 184
 },
 "giga_tech_neutronium_gigaforge": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 184
 },
 "giga_tech_nidavellir": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 184
 },
 "giga_tech_orbital_arcologies": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 184
 },
 "giga_tech_orbital_artificial_eco": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 184
 },
 "giga_tech_orbital_elysium": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 184
 },
 "giga_tech_orbital_naval_logistics": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 184
 },
 "giga_tech_orbital_ring_iodizium_hub": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 184
 },
 "giga_tech_orbital_ring_strategic_resources": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 184
 },
 "giga_tech_orbital_ring_supertensiles_mine_hub": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 184
 },
 "giga_tech_penrose_sphere_1": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 184
 },
 "giga_tech_penrose_sphere_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 184
+"x": 26,
+"y": 244
 },
 "giga_tech_penrose_sphere_3": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 184
+"x": 130,
+"y": 244
 },
 "giga_tech_planet_assembly": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 184
+"x": 234,
+"y": 244
 },
 "giga_tech_planetary_computer": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 184
+"x": 338,
+"y": 244
 },
 "giga_tech_planetary_drive_yard": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 184
+"x": 442,
+"y": 244
 },
 "giga_tech_planetary_drive_yard_defense": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 244
 },
 "giga_tech_planetary_drive_yard_shipyard": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 244
 },
 "giga_tech_planetary_seeder_nexus": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 244
 },
 "giga_tech_psychic_beacon": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 244
 },
 "giga_tech_psychic_hypersiphon_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 244
 },
 "giga_tech_psychic_hypersiphon_5": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 244
 },
 "giga_tech_quasi_stellar_1": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 244
 },
 "giga_tech_quasi_stellar_2": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 244
 },
 "giga_tech_quasi_stellar_3": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 244
 },
 "giga_tech_quasi_stellar_4": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 244
 },
 "giga_tech_quasi_stellar_5": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 244
 },
 "giga_tech_quasi_stellar_6": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 244
 },
 "giga_tech_repeatable_alderson_cap": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 244
 },
 "giga_tech_repeatable_asteroid_artillery_cap": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 244
 },
 "giga_tech_repeatable_asteroid_artillery_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 244
 },
 "giga_tech_repeatable_asteroid_manufactory_cap": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 244
 },
 "giga_tech_repeatable_compressor_cap": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 244
 },
 "giga_tech_repeatable_crystal_cap": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 244
 },
 "giga_tech_repeatable_defense_nexus_capacity_upgrade": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 244
 },
 "giga_tech_repeatable_dimensional_storage": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 244
 },
 "giga_tech_repeatable_disco_moon_cap": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 244
 },
 "giga_tech_repeatable_drill_cap": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 244
 },
 "giga_tech_repeatable_furnace_cap": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 244
 },
 "giga_tech_repeatable_geothermal_cap": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 244
 },
 "giga_tech_repeatable_gigaforge_cap": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 244
 },
 "giga_tech_repeatable_glue_cap": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 244
 },
 "giga_tech_repeatable_hraemc_cap": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 244
 },
 "giga_tech_repeatable_hyperstructural_ass_cap": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 244
+"x": 26,
+"y": 304
 },
 "giga_tech_repeatable_increased_katzen_damage": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 244
+"x": 130,
+"y": 304
 },
 "giga_tech_repeatable_kugel_cap": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 244
+"x": 234,
+"y": 304
 },
 "giga_tech_repeatable_lifters_cap": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 244
+"x": 338,
+"y": 304
 },
 "giga_tech_repeatable_maginot_cap": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 244
+"x": 442,
+"y": 304
 },
 "giga_tech_repeatable_matrioshka_brain_cap": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 304
 },
 "giga_tech_repeatable_megabase_cap": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 304
 },
 "giga_tech_repeatable_nidavellir_cap": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 304
 },
 "giga_tech_repeatable_orbital_arcologies_cap": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 304
 },
 "giga_tech_repeatable_orbital_artificial_eco_cap": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 304
 },
 "giga_tech_repeatable_orbital_naval_logistics_cap": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 304
 },
 "giga_tech_repeatable_orchid_cap": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 304
 },
 "giga_tech_repeatable_penrose_sphere_cap": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 304
 },
 "giga_tech_repeatable_planetary_computer_cap": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 304
 },
 "giga_tech_repeatable_planetary_seeder_nexus_cap": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 304
 },
 "giga_tech_repeatable_planetshipyard_cap": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 304
 },
 "giga_tech_repeatable_reduced_mega_building_time": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 304
 },
 "giga_tech_repeatable_shipyard_cap": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 304
 },
 "giga_tech_repeatable_siphon_cap": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 304
 },
 "giga_tech_repeatable_stellarhabitat_cap": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 304
 },
 "giga_tech_repeatable_succ_cap": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 304
 },
 "giga_tech_repeatable_suppressor_cap": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 304
 },
 "giga_tech_repeatable_systemcraft_cap": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 304
 },
 "giga_tech_repeatable_terraform_barren_cap": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 304
 },
 "giga_tech_repeatable_terraform_gasgiant_cap": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 304
 },
 "giga_tech_repeatable_terraform_toxic_cap": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 304
 },
 "giga_tech_repeatable_the_vat_cap": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_array_cap": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_art_cap": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_dyson_cap": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_interstellar_cap": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_matter_cap": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 304
 },
 "giga_tech_repeatable_vanilla_nexus_cap": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 304
+"x": 26,
+"y": 364
 },
 "giga_tech_repeatable_vanilla_ringworld_cap": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 304
+"x": 130,
+"y": 364
 },
 "giga_tech_repeatable_vanilla_shipyard_cap": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 304
+"x": 234,
+"y": 364
 },
 "giga_tech_repeatable_vanilla_strategic_cap": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 304
+"x": 338,
+"y": 364
 },
 "giga_tech_repeatable_warmoon_cap": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 304
+"x": 442,
+"y": 364
 },
 "giga_tech_repeatable_warplanet_cap": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 364
 },
 "giga_tech_ringworld_behemoth": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 364
 },
 "giga_tech_ringworld_buildings": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 364
 },
 "giga_tech_ringworld_gargantuan_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 364
 },
 "giga_tech_ringworld_gargantuan_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 364
 },
 "giga_tech_ringworld_titanic_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 364
 },
 "giga_tech_ringworld_titanic_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 364
 },
 "giga_tech_ringworld_upgrade": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 364
 },
 "giga_tech_star_lifter": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 364
 },
 "giga_tech_stellar_ring_habitat": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 364
 },
 "giga_tech_stellarite_kaiser_moon": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 364
 },
 "giga_tech_substellar_compressor": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 364
 },
 "giga_tech_succ": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 364
 },
 "giga_tech_supermassive_ehof": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 364
 },
 "giga_tech_terraform_barren": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 364
 },
 "giga_tech_terraform_gas": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 364
 },
 "giga_tech_terraform_molten": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 364
 },
 "giga_tech_terraform_shattered": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 364
 },
 "giga_tech_terraform_toxic": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 364
 },
 "giga_tech_tetradimensional_engineering": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 364
 },
 "giga_tech_thaumaturgic_weaponry": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 364
 },
 "giga_tech_the_vat": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 364
 },
 "giga_tech_translate_blokkatese": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 364
 },
 "giga_tech_war_moon_1": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 364
 },
 "giga_tech_war_moon_2": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 364
 },
 "giga_tech_war_moon_artillery": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 364
 },
 "giga_tech_war_moon_sections": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 364
 },
 "giga_tech_war_moon_specialization": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 364
+"x": 26,
+"y": 424
 },
 "giga_tech_war_planet": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 364
+"x": 130,
+"y": 424
 },
 "giga_tech_war_system_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 364
+"x": 234,
+"y": 424
 },
 "giga_tech_war_system_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 364
+"x": 338,
+"y": 424
 },
 "giga_tech_war_system_3": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 364
+"x": 442,
+"y": 424
 },
 "giga_tech_war_system_4": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 424
 },
 "giga_tech_war_system_5": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 424
 },
 "giga_tech_war_system_6": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 424
 },
 "giga_tech_yggdrasil_orchid": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 424
 },
 "null_void_beam": {
 "h": 58,
 "w": 58,
-"x": 439,
+"x": 959,
 "y": 421
 },
 "tech_abstract_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 424
 },
 "tech_abstract_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 424
 },
 "tech_abstract_3": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 424
 },
 "tech_abstract_4": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 424
 },
 "tech_adaptive_bureaucracy": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 424
 },
 "tech_adaptive_combat_algorithms": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 424
 },
 "tech_administrative_ai": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 424
 },
 "tech_advanced_industrial_storm_protection": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 424
 },
 "tech_advanced_metallurgy_1": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 424
 },
 "tech_advanced_metallurgy_2": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 424
 },
 "tech_advanced_storm_manipulation": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 424
 },
 "tech_afterburners_1": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 424
 },
 "tech_afterburners_2": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 424
 },
 "tech_akx_worm_1": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 424
 },
 "tech_akx_worm_2": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 424
 },
 "tech_akx_worm_3": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 424
 },
 "tech_alien_cloning": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 424
 },
 "tech_alien_life_studies": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 424
 },
 "tech_alien_topography": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 424
 },
 "tech_alloy_fossilization": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 424
 },
 "tech_alloys_1": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 424
 },
 "tech_alloys_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 424
 },
 "tech_amoeba_strike_craft_1": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 424
+"x": 26,
+"y": 484
 },
 "tech_antimatter_power": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 424
+"x": 130,
+"y": 484
 },
 "tech_arc_emitter_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 424
+"x": 234,
+"y": 484
 },
 "tech_arc_emitter_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 424
+"x": 338,
+"y": 484
 },
 "tech_arcane_deciphering": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 424
+"x": 442,
+"y": 484
 },
 "tech_archaeo_detection_scrambler": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 484
 },
 "tech_archaeo_lasers": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 484
 },
 "tech_archaeo_mass_accelerator": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 484
 },
 "tech_archaeo_mass_drivers": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 484
 },
 "tech_archaeo_missiles": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 484
 },
 "tech_archaeo_overcharger": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 484
 },
 "tech_archaeo_pk_devolving_beam": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 484
 },
 "tech_archaeo_point_defence": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 484
 },
 "tech_archaeo_rampart": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 484
 },
 "tech_archaeo_refinery": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 484
 },
 "tech_archaeo_strike_crafts": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 484
 },
 "tech_archaeo_titan_beam": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 484
 },
 "tech_archaeoarmor": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 484
 },
 "tech_archaeoshield": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 484
 },
 "tech_archaeostudies": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 484
 },
 "tech_archeology_lab": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 484
 },
 "tech_arkship_construction": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 484
 },
 "tech_arkship_exodus_jump": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 484
 },
 "tech_arkship_planetary_refinery": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 484
 },
 "tech_arkship_stellar_igniter": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 484
 },
 "tech_arkship_system_scanner": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 484
 },
 "tech_arkship_tier_2": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 484
 },
 "tech_arkship_tier_3": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 484
 },
 "tech_armor_hardeners_1": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 484
 },
 "tech_armor_hardeners_2": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 484
 },
 "tech_artificial_moral_codes": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 484
 },
 "tech_ascension_theory": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 484
 },
 "tech_assault_armies": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 484
+"x": 26,
+"y": 544
 },
 "tech_assembly_pattern": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 484
+"x": 130,
+"y": 544
 },
 "tech_assisted_detection": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 484
+"x": 234,
+"y": 544
 },
 "tech_asteroidal_carapace": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 484
+"x": 338,
+"y": 544
 },
 "tech_astral_harvesting": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 484
+"x": 442,
+"y": 544
 },
 "tech_atmospheric_orbital_mechanics": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 544
 },
 "tech_aura_intensification": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 544
 },
 "tech_aura_resonation": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 544
 },
 "tech_autocannons_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 544
 },
 "tech_autocannons_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 544
 },
 "tech_autocannons_3": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 544
 },
 "tech_autocurating_vault": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 544
 },
 "tech_automated_exploration": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 544
 },
 "tech_autonomous_agents": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 544
 },
 "tech_auxiliary_fire_control": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 544
 },
 "tech_basic_health": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 544
 },
 "tech_basic_industry": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 544
 },
 "tech_basic_science_lab_1": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 544
 },
 "tech_basic_science_lab_2": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 544
 },
 "tech_basic_science_lab_3": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 544
 },
 "tech_battleship_build_speed": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 544
 },
 "tech_battleship_hull_1": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 544
 },
 "tech_battleship_hull_2": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 544
 },
 "tech_battleships": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 544
 },
 "tech_binary_motivators": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 544
 },
 "tech_bio_reactor": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 544
 },
 "tech_bio_reactor_2": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 544
 },
 "tech_biomechanics": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 544
 },
 "tech_boarding_cables": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 544
 },
 "tech_btc_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 544
 },
 "tech_capacity_boosters": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 544
 },
 "tech_capital_productivity_1": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 544
 },
 "tech_capital_productivity_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 544
+"x": 26,
+"y": 604
 },
 "tech_capital_productivity_3": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 544
+"x": 130,
+"y": 604
 },
 "tech_centralized_command": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 544
+"x": 234,
+"y": 604
 },
 "tech_civilian_arkship": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 544
+"x": 338,
+"y": 604
 },
 "tech_climate_restoration": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 544
+"x": 442,
+"y": 604
 },
 "tech_cloaking_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 604
 },
 "tech_cloaking_2": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 604
 },
 "tech_cloaking_3": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 604
 },
 "tech_cloaking_dark_matter": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 604
 },
 "tech_cloaking_psi": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 604
 },
 "tech_cloning": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 604
 },
 "tech_cold_fusion_power": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 604
 },
 "tech_collective_production_methods": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 604
 },
 "tech_collective_self": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 604
 },
 "tech_colonial_bureaucracy": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 604
 },
 "tech_colonial_centralization": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 604
 },
 "tech_colonization_1": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 604
 },
 "tech_colonization_2": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 604
 },
 "tech_colonization_3": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 604
 },
 "tech_colonization_4": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 604
 },
 "tech_colonization_5": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 604
 },
 "tech_colossus": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 604
 },
 "tech_combat_computers_1": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 604
 },
 "tech_combat_computers_2": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 604
 },
 "tech_combat_computers_3": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 604
 },
 "tech_combat_computers_autonomous": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 604
 },
 "tech_combat_computers_bio_integration": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 604
 },
 "tech_combat_training": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 604
 },
 "tech_command_matrix": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 604
 },
 "tech_compact_living": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 604
 },
 "tech_condensed_ews": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 604
 },
 "tech_consecration_fields": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 604
 },
 "tech_construction_templates": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 604
+"x": 26,
+"y": 664
 },
 "tech_consumer_good_refinement_1": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 604
+"x": 130,
+"y": 664
 },
 "tech_consumer_good_refinement_2": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 604
+"x": 234,
+"y": 664
 },
 "tech_containment_vessel": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 604
+"x": 338,
+"y": 664
 },
 "tech_controlled_mutations": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 604
+"x": 442,
+"y": 664
 },
 "tech_controlled_mutations_2": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 664
 },
 "tech_corvette_build_speed": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 664
 },
 "tech_corvette_hull_1": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 664
 },
 "tech_corvette_hull_2": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 664
 },
 "tech_corvettes": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 664
 },
 "tech_cosmogenesis_FE_titan": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 664
 },
 "tech_cosmogenesis_battlecruiser": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 664
 },
 "tech_cosmogenesis_crisis_1": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 664
 },
 "tech_cosmogenesis_crisis_2": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 664
 },
 "tech_cosmogenesis_crisis_3": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 664
 },
 "tech_cosmogenesis_crisis_4": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 664
 },
 "tech_cosmogenesis_crisis_5": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 664
 },
 "tech_cosmogenesis_escort": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 664
 },
 "tech_cosmogenesis_harbinger": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 664
 },
 "tech_cosmogenesis_mauler": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 664
 },
 "tech_cosmogenesis_stinger": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 664
 },
 "tech_cosmogenesis_thesis": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 664
 },
 "tech_cosmogenesis_weaver": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 664
 },
 "tech_cosmogenesis_world": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 664
 },
 "tech_covenant_composer": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 664
 },
 "tech_covenant_cradle": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 664
 },
 "tech_covenant_eater": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 664
 },
 "tech_covenant_instrument": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 664
 },
 "tech_covenant_whisperers": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 664
 },
 "tech_critter_feeder": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 664
 },
 "tech_cruiser_build_speed": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 664
 },
 "tech_cruiser_hull_1": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 664
 },
 "tech_cruiser_hull_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 664
+"x": 26,
+"y": 724
 },
 "tech_cruisers": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 664
+"x": 130,
+"y": 724
 },
 "tech_cryostasis_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 664
+"x": 234,
+"y": 724
 },
 "tech_cryostasis_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 664
+"x": 338,
+"y": 724
 },
 "tech_cryovault": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 664
+"x": 442,
+"y": 724
 },
 "tech_crystal_armor_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 724
 },
 "tech_crystal_armor_2": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 724
 },
 "tech_cultural_heritage": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 724
 },
 "tech_curator_lab": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 724
 },
 "tech_dangerous_wildlife": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 724
 },
 "tech_dark_matter_deflector": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 724
 },
 "tech_dark_matter_detection": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 724
 },
 "tech_dark_matter_power_core": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 724
 },
 "tech_dark_matter_propulsion": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 724
 },
 "tech_decryption_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 724
 },
 "tech_decryption_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 724
 },
 "tech_decryption_3": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 724
 },
 "tech_deep_sinkhole": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 724
 },
 "tech_deep_space_citadel": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 724
 },
 "tech_defense_platform_hull_1": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 724
 },
 "tech_dense_jungle": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 724
 },
 "tech_destroyer_build_speed": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 724
 },
 "tech_destroyer_hull_1": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 724
 },
 "tech_destroyer_hull_2": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 724
 },
 "tech_destroyers": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 724
 },
 "tech_detection_array": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 724
 },
 "tech_disruptors_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 724
 },
 "tech_disruptors_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 724
 },
 "tech_disruptors_3": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 724
 },
 "tech_doctrine_fleet_size_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 724
 },
 "tech_doctrine_fleet_size_2": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 724
 },
 "tech_doctrine_fleet_size_3": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 724
 },
 "tech_doctrine_fleet_size_4": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 724
+"x": 26,
+"y": 784
 },
 "tech_doctrine_fleet_size_5": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 724
+"x": 130,
+"y": 784
 },
 "tech_doctrine_navy_size_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 724
+"x": 234,
+"y": 784
 },
 "tech_doctrine_navy_size_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 724
+"x": 338,
+"y": 784
 },
 "tech_doctrine_navy_size_3": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 724
+"x": 442,
+"y": 784
 },
 "tech_doctrine_navy_size_4": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 784
 },
 "tech_dragon_armor": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 784
 },
 "tech_droid_workers": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 784
 },
 "tech_dyson_gun": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 784
 },
 "tech_dyson_sphere": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 784
 },
 "tech_dyson_swarm": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 784
 },
 "tech_eco_simulation": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 784
 },
 "tech_ecological_adaptation": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 784
 },
 "tech_effective_bureaucracy": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 784
 },
 "tech_ehof_phase_01": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 784
 },
 "tech_ehof_phase_02": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 784
 },
 "tech_ehof_phase_03": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 784
 },
 "tech_ehof_phase_04": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 784
 },
 "tech_ehof_sentient_tier_1": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 784
 },
 "tech_ehof_sentient_tier_2": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 784
 },
 "tech_ehof_sentient_tier_3": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 784
 },
 "tech_ehof_sentient_tier_4": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 784
 },
 "tech_ehof_sentient_tier_5": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 784
 },
 "tech_ehof_sentient_tier_6": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 784
 },
 "tech_ehof_sentient_tier_7": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 784
 },
 "tech_ehof_spinal": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 784
 },
 "tech_embodied_dynamism": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 784
 },
 "tech_encryption_1": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 784
 },
 "tech_encryption_2": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 784
 },
 "tech_encryption_3": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 784
 },
 "tech_energy_lance_1": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 784
 },
 "tech_energy_lance_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 784
 },
 "tech_energy_torpedoes_1": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 784
+"x": 26,
+"y": 844
 },
 "tech_energy_torpedoes_2": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 784
+"x": 130,
+"y": 844
 },
 "tech_engineering_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 784
+"x": 234,
+"y": 844
 },
 "tech_engineering_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 784
+"x": 338,
+"y": 844
 },
 "tech_engineering_3": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 784
+"x": 442,
+"y": 844
 },
 "tech_enhanced_cryosleep_sedatives": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 844
 },
 "tech_enigmatic_decoder": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 844
 },
 "tech_enigmatic_encoder": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 844
 },
 "tech_epigenetic_triggers": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 844
 },
 "tech_executive_retreat": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 844
 },
 "tech_existential_campaigns": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 844
 },
 "tech_exotic_gases": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 844
 },
 "tech_experimental_subspace_navigation": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 844
 },
 "tech_extradimensional_weapon_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 844
 },
 "tech_fe_administration_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 844
 },
 "tech_fe_administration_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 844
 },
 "tech_fe_affluence_1": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 844
 },
 "tech_fe_affluence_2": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 844
 },
 "tech_fe_assembly_1": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 844
 },
 "tech_fe_assembly_2": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 844
 },
 "tech_fe_clinic_1": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 844
 },
 "tech_fe_clinic_2": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 844
 },
 "tech_fe_dome_1": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 844
 },
 "tech_fe_dome_2": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 844
 },
 "tech_fe_entertainment_1": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 844
 },
 "tech_fe_entertainment_2": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 844
 },
 "tech_fe_fabricator_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 844
 },
 "tech_fe_fabricator_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 844
 },
 "tech_fe_forge_1": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 844
 },
 "tech_fe_forge_2": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 844
 },
 "tech_fe_fortress_1": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 844
 },
 "tech_fe_fortress_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 844
 },
 "tech_fe_lab_1": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 844
+"x": 26,
+"y": 904
 },
 "tech_fe_lab_2": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 844
+"x": 130,
+"y": 904
 },
 "tech_fe_market_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 844
+"x": 234,
+"y": 904
 },
 "tech_fe_market_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 844
+"x": 338,
+"y": 904
 },
 "tech_fe_mine_1": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 844
+"x": 442,
+"y": 904
 },
 "tech_fe_mine_2": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 904
 },
 "tech_fe_nourishment_1": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 904
 },
 "tech_fe_nourishment_2": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 904
 },
 "tech_fe_security_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 904
 },
 "tech_fe_security_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 904
 },
 "tech_fe_silo_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 904
 },
 "tech_fe_silo_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 904
 },
 "tech_fe_singularity_1": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 904
 },
 "tech_fe_singularity_2": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 904
 },
 "tech_federation_code": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 904
 },
 "tech_field_e_e_t": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 904
 },
 "tech_fission_power": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 904
 },
 "tech_flak_batteries_1": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 904
 },
 "tech_flak_batteries_2": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 904
 },
 "tech_flak_batteries_3": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 904
 },
 "tech_food_processing_1": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 904
 },
 "tech_food_processing_2": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 904
 },
 "tech_frameworld_defensive_station_2": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 904
 },
 "tech_frameworld_defensive_station_3": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 904
 },
 "tech_frameworld_defensive_station_4": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 904
 },
 "tech_frameworld_defensive_station_5": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 904
 },
 "tech_frameworld_harvest_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 904
 },
 "tech_frameworld_harvest_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 904
 },
 "tech_frameworld_harvest_3": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 904
 },
 "tech_frameworld_repeatable_outpost_output": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 904
 },
 "tech_frontier_health": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 904
 },
 "tech_frontier_hospital": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 904
 },
 "tech_ftl_inhibitor": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 904
+"x": 26,
+"y": 964
 },
 "tech_fusion_power": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 904
+"x": 130,
+"y": 964
 },
 "tech_galactic_administration": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 904
+"x": 234,
+"y": 964
 },
 "tech_galactic_ambitions": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 904
+"x": 338,
+"y": 964
 },
 "tech_galactic_archivism": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 904
+"x": 442,
+"y": 964
 },
 "tech_galactic_bureaucracy": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 964
 },
 "tech_galactic_campaigns": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 964
 },
 "tech_galactic_markets": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 964
 },
 "tech_gargantuan_evolution": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 964
 },
 "tech_gateway_activation": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 964
 },
 "tech_gateway_construction": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 964
 },
 "tech_gene_banks": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 964
 },
 "tech_gene_crops": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 964
 },
 "tech_gene_expressions": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 964
 },
 "tech_gene_seed_purification": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 964
 },
 "tech_gene_tailoring": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 964
 },
 "tech_genome_mapping": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 964
 },
 "tech_georadiation_terraforming": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 964
 },
 "tech_giga_planetary_shield_generator_2": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 964
 },
 "tech_giga_power_plant_1": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 964
 },
 "tech_giga_power_plant_2": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 964
 },
 "tech_giga_power_plant_3": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 964
 },
 "tech_glandular_acclimation": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 964
 },
 "tech_global_defense_grid": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 964
 },
 "tech_global_production_strategy": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 964
 },
 "tech_global_research_initiative": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 964
 },
 "tech_gravity_snare_capacity_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 964
 },
 "tech_gravity_snare_capacity_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 964
 },
 "tech_gravity_snare_capacity_3": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 964
 },
 "tech_gravity_wells": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 964
 },
 "tech_ground_defense_planning": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 964
 },
 "tech_growth_chamber_1": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 964
 },
 "tech_growth_chamber_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 964
+"x": 26,
+"y": 1024
 },
 "tech_habitat_1": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 964
+"x": 130,
+"y": 1024
 },
 "tech_habitat_2": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 964
+"x": 234,
+"y": 1024
 },
 "tech_habitat_3": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 964
+"x": 338,
+"y": 1024
 },
 "tech_harbinger_build_speed": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 964
+"x": 442,
+"y": 1024
 },
 "tech_harbinger_growth_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1024
 },
 "tech_harbinger_growth_2": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1024
 },
 "tech_harbingers": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1024
 },
 "tech_hardlight_c_u": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1024
 },
 "tech_heritage_site": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1024
 },
 "tech_hive_cluster": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1024
 },
 "tech_hive_confluence": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1024
 },
 "tech_hive_node": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1024
 },
 "tech_holo_entertainment": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1024
 },
 "tech_holographic_rituals": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1024
 },
 "tech_housing_1": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1024
 },
 "tech_housing_2": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1024
 },
 "tech_housing_agrarian_idyll": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1024
 },
 "tech_hydroponics": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1024
 },
 "tech_hyper_drive_1": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1024
 },
 "tech_hyper_drive_2": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1024
 },
 "tech_hyper_drive_3": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1024
 },
 "tech_hyper_drive_bio_integration": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1024
 },
 "tech_hyper_entertainment_forum": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1024
 },
 "tech_hyper_relays": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1024
 },
 "tech_hypercomms_forum": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1024
 },
 "tech_hyperlane_p_t": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1024
 },
 "tech_identity_copy": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1024
 },
 "tech_identity_fusion": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1024
 },
 "tech_identity_initialization": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1024
 },
 "tech_improved_incubators": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1024
 },
 "tech_industrial_farming": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1024
 },
 "tech_industrial_storm_protection": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1024
+"x": 26,
+"y": 1084
 },
 "tech_integrated_cybernetics": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1024
+"x": 130,
+"y": 1084
 },
 "tech_interplanetary_commerce": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1024
+"x": 234,
+"y": 1084
 },
 "tech_interstellar_assembly": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1024
+"x": 338,
+"y": 1084
 },
 "tech_interstellar_campaigns": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1024
+"x": 442,
+"y": 1084
 },
 "tech_interstellar_economics": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1084
 },
 "tech_interstellar_fleet_traditions": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1084
 },
 "tech_juggernaut": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1084
 },
 "tech_jump_drive_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1084
 },
 "tech_katzen_atomic_munitions": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1084
 },
 "tech_kinetic_artillery_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1084
 },
 "tech_kinetic_artillery_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1084
 },
 "tech_l_conductor": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1084
 },
 "tech_lasers_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1084
 },
 "tech_lasers_2": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1084
 },
 "tech_lasers_3": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1084
 },
 "tech_lasers_4": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1084
 },
 "tech_lasers_5": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1084
 },
 "tech_lathe_cogitator": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1084
 },
 "tech_lathe_life_support": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1084
 },
 "tech_lathe_overclocker": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1084
 },
 "tech_lathe_preserver": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1084
 },
 "tech_lathe_resonator": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1084
 },
 "tech_lathe_validator": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1084
 },
 "tech_leviathan_techgenesis": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1084
 },
 "tech_lgate_activation": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1084
 },
 "tech_living_state": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1084
 },
 "tech_living_test_subjects": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1084
 },
 "tech_lost_building_methods": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1084
 },
 "tech_luxuries_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1084
 },
 "tech_luxuries_2": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1084
 },
 "tech_mandibles_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1084
 },
 "tech_mandibles_3": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1084
+"x": 26,
+"y": 1144
 },
 "tech_manifest_destiny": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1084
+"x": 130,
+"y": 1144
 },
 "tech_mass_accelerator_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1084
+"x": 234,
+"y": 1144
 },
 "tech_mass_accelerator_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1084
+"x": 338,
+"y": 1144
 },
 "tech_mass_drivers_1": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1084
+"x": 442,
+"y": 1144
 },
 "tech_mass_drivers_2": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1144
 },
 "tech_mass_drivers_3": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1144
 },
 "tech_mass_drivers_4": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1144
 },
 "tech_mass_drivers_5": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1144
 },
 "tech_massive_glacier": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1144
 },
 "tech_materiality_engine": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1144
 },
 "tech_matter_decompressor": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1144
 },
 "tech_mauler_build_speed": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1144
 },
 "tech_mauler_growth_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1144
 },
 "tech_mauler_growth_2": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1144
 },
 "tech_maulers": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1144
 },
 "tech_mechanized_mining": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1144
 },
 "tech_mega_art": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1144
 },
 "tech_mega_assembly": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1144
 },
 "tech_mega_engineering": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1144
 },
 "tech_mega_shipyard": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1144
 },
 "tech_metabolic_gases": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1144
 },
 "tech_micro_replicators": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1144
 },
 "tech_military_arkship": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1144
 },
 "tech_mine_betharian": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1144
 },
 "tech_mine_dark_matter": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1144
 },
 "tech_mine_living_metal": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1144
 },
 "tech_mine_rare_crystals": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1144
 },
 "tech_mine_zro": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1144
 },
 "tech_mineral_purification_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1144
 },
 "tech_mineral_purification_2": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1144
 },
 "tech_mining_1": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1144
 },
 "tech_mining_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1144
+"x": 26,
+"y": 1204
 },
 "tech_mining_3": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1144
+"x": 130,
+"y": 1204
 },
 "tech_mining_drone_weapon_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1144
+"x": 234,
+"y": 1204
 },
 "tech_missiles_1": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1144
+"x": 338,
+"y": 1204
 },
 "tech_missiles_2": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1144
+"x": 442,
+"y": 1204
 },
 "tech_missiles_3": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1204
 },
 "tech_missiles_4": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1204
 },
 "tech_missiles_5": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1204
 },
 "tech_modular_engineering": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1204
 },
 "tech_morphogenetic_field_mastery": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1204
 },
 "tech_mountain_range": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1204
 },
 "tech_nanite_assemblers": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1204
 },
 "tech_nanite_autocannon": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1204
 },
 "tech_nanite_flak_batteries": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1204
 },
 "tech_nanite_repair_system": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1204
 },
 "tech_nanite_repair_system_synth_queen": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1204
 },
 "tech_nanite_transmutation": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1204
 },
 "tech_nano_vitality_crops": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1204
 },
 "tech_negative_e_s": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1204
 },
 "tech_negative_pressure": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1204
 },
 "tech_neural_implants": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1204
 },
 "tech_neuro_quantum_links": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1204
 },
 "tech_neuroregeneration": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1204
 },
 "tech_new_numbers": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1204
 },
 "tech_nm_utilization_1": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1204
 },
 "tech_nm_utilization_2": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1204
 },
 "tech_node_culling_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1204
 },
 "tech_node_culling_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1204
 },
 "tech_node_culling_3": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1204
 },
 "tech_node_reformatting_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1204
 },
 "tech_node_reformatting_2": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1204
 },
 "tech_node_reformatting_3": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1204
 },
 "tech_non_local_r_i": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1204
+"x": 26,
+"y": 1264
 },
 "tech_noxious_swamp": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1204
+"x": 130,
+"y": 1264
 },
 "tech_nutrient_replication": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1204
+"x": 234,
+"y": 1264
 },
 "tech_orbital_arc_furnace": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1204
+"x": 338,
+"y": 1264
 },
 "tech_orbital_maneuvers": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1204
+"x": 442,
+"y": 1264
 },
 "tech_orbital_ring_tier_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1264
 },
 "tech_orbital_trash_dispersal": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1264
 },
 "tech_ordered_retreat": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1264
 },
 "tech_paradise_dome": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1264
 },
 "tech_pd_tracking_1": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1264
 },
 "tech_pd_tracking_2": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1264
 },
 "tech_pd_tracking_3": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1264
 },
 "tech_penal_colonies": {
 "h": 45,
 "w": 45,
-"x": 757,
+"x": 1277,
 "y": 1267
 },
 "tech_photonic_m": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1264
 },
 "tech_physics_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1264
 },
 "tech_physics_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1264
 },
 "tech_physics_3": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1264
 },
 "tech_pk_cracker": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1264
 },
 "tech_pk_godray": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1264
 },
 "tech_pk_nanobots": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1264
 },
 "tech_pk_neutron": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1264
 },
 "tech_pk_shielder": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1264
 },
 "tech_pk_smelter": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1264
 },
 "tech_planetary_defenses": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1264
 },
 "tech_planetary_engineering": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1264
 },
 "tech_planetary_government": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1264
 },
 "tech_planetary_infrastructure_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1264
 },
 "tech_planetary_infrastructure_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1264
 },
 "tech_planetary_shield_generator": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1264
 },
 "tech_planetary_unification": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1264
 },
 "tech_plasma_1": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1264
 },
 "tech_plasma_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1264
 },
 "tech_plasma_3": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1264
+"x": 26,
+"y": 1324
 },
 "tech_positronic_implants": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1264
+"x": 130,
+"y": 1324
 },
 "tech_power_hub_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1264
+"x": 234,
+"y": 1324
 },
 "tech_power_hub_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1264
+"x": 338,
+"y": 1324
 },
 "tech_power_plant_1": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1264
+"x": 442,
+"y": 1324
 },
 "tech_power_plant_2": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1324
 },
 "tech_power_plant_3": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1324
 },
 "tech_power_plant_4": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1324
 },
 "tech_powered_exoskeletons": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1324
 },
 "tech_precognition_interface": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1324
 },
 "tech_predatory_tactics": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1324
 },
 "tech_prescient_data_modeling": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1324
 },
 "tech_prob_c": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1324
 },
 "tech_psi_jump_drive_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1324
 },
 "tech_psionic_aura": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1324
 },
 "tech_psionic_barrier": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1324
 },
 "tech_psionic_bombers": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1324
 },
 "tech_psionic_disruptor": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1324
 },
 "tech_psionic_lightning": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1324
 },
 "tech_psionic_shield": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1324
 },
 "tech_psionic_suppression": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1324
 },
 "tech_psionic_theory": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1324
 },
 "tech_pyroclastic_resonation": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1324
 },
 "tech_qnm_arc_emitter": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1324
 },
 "tech_qnm_disruptors": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1324
 },
 "tech_qnm_energy_lance": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1324
 },
 "tech_qnm_energy_torpedoes": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1324
 },
 "tech_qnm_jumpdrive": {
 "h": 58,
 "w": 58,
-"x": 2311,
+"x": 2831,
 "y": 1321
 },
 "tech_qnm_lasers": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1324
 },
 "tech_qnm_pd_tracking": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1324
 },
 "tech_qnm_plasma": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1324
 },
 "tech_qnm_reactors": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1324
 },
 "tech_qnm_sensors": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1324
+"x": 26,
+"y": 1384
 },
 "tech_qnm_shields": {
 "h": 58,
 "w": 58,
-"x": 2935,
-"y": 1321
+"x": 127,
+"y": 1381
 },
 "tech_qnm_thrusters": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1324
+"x": 234,
+"y": 1384
 },
 "tech_qnm_titanic": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1324
+"x": 338,
+"y": 1384
 },
 "tech_qnm_utilities": {
 "h": 58,
 "w": 58,
-"x": 3247,
-"y": 1321
+"x": 439,
+"y": 1381
 },
 "tech_quantum_catapult": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1384
 },
 "tech_quasi_neural_net": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1384
 },
 "tech_quicksand_basin": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1384
 },
 "tech_rare_crystals": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1384
 },
 "tech_reactor_boosters_1": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1384
 },
 "tech_reactor_boosters_2": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1384
 },
 "tech_reactor_boosters_3": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1384
 },
 "tech_refit_standards": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1384
 },
 "tech_regenerative_hull_tissue": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1384
 },
 "tech_repeatable_command_limit": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1384
 },
 "tech_repeatable_improved_armor_output": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1384
 },
 "tech_repeatable_improved_army_damage": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1384
 },
 "tech_repeatable_improved_army_health": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1384
 },
 "tech_repeatable_improved_core_system_cap": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1384
 },
 "tech_repeatable_improved_leader_life_span": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1384
 },
 "tech_repeatable_improved_military_station_damage": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1384
 },
 "tech_repeatable_improved_military_station_health": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1384
 },
 "tech_repeatable_improved_shield_output": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1384
 },
 "tech_repeatable_improved_starbase_capacity": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1384
 },
 "tech_repeatable_improved_tile_energy_output": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1384
 },
 "tech_repeatable_improved_tile_food_output": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1384
 },
 "tech_repeatable_improved_tile_mineral_output": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1384
 },
 "tech_repeatable_lcluster_clue": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1384
 },
 "tech_repeatable_naval_cap": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1384
 },
 "tech_repeatable_reduced_building_cost": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1384
 },
 "tech_repeatable_reduced_building_time": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1384
 },
 "tech_repeatable_weapon_type_energy_damage": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1384
 },
 "tech_repeatable_weapon_type_energy_fire_rate": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1384
+"x": 26,
+"y": 1444
 },
 "tech_repeatable_weapon_type_explosive_damage": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1384
+"x": 130,
+"y": 1444
 },
 "tech_repeatable_weapon_type_explosive_fire_rate": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1384
+"x": 234,
+"y": 1444
 },
 "tech_repeatable_weapon_type_kinetic_damage": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1384
+"x": 338,
+"y": 1444
 },
 "tech_repeatable_weapon_type_kinetic_fire_rate": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1384
+"x": 442,
+"y": 1444
 },
 "tech_repeatable_weapon_type_strike_craft_fire_damage": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1444
 },
 "tech_repeatable_weapon_type_strike_craft_fire_rate": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1444
 },
 "tech_resort_colonies": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1444
 },
 "tech_resource_processing_algorithms": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1444
 },
 "tech_rift_sphere": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1444
 },
 "tech_ring_world": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1444
 },
 "tech_robomodding": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1444
 },
 "tech_robomodding_m": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1444
 },
 "tech_robomodding_points_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1444
 },
 "tech_robomodding_points_2": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1444
 },
 "tech_robotic_workers": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1444
 },
 "tech_sapient_ai": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1444
 },
 "tech_satisfying_insults": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1444
 },
 "tech_science_arkship": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1444
 },
 "tech_science_nexus": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1444
 },
 "tech_scourge_deployment": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1444
 },
 "tech_scourge_missile_1": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1444
 },
 "tech_secrets_baol": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1444
 },
 "tech_secrets_cybrex": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1444
 },
 "tech_secrets_irassian": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1444
 },
 "tech_secrets_league": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1444
 },
 "tech_secrets_vultaum": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1444
 },
 "tech_secrets_yuht": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1444
 },
 "tech_secrets_zroni": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1444
 },
 "tech_selected_lineages": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1444
 },
 "tech_self_assembling_components": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1444
 },
 "tech_self_aware_logic": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1444
 },
 "tech_sensors_2": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1444
+"x": 26,
+"y": 1504
 },
 "tech_sensors_3": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1444
+"x": 130,
+"y": 1504
 },
 "tech_sensors_4": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1444
+"x": 234,
+"y": 1504
 },
 "tech_sensors_bio_integration": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1444
+"x": 338,
+"y": 1504
 },
 "tech_sentry_array": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1444
+"x": 442,
+"y": 1504
 },
 "tech_shield_hardeners_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1504
 },
 "tech_shield_hardeners_2": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1504
 },
 "tech_shield_rechargers_1": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1504
 },
 "tech_shields_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1504
 },
 "tech_shields_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1504
 },
 "tech_shields_3": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1504
 },
 "tech_shields_4": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1504
 },
 "tech_shields_5": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1504
 },
 "tech_ship_armor_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1504
 },
 "tech_ship_armor_2": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1504
 },
 "tech_ship_armor_3": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1504
 },
 "tech_ship_armor_4": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1504
 },
 "tech_ship_armor_5": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1504
 },
 "tech_ship_hull_storm_breaker_1": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1504
 },
 "tech_ship_hull_storm_breaker_2": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1504
 },
 "tech_ship_storm_weapons_1": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1504
 },
 "tech_ship_storm_weapons_2": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1504
 },
 "tech_slave_colonies": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1504
 },
 "tech_sm_armor": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1504
 },
 "tech_sm_auto_repair": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1504
 },
 "tech_sm_autocannons": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1504
 },
 "tech_sm_computers": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1504
 },
 "tech_sm_flak_batteries": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1504
 },
 "tech_sm_kinetic_artillery": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1504
 },
 "tech_sm_mass_accelerator": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1504
 },
 "tech_sm_mass_drivers": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1504
 },
 "tech_sm_megastructure": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1504
 },
 "tech_sm_titanic": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1504
+"x": 26,
+"y": 1564
 },
 "tech_society_1": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1504
+"x": 130,
+"y": 1564
 },
 "tech_society_2": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1504
+"x": 234,
+"y": 1564
 },
 "tech_society_3": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1504
+"x": 338,
+"y": 1564
 },
 "tech_solar_panel_network": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1504
+"x": 442,
+"y": 1564
 },
 "tech_space_cloud_weapon_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1564
 },
 "tech_space_construction": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1564
 },
 "tech_space_defense_station_1": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1564
 },
 "tech_space_defense_station_improvement": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1564
 },
 "tech_space_exploration": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1564
 },
 "tech_space_mining_1": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1564
 },
 "tech_space_mining_2": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1564
 },
 "tech_space_mining_3": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1564
 },
 "tech_space_mining_4": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1564
 },
 "tech_space_mining_5": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1564
 },
 "tech_space_science_1": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1564
 },
 "tech_space_science_2": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1564
 },
 "tech_space_science_3": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1564
 },
 "tech_space_science_4": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1564
 },
 "tech_space_science_5": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1564
 },
 "tech_space_trading": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1564
 },
 "tech_space_whale_weapon_1": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1564
 },
 "tech_ssn_det": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1564
 },
 "tech_starbase_1": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1564
 },
 "tech_starbase_2": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1564
 },
 "tech_starbase_3": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1564
 },
 "tech_starbase_4": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1564
 },
 "tech_starbase_5": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1564
 },
 "tech_starfire_cannon": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1564
 },
 "tech_stinger_build_speed": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1564
 },
 "tech_stinger_growth_1": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1564
 },
 "tech_stinger_growth_2": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1564
 },
 "tech_stingers": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1564
+"x": 26,
+"y": 1624
 },
 "tech_storm_manipulation": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1564
+"x": 130,
+"y": 1624
 },
 "tech_storm_prediction_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1564
+"x": 234,
+"y": 1624
 },
 "tech_storm_prediction_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1564
+"x": 338,
+"y": 1624
 },
 "tech_strategic_coordination": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1564
+"x": 442,
+"y": 1624
 },
 "tech_strike_craft_1": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1624
 },
 "tech_strike_craft_2": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1624
 },
 "tech_strike_craft_3": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1624
 },
 "tech_strike_craft_skrand": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1624
 },
 "tech_subdermal_stimulation": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1624
 },
 "tech_subspace_drive": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1624
 },
 "tech_supreme_alloy": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1624
 },
 "tech_swarm_strike_craft_1": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1624
 },
 "tech_swarmer_missiles_1": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1624
 },
 "tech_swarmer_missiles_2": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1624
 },
 "tech_synchronized_defences": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1624
 },
 "tech_synth_queen_knowledge": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1624
 },
 "tech_synthetic_leaders": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1624
 },
 "tech_synthetic_thought_patterns": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1624
 },
 "tech_synthetic_workers": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1624
 },
 "tech_telepathy": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1624
 },
 "tech_temple_of_transportation": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1624
 },
 "tech_terrestrial_sculpting": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1624
 },
 "tech_thought_enforcement": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1624
 },
 "tech_thrusters_1": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1624
 },
 "tech_thrusters_2": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1624
 },
 "tech_thrusters_3": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1624
 },
 "tech_thrusters_4": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1624
 },
 "tech_thrusters_bio_integration": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1624
 },
 "tech_titan_hull_1": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1624
 },
 "tech_titan_hull_2": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1624
 },
 "tech_titans": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1624
 },
 "tech_tomb_world_adaption": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1624
+"x": 26,
+"y": 1684
 },
 "tech_torpedoes_1": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1624
+"x": 130,
+"y": 1684
 },
 "tech_torpedoes_2": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1624
+"x": 234,
+"y": 1684
 },
 "tech_torpedoes_3": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1624
+"x": 338,
+"y": 1684
 },
 "tech_toxic_kelp": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1624
+"x": 442,
+"y": 1684
 },
 "tech_tracking_implants": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1684
 },
 "tech_transcendent_faith": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1684
 },
 "tech_trinary_computing": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1684
 },
 "tech_u_r_e_t": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1684
 },
 "tech_unique_mutation_crystalline_entity": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1684
 },
 "tech_unique_mutation_cutholoid": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1684
 },
 "tech_unique_mutation_restorative_enzymes": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1684
 },
 "tech_unique_mutation_space_amoeba": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1684
 },
 "tech_unique_mutation_starborne_biology": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1684
 },
 "tech_unique_mutation_tiyanki": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1684
 },
 "tech_unique_mutation_voidworm": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1684
 },
 "tech_unity_of_purpose": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1684
 },
 "tech_universal_marcophage": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1684
 },
 "tech_unusual_senses": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1684
 },
 "tech_vitality_boosters": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1684
 },
 "tech_voidworm_immunity": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1684
 },
 "tech_volatile_motes": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1684
 },
 "tech_volcanic_forge": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1684
 },
 "tech_volcanic_terraforming": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1684
 },
 "tech_volcano": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1684
 },
 "tech_waystation_1": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1684
 },
 "tech_waystation_2": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1684
 },
 "tech_waystation_3": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1684
 },
 "tech_weaver_bio_anti_evasion_1": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1684
 },
 "tech_weaver_bio_anti_evasion_2": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1684
 },
 "tech_weaver_bio_anti_evasion_3": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1684
 },
 "tech_weaver_bio_anti_evasion_4": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1684
 },
 "tech_weaver_bio_anti_evasion_5": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1684
+"x": 26,
+"y": 1744
 },
 "tech_weaver_bio_anti_evasion_6": {
 "h": 52,
 "w": 52,
-"x": 2938,
-"y": 1684
+"x": 130,
+"y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_1": {
 "h": 52,
 "w": 52,
-"x": 3042,
-"y": 1684
+"x": 234,
+"y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_2": {
 "h": 52,
 "w": 52,
-"x": 3146,
-"y": 1684
+"x": 338,
+"y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_3": {
 "h": 52,
 "w": 52,
-"x": 3250,
-"y": 1684
+"x": 442,
+"y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_4": {
 "h": 52,
 "w": 52,
-"x": 26,
+"x": 546,
 "y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_5": {
 "h": 52,
 "w": 52,
-"x": 130,
+"x": 650,
 "y": 1744
 },
 "tech_weaver_bio_anti_fire_rate_6": {
 "h": 52,
 "w": 52,
-"x": 234,
+"x": 754,
 "y": 1744
 },
 "tech_weaver_bio_confuser_1": {
 "h": 52,
 "w": 52,
-"x": 338,
+"x": 858,
 "y": 1744
 },
 "tech_weaver_bio_confuser_2": {
 "h": 52,
 "w": 52,
-"x": 442,
+"x": 962,
 "y": 1744
 },
 "tech_weaver_bio_confuser_3": {
 "h": 52,
 "w": 52,
-"x": 546,
+"x": 1066,
 "y": 1744
 },
 "tech_weaver_bio_confuser_4": {
 "h": 52,
 "w": 52,
-"x": 650,
+"x": 1170,
 "y": 1744
 },
 "tech_weaver_bio_confuser_5": {
 "h": 52,
 "w": 52,
-"x": 754,
+"x": 1274,
 "y": 1744
 },
 "tech_weaver_bio_confuser_6": {
 "h": 52,
 "w": 52,
-"x": 858,
+"x": 1378,
 "y": 1744
 },
 "tech_weaver_bio_evasion_1": {
 "h": 52,
 "w": 52,
-"x": 962,
+"x": 1482,
 "y": 1744
 },
 "tech_weaver_bio_evasion_2": {
 "h": 52,
 "w": 52,
-"x": 1066,
+"x": 1586,
 "y": 1744
 },
 "tech_weaver_bio_evasion_3": {
 "h": 52,
 "w": 52,
-"x": 1170,
+"x": 1690,
 "y": 1744
 },
 "tech_weaver_bio_evasion_4": {
 "h": 52,
 "w": 52,
-"x": 1274,
+"x": 1794,
 "y": 1744
 },
 "tech_weaver_bio_evasion_5": {
 "h": 52,
 "w": 52,
-"x": 1378,
+"x": 1898,
 "y": 1744
 },
 "tech_weaver_bio_evasion_6": {
 "h": 52,
 "w": 52,
-"x": 1482,
+"x": 2002,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_1": {
 "h": 52,
 "w": 52,
-"x": 1586,
+"x": 2106,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_2": {
 "h": 52,
 "w": 52,
-"x": 1690,
+"x": 2210,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_3": {
 "h": 52,
 "w": 52,
-"x": 1794,
+"x": 2314,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_4": {
 "h": 52,
 "w": 52,
-"x": 1898,
+"x": 2418,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_5": {
 "h": 52,
 "w": 52,
-"x": 2002,
+"x": 2522,
 "y": 1744
 },
 "tech_weaver_bio_fire_rate_6": {
 "h": 52,
 "w": 52,
-"x": 2106,
+"x": 2626,
 "y": 1744
 },
 "tech_weaver_bio_healing_1": {
 "h": 52,
 "w": 52,
-"x": 2210,
+"x": 2730,
 "y": 1744
 },
 "tech_weaver_bio_healing_2": {
 "h": 52,
 "w": 52,
-"x": 2314,
+"x": 2834,
 "y": 1744
 },
 "tech_weaver_bio_healing_3": {
 "h": 52,
 "w": 52,
-"x": 2418,
+"x": 2938,
 "y": 1744
 },
 "tech_weaver_bio_healing_4": {
 "h": 52,
 "w": 52,
-"x": 2522,
+"x": 3042,
 "y": 1744
 },
 "tech_weaver_bio_healing_5": {
 "h": 52,
 "w": 52,
-"x": 2626,
+"x": 3146,
 "y": 1744
 },
 "tech_weaver_bio_healing_6": {
 "h": 52,
 "w": 52,
-"x": 2730,
+"x": 3250,
 "y": 1744
 },
 "tech_weaver_build_speed": {
 "h": 52,
 "w": 52,
-"x": 2834,
-"y": 1744
-},
-"tech_weaver_growth_1": {
-"h": 52,
-"w": 52,
-"x": 2938,
-"y": 1744
-},
-"tech_weaver_growth_2": {
-"h": 52,
-"w": 52,
-"x": 3042,
-"y": 1744
-},
-"tech_weavers": {
-"h": 52,
-"w": 52,
-"x": 3146,
-"y": 1744
-},
-"tech_wilderness_cluster": {
-"h": 52,
-"w": 52,
-"x": 3250,
-"y": 1744
-},
-"tech_wilderness_confluence": {
-"h": 52,
-"w": 52,
 "x": 26,
 "y": 1804
 },
-"tech_wilderness_node": {
+"tech_weaver_growth_1": {
 "h": 52,
 "w": 52,
 "x": 130,
 "y": 1804
 },
-"tech_wilderness_terraform": {
+"tech_weaver_growth_2": {
 "h": 52,
 "w": 52,
 "x": 234,
 "y": 1804
 },
-"tech_wormhole_stabilization": {
+"tech_weavers": {
 "h": 52,
 "w": 52,
 "x": 338,
 "y": 1804
 },
-"tech_xeno_aesthetics": {
+"tech_wilderness_cluster": {
 "h": 52,
 "w": 52,
 "x": 442,
 "y": 1804
 },
-"tech_xeno_diplomacy": {
+"tech_wilderness_confluence": {
 "h": 52,
 "w": 52,
 "x": 546,
 "y": 1804
 },
-"tech_xeno_linguistics": {
+"tech_wilderness_node": {
 "h": 52,
 "w": 52,
 "x": 650,
 "y": 1804
 },
-"tech_xeno_relations": {
+"tech_wilderness_terraform": {
 "h": 52,
 "w": 52,
 "x": 754,
 "y": 1804
 },
-"tech_xeno_tourism_agency": {
+"tech_wormhole_stabilization": {
 "h": 52,
 "w": 52,
 "x": 858,
 "y": 1804
 },
-"tech_zero_point_power": {
+"tech_xeno_aesthetics": {
 "h": 52,
 "w": 52,
 "x": 962,
 "y": 1804
 },
-"tech_zro_launcher": {
+"tech_xeno_diplomacy": {
 "h": 52,
 "w": 52,
 "x": 1066,
+"y": 1804
+},
+"tech_xeno_linguistics": {
+"h": 52,
+"w": 52,
+"x": 1170,
+"y": 1804
+},
+"tech_xeno_relations": {
+"h": 52,
+"w": 52,
+"x": 1274,
+"y": 1804
+},
+"tech_xeno_tourism_agency": {
+"h": 52,
+"w": 52,
+"x": 1378,
+"y": 1804
+},
+"tech_zero_point_power": {
+"h": 52,
+"w": 52,
+"x": 1482,
+"y": 1804
+},
+"tech_zro_launcher": {
+"h": 52,
+"w": 52,
+"x": 1586,
 "y": 1804
 }
 }

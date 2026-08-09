@@ -1,0 +1,39 @@
+{
+"cell": {
+"h": 60,
+"w": 52
+},
+"columns": 5,
+"icons": {
+"ap_celestial_printing": {
+"h": 60,
+"w": 52,
+"x": 0,
+"y": 0
+},
+"ap_gigastructural_constructs": {
+"h": 60,
+"w": 52,
+"x": 52,
+"y": 0
+},
+"ap_qso": {
+"h": 60,
+"w": 52,
+"x": 104,
+"y": 0
+},
+"ap_supermassive_ehof": {
+"h": 60,
+"w": 52,
+"x": 156,
+"y": 0
+},
+"ap_vast_expanses": {
+"h": 60,
+"w": 52,
+"x": 208,
+"y": 0
+}
+}
+}
