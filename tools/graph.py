@@ -23,6 +23,16 @@ CROSSMOD_VAR_FILE = "zz_giga_compat_overwrite_me.txt"
 #: Techs matching these id prefixes are grouped into a synthetic category,
 #: overriding the category declared in script. Used for content lines that
 #: are thematically one thing but scattered across research areas.
+#: Friendly names for non-perk requirements that appear as alternatives.
+#: Extend via data/manual-perk-grants.json ("conditionLabels").
+CONDITION_LABELS: dict = {
+    "has_genetically_ascended": "Genetic Ascension",
+    "is_machine_empire": "a machine empire",
+    "has_psionic_ascension": "Psionic Ascension",
+    "has_cybernetic_ascension": "Cybernetic Ascension",
+    "is_hive_empire": "a hive mind",
+}
+
 SYNTHETIC_CATEGORIES = (
     ("giga_tech_eawaf_", "sirenalia"),
 )
@@ -30,7 +40,8 @@ SYNTHETIC_CATEGORIES = (
 
 def _collect_perk_groups(block: Block, groups: list,
                          triggers: Optional[dict] = None,
-                         inside_or: bool = False) -> None:
+                         inside_or: bool = False,
+                         flags: Optional[dict] = None) -> None:
     """Ascension perk requirements as *alternative groups*.
 
     `OR = { has_ascension_perk = ap_a  has_ascension_perk = ap_b }` is one
@@ -40,50 +51,117 @@ def _collect_perk_groups(block: Block, groups: list,
     groups must all be satisfied.
     """
     triggers = triggers or {}
+    flags = flags or {}
     local: list = []
-    other = False        # non-perk alternatives seen at this level
+    conds: list = []     # non-perk alternatives seen at this level
     for p in block.pairs():
         if p.key == "has_ascension_perk" and isinstance(p.value, str):
             local.append(p.value)
         elif p.key in triggers and p.value == "yes" and triggers[p.key]:
             local.append(triggers[p.key])
+        elif p.key == "has_country_flag" and isinstance(p.value, str) \
+                and p.value in flags:
+            # The flag is only obtainable from a perk, so it is that perk.
+            for perk in flags[p.value]:
+                if perk not in local:
+                    local.append(perk)
         elif isinstance(p.value, Block) and p.key not in ("NOT", "NOR"):
             if p.key in ("OR", "or"):
                 sub: list = []
-                _collect_perk_groups(p.value, sub, triggers, inside_or=True)
+                _collect_perk_groups(p.value, sub, triggers,
+                                     inside_or=True, flags=flags)
                 perks = [x for grp in sub for x in grp["perks"]]
                 # An OR may offer routes that are not perks at all — The Vat
                 # accepts genetic ascension, a tradition, or Mechromancy. The
                 # perk is then one option among several, not a requirement.
-                has_other = any(grp["other"] for grp in sub) or \
-                    _has_non_perk_option(p.value, triggers)
-                if perks:
-                    groups.append({"perks": sorted(set(perks),
-                                                   key=perks.index),
-                                   "other": has_other})
+                sub_conds = [c for grp in sub for c in grp["conditions"]]
+                sub_conds += _non_perk_options(p.value, triggers)
+                if perks or sub_conds:
+                    groups.append({
+                        "perks": sorted(set(perks), key=perks.index),
+                        "conditions": sorted(set(sub_conds),
+                                             key=sub_conds.index),
+                    })
             else:
-                _collect_perk_groups(p.value, groups, triggers, inside_or)
-        elif inside_or:
-            other = True
+                _collect_perk_groups(p.value, groups, triggers, inside_or,
+                                     flags)
+        elif inside_or and p.key not in _NOT_AN_OPTION \
+                and not isinstance(p.value, Block):
+            # Store what a player would call it, not the script key.
+            label = _condition_label(p.key, p.value)
+            if label not in conds:
+                conds.append(label)
     if local:
         if inside_or:
-            groups.append({"perks": local, "other": other})
+            groups.append({"perks": local, "conditions": conds})
         else:
             for perk in local:
-                groups.append({"perks": [perk], "other": False})
-    elif inside_or and other and not groups:
-        groups.append({"perks": [], "other": True})
+                groups.append({"perks": [perk], "conditions": []})
+    elif inside_or and conds and not groups:
+        groups.append({"perks": [], "conditions": conds})
 
 
-def _has_non_perk_option(block: Block, triggers: dict) -> bool:
-    """True when an OR offers a route that is not an ascension perk."""
+#: Conditions that appear as alternatives to an ascension perk, mapped to
+#: what a player would call them. Anything unlisted keeps a prettified form
+#: of its script name, so a new condition is readable rather than invisible.
+CONDITION_LABELS = {
+    "has_genetically_ascended": "Genetic Ascension",
+    "has_psionically_ascended": "Psionic Ascension",
+    "has_cybernetically_ascended": "Cybernetic Ascension",
+    "has_synthetically_ascended": "Synthetic Ascension",
+    "is_machine_empire": "Machine Intelligence",
+    "is_hive_empire": "Hive Mind",
+}
+
+#: Keys that qualify a requirement rather than offering an alternative
+#: route; they must never be listed as a way to obtain a technology.
+_NOT_AN_OPTION = {"NOT", "NOR", "AND", "hidden_trigger", "has_global_flag",
+                  "has_technology", "uses_district_set", "any_owned_planet",
+                  "has_valid_civic", "always",
+                  # A finished tradition tree is the same route as the
+                  # ascension it completes; listing both says it twice.
+                  "has_active_tradition"}
+
+
+def _condition_label(key: str, value) -> str:
+    # Value-aware first: "has_country_flag = blokkat_bureau_unlocked" should
+    # say what the flag means, not just that a flag is involved.
+    if isinstance(value, str):
+        keyed = f"{key}:{value}"
+        if keyed in CONDITION_LABELS:
+            return CONDITION_LABELS[keyed]
+    if key in CONDITION_LABELS:
+        return CONDITION_LABELS[key]
+    if key == "has_country_flag" and isinstance(value, str):
+        return value.replace("_", " ").strip().capitalize()
+    if key == "has_active_tradition" and isinstance(value, str):
+        stem = value.replace("tr_", "").split("_")[0]
+        return f"{stem.capitalize()} tradition"
+    pretty = key.replace("has_", "").replace("is_", "").replace("_", " ")
+    return pretty.strip().capitalize()
+
+
+def _non_perk_options(block: Block, triggers: dict) -> list:
+    """Alternatives inside an OR that are not ascension perks, named as a
+    player would say them ("Genetic Ascension"), so the requirement can be
+    stated exactly instead of as "another qualifying condition".
+
+    Keys that qualify a requirement rather than offering a route out of it
+    (flags, prerequisite technologies, planet checks) are not alternatives
+    and are skipped.
+    """
+    out = []
     for p in block.pairs():
-        if p.key == "has_ascension_perk":
+        if p.key == "has_ascension_perk" or p.key in _NOT_AN_OPTION:
             continue
         if p.key in triggers and p.value == "yes":
             continue
-        return True
-    return False
+        if isinstance(p.value, Block):
+            continue
+        label = _condition_label(p.key, p.value)
+        if label and label not in out:
+            out.append(label)
+    return out
 
 
 def _collect_ascension_perks(block: Block, out: list,
@@ -172,6 +250,9 @@ class Tech:
     inherited_perks: list[str] = field(default_factory=list)
     #: perks that hand this technology to the player outright
     granted_by: list[str] = field(default_factory=list)
+    #: perks that are one route among several — used for placement and for
+    #: the "requires A or B" line, but never asserted as a hard requirement
+    soft_perks: list[str] = field(default_factory=list)
     #: alternative requirement groups: each inner list is satisfied by any
     #: one of its perks; every group must be satisfied
     perk_groups: list = field(default_factory=list)
@@ -244,6 +325,64 @@ def weight_is_zero(body: Block, vars_: VarTable) -> bool:
     return False
 
 
+def _ai_only(limit: Block) -> bool:
+    """True when a branch applies to AI empires alone."""
+    for p in limit.pairs():
+        if p.key == "is_ai" and p.value == "yes":
+            return True
+        if isinstance(p.value, Block) and p.key in ("AND", "and"):
+            if _ai_only(p.value):
+                return True
+    return False
+
+
+def load_perk_flags(root) -> dict:
+    """Map country flag -> perks that set it.
+
+    A technology gated on `has_country_flag = can_spawn_smbh` needs whatever
+    perk sets that flag, which is only visible from the perk's own effects.
+    """
+    from pathlib import Path
+    from .pdx.parser import parse_bytes, ParseError
+    from .pdx.lexer import LexError
+
+    out: dict = {}
+    d = Path(root) / "common" / "ascension_perks"
+    if not d.is_dir():
+        return out
+
+    def collect(block: Block, flags: list) -> None:
+        limit = block.get_last("limit")
+        if isinstance(limit, Block) and _ai_only(limit):
+            return
+        for p in block.pairs():
+            if p.key == "set_country_flag" and isinstance(p.value, str):
+                if p.value not in flags:
+                    flags.append(p.value)
+            elif p.key == "set_country_flag" and isinstance(p.value, Block):
+                f = p.value.get_last("flag")
+                if isinstance(f, str) and f not in flags:
+                    flags.append(f)
+            elif isinstance(p.value, Block) and p.key != "limit":
+                collect(p.value, flags)
+
+    for f in sorted(d.glob("*.txt")):
+        try:
+            ast = parse_bytes(f.read_bytes())
+        except (ParseError, LexError):
+            continue
+        for p in ast.pairs():
+            if not isinstance(p.value, Block) or not p.key.startswith("ap_"):
+                continue
+            flags: list = []
+            collect(p.value, flags)
+            for flag in flags:
+                out.setdefault(flag, [])
+                if p.key not in out[flag]:
+                    out[flag].append(p.key)
+    return out
+
+
 def load_perk_tech_grants(root) -> dict:
     """Map technology id -> perks that grant it.
 
@@ -262,7 +401,7 @@ def load_perk_tech_grants(root) -> dict:
     if not d.is_dir():
         return out
 
-    def ai_only(limit: Block) -> bool:
+    def ai_only(limit: Block) -> bool:  # noqa: D401 - see _ai_only
         """True when a branch applies to the AI alone. Galactic Wonders
         hands Mega-Engineering to AI empires only:
 
@@ -316,13 +455,15 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 icon_stems: Optional[set] = None,
                 categories: Optional[dict] = None,
                 ascension_triggers: Optional[dict] = None,
-                perk_grants: Optional[dict] = None) -> GraphResult:
+                perk_grants: Optional[dict] = None,
+                perk_flags: Optional[dict] = None) -> GraphResult:
     res = GraphResult()
     provenance = var_provenance or vars_
     icon_stems = icon_stems or set()
     categories = categories or {}
     ascension_triggers = ascension_triggers or {}
     perk_grants = perk_grants or {}
+    perk_flags = perk_flags or {}
 
     # -- extraction ------------------------------------------------------
     for tid, td in techdefs.items():
@@ -374,12 +515,17 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         t.gated = isinstance(pot, Block) and len(pot) > 0
         if isinstance(pot, Block):
             before = list(t.ascension_perks)
-            _collect_perk_groups(pot, t.perk_groups, ascension_triggers)
+            _collect_perk_groups(pot, t.perk_groups, ascension_triggers,
+                                 flags=perk_flags)
             # Only a group with exactly one perk and no other route is a
             # requirement; anything else is an alternative and must not
             # propagate to dependent technologies.
             for grp in t.perk_groups:
-                if len(grp["perks"]) == 1 and not grp["other"]:
+                if len(grp["perks"]) > 1 or (grp["perks"] and grp["conditions"]):
+                    for perk in grp["perks"]:
+                        if perk not in t.soft_perks:
+                            t.soft_perks.append(perk)
+                if len(grp["perks"]) == 1 and not grp["conditions"]:
                     perk = grp["perks"][0]
                     if perk not in t.ascension_perks:
                         t.ascension_perks.append(perk)
@@ -396,7 +542,7 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 t.ascension_perks.append(perk)
                 t.perk_reasons[perk] = "granted"
             if not any(grp["perks"] == [perk] for grp in t.perk_groups):
-                t.perk_groups.append({"perks": [perk], "other": False})
+                t.perk_groups.append({"perks": [perk], "conditions": []})
 
         prereq = b.get_last("prerequisites")
         if isinstance(prereq, Block):
@@ -617,6 +763,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "grantedByPerks": t.granted_by,
             "perkReasons": t.perk_reasons,
             "perkGroups": t.perk_groups,
+            "softPerks": t.soft_perks,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
             "source": t.raw.source_id,

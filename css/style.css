@@ -453,3 +453,6 @@ select {
   font: inherit; font-size: 11px; padding: 2px 8px; cursor: pointer;
 }
 #req-filter { width: 100%; }
+
+.guide-lead { color: var(--text); font-size: 13px; }
+#guide-panel code { color: var(--physics); }

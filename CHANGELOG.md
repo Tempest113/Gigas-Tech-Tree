@@ -4,6 +4,192 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.9.1
+
+### Changed
+
+- A perk that is one route among several now reads "Needs …" on the card
+  like any other requirement; the alternatives stay in the detail panel,
+  where Tetradimensional Engineering reads "requires Gigastructural
+  Constructs or Blokkat Research Bureau unlock".
+- Country flags name what they check rather than saying "Country flag", and
+  `data/manual-perk-grants.json` can rename any condition, keyed either by
+  the condition or by condition and value.
+
+### Added
+
+- Cosmogenesis technologies that come from nowhere else — the escort,
+  mauler, weaver and the level 2 crisis technology — are marked as needing
+  Cosmogenesis. They are handed out by a scripted effect when the crisis
+  reaches a level rather than by the perk, so they are declared in
+  `data/manual-perk-grants.json`. Dark Matter Propulsion and the Enigmatic
+  Decoder arrive at the same moment but are researchable by other means, so
+  they are deliberately not marked.
+
+## 1.9.0
+
+### Changed
+
+- **Circuit-trace edge routing is now the default.** `?curves` restores the
+  previous bezier style.
+- **A perk that is one route among several counts for placement.**
+  Tetradimensional Engineering can be reached through Gigastructural
+  Constructs *or* a Blokkat questline flag, so it was placed as needing no
+  gate at all; it now sits in the Gigastructural Constructs band, and its
+  card reads "Or via Gigastructural Constructs" rather than asserting a
+  requirement it does not have. These soft requirements propagate to
+  dependent technologies the same way hard ones do.
+- **Country flags set by a perk resolve to that perk.** A technology gated
+  on `has_country_flag = can_spawn_smbh` needs whichever perk sets the flag,
+  which is only visible from the perk's own effects.
+- A finished tradition tree is no longer listed as a separate route from the
+  ascension it completes, so The Vat reads "requires Mechromancy or Genetic
+  Ascension".
+
+## 1.8.1
+
+### Fixed
+
+- The alternating column shading left a gap between each band, which read as
+  a stripe in its own right. Bands now meet exactly, alternating plain and
+  lifted across tiers (and across gates in Ascension Gate mode).
+- Colossus technologies read "Needs Colossus Project" rather than "Needs
+  Colossus". The perk's display name was not among those the extractor
+  captured, so the name was being derived from its id; declared names can
+  now be supplied in `data/manual-perk-grants.json`, and a name found in the
+  game's own files always takes precedence.
+
+## 1.8.0
+
+### Added
+
+- **Circuit-board edge routing** under `?dev`: edges leave a card
+  horizontally, turn in the empty channel between columns with chamfered
+  corners, and arrive horizontally, so a trace never crosses a card. The
+  curved routing remains the default while this is tried out.
+- Middle-clicking a technology now **frames its chain on screen** rather
+  than leaving you to hunt for it.
+
+### Changed
+
+- **Tall stacks spread sideways.** Every Blokkat technology is tier 5, so
+  they piled into a single column; a column that holds a tall stack in any
+  category now gets extra slots and lays the stack across them. Overall map
+  height dropped from 19,138 to 8,818. Technologies feeding something
+  further right are placed in the last slot, so their edges leave from the
+  outside of the stack instead of crossing the cards beside them.
+- **Alternating column shading is back**, and now applies in Ascension Gate
+  mode too, so bands read at any zoom.
+- **Requirements that can be met more than one way are named exactly.** The
+  Vat reads "requires Mechromancy or Genetic Ascension or a matching
+  tradition" instead of "another qualifying condition". Conditions that
+  qualify a requirement rather than offering a route out of it — flags,
+  prerequisite technologies, planet checks — are no longer listed as
+  alternatives.
+- The guide has been rewritten around what a reader actually needs: how
+  columns work in both modes, what each part of a card means, how to find a
+  route, and where the data comes from.
+
+## 1.9.1
+
+### Changed
+
+- A perk that is one route among several now reads "Needs …" on the card
+  like any other requirement; the alternatives stay in the detail panel,
+  where Tetradimensional Engineering reads "requires Gigastructural
+  Constructs or Blokkat Research Bureau unlock".
+- Country flags name what they check rather than saying "Country flag", and
+  `data/manual-perk-grants.json` can rename any condition, keyed either by
+  the condition or by condition and value.
+
+### Added
+
+- Cosmogenesis technologies that come from nowhere else — the escort,
+  mauler, weaver and the level 2 crisis technology — are marked as needing
+  Cosmogenesis. They are handed out by a scripted effect when the crisis
+  reaches a level rather than by the perk, so they are declared in
+  `data/manual-perk-grants.json`. Dark Matter Propulsion and the Enigmatic
+  Decoder arrive at the same moment but are researchable by other means, so
+  they are deliberately not marked.
+
+## 1.9.0
+
+### Changed
+
+- **Circuit-trace edge routing is now the default.** `?curves` restores the
+  previous bezier style.
+- **A perk that is one route among several counts for placement.**
+  Tetradimensional Engineering can be reached through Gigastructural
+  Constructs *or* a Blokkat questline flag, so it was placed as needing no
+  gate at all; it now sits in the Gigastructural Constructs band, and its
+  card reads "Or via Gigastructural Constructs" rather than asserting a
+  requirement it does not have. These soft requirements propagate to
+  dependent technologies the same way hard ones do.
+- **Country flags set by a perk resolve to that perk.** A technology gated
+  on `has_country_flag = can_spawn_smbh` needs whichever perk sets the flag,
+  which is only visible from the perk's own effects.
+- A finished tradition tree is no longer listed as a separate route from the
+  ascension it completes, so The Vat reads "requires Mechromancy or Genetic
+  Ascension".
+
+## 1.8.1
+
+### Fixed
+
+- The alternating column shading left a gap between each band, which read as
+  a stripe in its own right. Bands now meet exactly, alternating plain and
+  lifted across tiers (and across gates in Ascension Gate mode).
+- Colossus technologies read "Needs Colossus Project" rather than "Needs
+  Colossus". The perk's display name was not among those the extractor
+  captured, so the name was being derived from its id; declared names can
+  now be supplied in `data/manual-perk-grants.json`, and a name found in the
+  game's own files always takes precedence.
+
+## 1.8.0
+
+### Added
+
+- **Alternating column washes are back**, and now apply in Ascension Gate
+  mode as well as Tier mode, so group boundaries read at any zoom without
+  depending on the labels.
+- **Middle-click frames what it isolates.** The chain was usually off
+  screen, leaving you to zoom out and hunt for it.
+- **`?traces`**: an experimental circuit-board edge routing — orthogonal
+  runs with 45° corners, routed through the empty lanes between columns and
+  rows so a trace never crosses a card. The default bezier routing is
+  unchanged.
+
+### Changed
+
+- **Crowded columns spread sideways rather than downwards.** The Blokkats
+  are all tier 5, so as a single stack they made the section enormously
+  tall; a column holding more than eight technologies now splits into
+  sub-columns, and the technologies feeding something further right take the
+  rightmost lane so their edges leave cleanly. Tier mode is 8818px tall,
+  against 19138 before.
+- Either/or requirements name their alternatives: "requires Mechromancy or
+  Genetic Ascension" rather than "or another qualifying condition". Names
+  for non-perk routes live in `data/manual-perk-grants.json`
+  ("conditionLabels") and can be extended without touching code.
+- The Colossus reads "Needs Colossus Project": a fallback perk name can now
+  be supplied in the same file for perks the vanilla extraction has not
+  captured. Names found in the game files always win.
+- "No gate" is capitalised as "No Gate".
+- The guide has been rewritten: it opens with the single rule that explains
+  the layout, covers both column modes, and describes the filters and
+  isolate behaviour that had been added since it was first written.
+
+## 1.7.3
+
+### Fixed
+
+- Repeatables shared columns with ordinary technologies under a filter. Tier
+  seeds are derived from the tiers actually on screen, so filtering to a
+  single perk compressed them until they collided with the repeatable seed,
+  and the Repeatables band ended up empty while management protocols sat in
+  Tier 5. Repeatables are now placed after every ordinary column in a stage
+  of their own, filtered or not.
+
 ## 1.7.2
 
 ### Added

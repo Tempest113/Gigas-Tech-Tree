@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "Readable names for non-perk conditions that appear as alternatives in a",
+    "technology's `potential` block. The Vat, for example, needs Galactic",
+    "Wonders and either genetic ascension, a genetics tradition, or",
+    "Mechromancy; without these labels the alternatives could only be",
+    "described vaguely.",
+    "",
+    "Format: condition key -> display name. Unlisted keys fall back to a name",
+    "derived from the key itself."
+  ],
+  "labels": {
+    "has_genetically_ascended": "Genetic Ascension",
+    "has_active_tradition": "a matching tradition",
+    "has_technology": "a technology",
+    "is_machine_empire": "a machine empire",
+    "has_origin": "a matching origin",
+    "has_civic": "a matching civic",
+    "has_country_flag": "an empire flag",
+    "has_global_flag": "a galaxy state"
+  }
+}

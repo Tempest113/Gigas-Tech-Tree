@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.7.2">
+<link rel="stylesheet" href="css/style.css?v=1.9.1">
 </head>
 <body>
 <header class="app-header">
@@ -27,7 +27,7 @@
       <span>Columns</span>
       <select id="mode-select" aria-label="Column mode">
         <option value="tier">Tier</option>
-        <option value="gate">Ascension gate</option>
+        <option value="gate">Ascension Gate</option>
       </select>
     </label>
     <button id="guide-btn" class="header-btn" title="How to read this tree">Guide</button>
@@ -93,61 +93,65 @@
     <button class="detail-close" data-close="guide-panel" aria-label="Close">×</button>
     <h2>Reading the tree</h2>
 
-    <h3>Layout</h3>
-    <p>Columns run left to right, and a technology is always to the right of
-    everything it needs. In <strong>Tier</strong> mode columns follow research
-    tiers, with gated technologies sitting beyond ungated ones of the same
-    tier and repeatables at the far right. In <strong>Ascension gate</strong>
-    mode columns are the perk progression itself: no gate, then
-    Mega-Engineering, Galactic Wonders and Gigastructural Constructs. Rows
-    are grouped into categories; each band is tinted by its research area.</p>
-    <p>In game, a tier is only available once you have researched
-    <strong>six technologies of the previous tier in the same area</strong>
-    (physics, society, engineering counted separately). Tier 1 has no such
-    requirement.</p>
+    <p class="guide-lead">Every technology sits to the right of everything it
+    needs, so any chain reads left to right. Rows are grouped into research
+    categories.</p>
 
-    <h3>Cards</h3>
+    <h3>Columns</h3>
+    <p><strong>Tier</strong> mode puts each technology in its research tier,
+    with repeatables in a band at the far right. Within a tier, technologies
+    behind an ascension perk sit right of those without one.</p>
+    <p><strong>Ascension Gate</strong> mode replaces tiers with the perk
+    progression itself — No Gate, then Mega-Engineering, Galactic Wonders and
+    Gigastructural Constructs — each in a band of its own.</p>
+
+    <h3>On a card</h3>
     <ul class="legend">
       <li><span class="sw" data-area="physics"></span> Physics</li>
       <li><span class="sw" data-area="society"></span> Society</li>
       <li><span class="sw" data-area="engineering"></span> Engineering</li>
       <li><span class="sw" data-kind="rare"></span> Rare technology</li>
-      <li><span class="sw" data-kind="blokkat"></span> Blokkats (hex texture)</li>
-      <li><span class="sw" data-kind="siren"></span> Sirenalia (wave art)</li>
-      <li><span class="sw" data-kind="stub"></span> From another mod, not loaded</li>
+      <li><span class="sw" data-kind="stub"></span> From a mod that is not loaded</li>
     </ul>
-    <p><code>T3</code> is the tier. <code>∞</code> marks an unlimited
-    repeatable; <code>×40</code> a repeatable capped at 40 levels. A red line
-    marks a dangerous technology; a <code>✦</code> badge on the
-    technology's icon marks one you cannot get without a particular ascension
-    perk, named on the card as "Needs …". A solid ring means this technology
-    itself depends on the perk — either gated behind it or handed over by it;
-    a dashed ring means it sits behind one that does. The detail panel spells
-    out which. Gigastructures gates most of its content this way, through
-    Galactic Wonders and Gigastructural Constructs. The number under the name is research cost.</p>
+    <p>The number under the name is research cost. <code>T5</code> is the
+    tier; <code>∞</code> marks an unlimited repeatable and <code>×40</code>
+    one capped at 40 levels. A red line marks a dangerous technology.</p>
+    <p>A badge on the icon marks a technology you cannot obtain without an
+    ascension perk — whether the perk gates it or hands it over. A solid ring
+    means this technology depends on the perk itself; a dashed ring means it
+    sits behind one that does. The card names the perk, and the detail panel
+    explains which case it is, including alternatives such as
+    "requires Mechromancy or Genetic Ascension".</p>
 
-    <h3>Interaction</h3>
+    <h3>Getting around</h3>
     <ul>
-      <li>Click a technology to select it: its prerequisites and unlocks stay
-      highlighted, everything else dims. Click empty space to clear.</li>
-      <li>Hover previews the same highlight when nothing is selected.</li>
-      <li>Drag to pan, scroll to zoom, or use the controls bottom-right.</li>
+      <li><strong>Click</strong> a technology to select it: its prerequisites
+      and unlocks stay highlighted and everything else dims. Click empty
+      space to clear.</li>
+      <li><strong>Middle-click</strong> to show only that technology, what it
+      needs and what it leads to, framed to fit — the quickest way to see a
+      route to something. <kbd>Esc</kbd> or Clear restores the tree.</li>
+      <li>Drag to pan, scroll to zoom, or use the controls at the
+      bottom right.</li>
       <li><kbd>F</kbd> search · <kbd>Esc</kbd> deselect · <kbd>Backspace</kbd> back</li>
-      <li>The sidebar filters by category, by source and by requirement;
-      unchecking a category removes its row entirely, and "Hide all" clears
-      every category at once.</li>
-      <li><strong>Middle-click</strong> a technology to show only it, what it
-      needs, and what it leads to — the quickest way to see a route to
-      something. Press <kbd>Esc</kbd> or use Clear to go back.</li>
-      <li>The <strong>Explore</strong> tab lists everything as a sortable
-      table.</li>
     </ul>
 
-    <h3>Sources</h3>
-    <p>Technologies are shown from Gigastructural Engineering &amp; More
-    merged over base Stellaris. Cards badged <em>overrides vanilla</em>
-    replace a base-game technology; <em>requires another mod</em> means the
-    technology only appears if that mod is also installed.</p>
+    <h3>Narrowing what you see</h3>
+    <p>The sidebar filters by category, by source and by requirement —
+    "Requires Mega-Engineering" and the two perk filters cover both direct
+    and inherited requirements. Unchecking a category removes its row
+    entirely, and <strong>Hide all</strong> clears every category so a narrow
+    view can be built up from nothing. The <strong>Explore</strong> tab lists
+    everything as a sortable table.</p>
+    <p>The view is in the address bar, so any selection, filter or isolated
+    chain can be linked to someone.</p>
+
+    <h3>Where the data comes from</h3>
+    <p>Gigastructural Engineering &amp; More merged over base Stellaris, the
+    same way the game loads them: a card badged <em>overrides vanilla</em>
+    replaces a base-game technology, and <em>requires another mod</em> means
+    it only appears with that mod installed. The tree is rebuilt weekly from
+    the mod's repository.</p>
   </aside>
 
   <aside id="modlist-panel" class="modal-panel" hidden aria-label="Loaded mods">
@@ -172,6 +176,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=1.7.2"></script>
+<script type="module" src="js/main.js?v=1.9.1"></script>
 </body>
 </html>

@@ -23,13 +23,14 @@ import { MISC_CATEGORIES } from "./viewmodel.js";
 
 export const CARD_W = 208, CARD_H = 64;
 const COL_GAP = 56;
+const SUBCOL_GAP = 24;        // between sub-columns of one crowded column
 const GROUP_GAP = 120;        // extra space at a tier/gate boundary
 const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
 const MAX_ROWS = 8;
 const AREA_ORDER = ["physics", "society", "engineering", null];
 
 export const GATES = [
-  { id: "none", label: "No gate" },
+  { id: "none", label: "No Gate" },
   { id: "mega", label: "Mega-Engineering", tech: "tech_mega_engineering" },
   { id: "galwon", label: "Galactic Wonders", perk: "ap_galactic_wonders" },
   { id: "gigacon", label: "Gigastructural Constructs",
@@ -40,7 +41,11 @@ export const GATES = [
    they are the stronger statement; Mega-Engineering counts when it is
    somewhere in the prerequisite chain. */
 function gateRank(t, needsMega) {
-  const perks = [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? [])];
+  // Soft perks count here: a technology reachable only through
+  // Gigastructural Constructs or a questline flag belongs with the gated
+  // ones, not among those needing nothing.
+  const perks = [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? []),
+                 ...(t.softPerks ?? [])];
   if (perks.includes("ap_gigastructural_constructs")) return 3;
   if (perks.includes("ap_galactic_wonders")) return 2;
   if (needsMega.has(t.id)) return 1;
@@ -77,12 +82,14 @@ export function layout(techs, visible = null, mode = "tier") {
   const tierIndex = new Map(tiers.map((t, i) => [t, i + 1]));
 
   // -- seeds ------------------------------------------------------------
+  // Repeatables are placed after every ordinary column (see below); the seed
+  // only needs to be beyond the tier seeds.
+  const REPEATABLE_SEED = (tiers.length + 1) * 4;
+
   const seedOf = t => {
     const gate = gateRank(t, needsMega);
     if (mode === "gate") return gate;
-    // Same scale as the tier seeds below, or repeatables land among the
-    // early tiers instead of after them.
-    if (t.isRepeatable) return (tiers.length + 1) * 4;
+    if (t.isRepeatable) return REPEATABLE_SEED;
     const base = t.tier === null || !tierIndex.has(t.tier)
       ? 0 : tierIndex.get(t.tier);
     // Within the same tier, a gated technology sits right of an ungated one.
@@ -138,10 +145,27 @@ export function layout(techs, visible = null, mode = "tier") {
       if (g + 1 < GATES.length) gateBase[g + 1] = maxCol + 1;
     }
   } else {
+    // Ordinary technologies first, then repeatables in a band of their own
+    // beyond every one of them. Without the second stage a filtered view
+    // could compress the tiers until repeatables shared columns with them.
     for (const id of order) {
       const t = techs.get(id);
-      if (!t) continue;
+      if (!t || t.isRepeatable) continue;
       let c = col.get(id);
+      for (const p of t.prerequisites) {
+        if (!present.has(p)) continue;
+        c = Math.max(c, col.get(p) + 1);
+      }
+      col.set(id, c);
+    }
+    let repBase = 0;
+    for (const t of nodes) {
+      if (!t.isRepeatable) repBase = Math.max(repBase, col.get(t.id) + 1);
+    }
+    for (const id of order) {
+      const t = techs.get(id);
+      if (!t || !t.isRepeatable) continue;
+      let c = repBase;
       for (const p of t.prerequisites) {
         if (!present.has(p)) continue;
         c = Math.max(c, col.get(p) + 1);
@@ -181,6 +205,25 @@ export function layout(techs, visible = null, mode = "tier") {
   }
   const dominant = c => labels[c];
 
+  /* A column can be very tall — every Blokkat technology is tier 5, so they
+     stacked into one column forty deep. Split an over-tall column into
+     side-by-side slots: the column keeps its place in the ordering (its
+     dependants are still further right), it just occupies more width and
+     less height. Slot counts are global so sections stay aligned. */
+  const slotCount = new Array(nCols).fill(1);
+  {
+    const perSection = new Map();
+    for (const t of nodes) {
+      const cat = t.categories?.[0] ?? "~none";
+      const key = `${cat}\u0000${col.get(t.id)}`;
+      perSection.set(key, (perSection.get(key) ?? 0) + 1);
+    }
+    for (const [key, n] of perSection) {
+      const c = Number(key.split("\u0000")[1]);
+      slotCount[c] = Math.max(slotCount[c], Math.ceil(n / MAX_ROWS));
+    }
+  }
+
   const colX = new Array(nCols);
   {
     let x = 0, prev = null;
@@ -188,11 +231,13 @@ export function layout(techs, visible = null, mode = "tier") {
       const label = dominant(c);
       if (prev !== null && label !== prev) x += GROUP_GAP;
       colX[c] = x;
-      x += CARD_W + COL_GAP;
+      x += slotCount[c] * CARD_W + (slotCount[c] - 1) * (COL_GAP / 2) + COL_GAP;
       prev = label;
     }
   }
-  const worldW = colX[nCols - 1] + CARD_W;
+  const worldW = colX[nCols - 1]
+    + slotCount[nCols - 1] * CARD_W
+    + (slotCount[nCols - 1] - 1) * (COL_GAP / 2);
 
   // -- sections ---------------------------------------------------------
   const sections = new Map();
@@ -228,6 +273,14 @@ export function layout(techs, visible = null, mode = "tier") {
     return a < b ? -1 : a > b ? 1 : 0;
   });
 
+  const forwardLinks = t => {
+    let n = 0;
+    for (const u of t.unlocks ?? []) {
+      if (present.has(u) && col.get(u) > col.get(t.id)) n++;
+    }
+    return n;
+  };
+
   const pos = new Map();
   const furniture = [];
   const sectionTops = [];
@@ -247,12 +300,28 @@ export function layout(techs, visible = null, mode = "tier") {
 
     const rows = Math.max(1, ...columns.map(c => Math.min(c.length, MAX_ROWS) ||
                                                  c.length));
-    const tallest = Math.max(1, ...columns.map(c => c.length));
-    const sectionH = Math.max(1, tallest) * (CARD_H + ROW_GAP);
+    const tallest = Math.max(1, ...columns.map(
+      (c, ci) => Math.ceil(c.length / slotCount[ci]) || 1));
+    const sectionH = tallest * (CARD_H + ROW_GAP);
 
     columns.forEach((c, ci) => {
-      c.forEach((t, ri) => {
-        pos.set(t.id, { x: colX[ci], y: yCursor + ri * (CARD_H + ROW_GAP) });
+      const slots = slotCount[ci];
+      const rows = Math.ceil(c.length / slots) || 1;
+      // Technologies whose dependants sit further right go in the rightmost
+      // slot, so their edges leave from the outside rather than crossing the
+      // cards beside them.
+      const ordered = [...c].sort((a, b) => {
+        const fa = (a.unlocks ?? []).some(u => (col.get(u) ?? -1) > ci) ? 1 : 0;
+        const fb = (b.unlocks ?? []).some(u => (col.get(u) ?? -1) > ci) ? 1 : 0;
+        return fa - fb;
+      });
+      ordered.forEach((t, i) => {
+        const slot = Math.floor(i / rows);
+        const row = i % rows;
+        pos.set(t.id, {
+          x: colX[ci] + slot * (CARD_W + COL_GAP / 2),
+          y: yCursor + row * (CARD_H + ROW_GAP),
+        });
       });
     });
 
@@ -271,6 +340,29 @@ export function layout(techs, visible = null, mode = "tier") {
   }
 
   // -- column labels, once at the top and again above every section ------
+  /* Alternating wash per group: untiered plain, tier 1 lifted, tier 2 plain
+     again, and so on. The bands must meet exactly — a gap between them
+     reads as a stripe of its own, which is what the first attempt looked
+     like. */
+  {
+    const bounds = [];
+    let prevLabel = null;
+    for (let c = 0; c < nCols; c++) {
+      const label = dominant(c);
+      if (label !== prevLabel) { bounds.push([c, c]); prevLabel = label; }
+      else bounds[bounds.length - 1][1] = c;
+    }
+    bounds.forEach(([s], i) => {
+      const x0 = i === 0 ? -40 : colX[s] - GROUP_GAP / 2;
+      const next = bounds[i + 1];
+      const x1 = next === undefined
+        ? worldW + 40
+        : colX[next[0]] - GROUP_GAP / 2;
+      furniture.push({ kind: "tiercolumn", parity: i % 2,
+                       x: x0, y: 0, w: x1 - x0, h: yCursor });
+    });
+  }
+
   let prev = null;
   for (let c = 0; c < nCols; c++) {
     const label = dominant(c);

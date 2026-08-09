@@ -20,7 +20,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools.graph import (build_graph, load_ascension_triggers,
-                         load_perk_tech_grants, to_json_model, weight_is_zero)
+                         load_perk_flags, load_perk_tech_grants,
+                         to_json_model, weight_is_zero)
 from tools.inline_scripts import InlineScriptLibrary
 from tools.loc import LocEntry, LocTable, strip_markup
 from tools.merge import MergeResult, Source, merge_sources
@@ -119,10 +120,27 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         td.body = lib.expand_block(td.body, context=td.id)
     td_bodies = {tid: td.body for tid, td in merged.techs.items()}
 
+    from tools.graph import CONDITION_LABELS
+    perk_grants = load_perk_tech_grants(mod_dir)
+    manual_path = out_dir / "manual-perk-grants.json"
+    manual = {}
+    manual_perk_names = {}
+    if manual_path.is_file():
+        _doc = json.loads(manual_path.read_text(encoding="utf-8"))
+        manual = _doc.get("grants") or {}
+        CONDITION_LABELS.update(_doc.get("conditionLabels") or {})
+        manual_perk_names = _doc.get("perkNames") or {}
+        for tid, perks in manual.items():
+            merged_perks = perk_grants.setdefault(tid, [])
+            for p in perks:
+                if p not in merged_perks:
+                    merged_perks.append(p)
+
     graph = build_graph(merged.techs, vars_, loc,
                         icon_stems=icon_stems, categories=categories,
                         ascension_triggers=load_ascension_triggers(mod_dir),
-                        perk_grants=load_perk_tech_grants(mod_dir))
+                        perk_grants=load_perk_tech_grants(mod_dir),
+                        perk_flags=load_perk_flags(mod_dir))
 
     meta = {
         "schemaVersion": SCHEMA_VERSION,
@@ -158,18 +176,6 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     (out_dir / "unresolved-loc-keys.json").write_text(
         json.dumps(unresolved, indent=1) + "\n", encoding="utf-8")
 
-    perk_grants = load_perk_tech_grants(mod_dir)
-    manual_path = out_dir / "manual-perk-grants.json"
-    manual = {}
-    if manual_path.is_file():
-        manual = (json.loads(manual_path.read_text(encoding="utf-8"))
-                  .get("grants") or {})
-        for tid, perks in manual.items():
-            merged_perks = perk_grants.setdefault(tid, [])
-            for p in perks:
-                if p not in merged_perks:
-                    merged_perks.append(p)
-
     # The exact icon keys the site references: every technology's resolved
     # icon plus every ascension perk named by a gated technology. The
     # extractor reads this so it converts only what is needed, rather than
@@ -199,7 +205,15 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     # to travel with the dataset.
     meta["perkGrants"] = {k: sorted(v) for k, v in sorted(perk_grants.items())}
     meta["manualPerkGrants"] = manual
+    meta["manualPerkNames"] = manual_perk_names
 
+    labels_path = out_dir / "condition-labels.json"
+    meta["conditionLabels"] = (
+        json.loads(labels_path.read_text(encoding="utf-8")).get("labels") or {}
+    ) if labels_path.is_file() else {}
+
+    # Manual names are a fallback: anything the game files provide wins.
+    meta["perkNamesFallback"] = manual_perk_names
     meta["perkNames"] = {
         p: strip_markup(loc.name(p) or "") or p
         for p in sorted({q for t in graph.techs.values()

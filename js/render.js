@@ -194,6 +194,50 @@ export class MapView {
     this.applyTransform();
   }
 
+  /* Frame a set of technologies: used when a chain is isolated, so the
+     result is on screen instead of somewhere off in the map. */
+  fitTo(ids) {
+    const pts = [];
+    for (const id of ids) {
+      const p = this.lay.pos.get(id);
+      if (p) pts.push(p);
+    }
+    if (!pts.length) return;
+    const x0 = Math.min(...pts.map(p => p.x));
+    const y0 = Math.min(...pts.map(p => p.y));
+    const x1 = Math.max(...pts.map(p => p.x)) + CARD_W;
+    const y1 = Math.max(...pts.map(p => p.y)) + CARD_H;
+    const { clientWidth: w, clientHeight: h } = this.stage;
+    const pad = 60;
+    const s = clampScale(Math.min((w - pad * 2) / Math.max(1, x1 - x0),
+                                  (h - pad * 2) / Math.max(1, y1 - y0), 1.4));
+    this.scale = s;
+    this.tx = w / 2 - ((x0 + x1) / 2) * s;
+    this.ty = h / 2 - ((y0 + y1) / 2) * s;
+    this.applyTransform();
+  }
+
+  /* Frame a set of technologies: after isolating a chain, the result is
+     usually somewhere off screen, so move and zoom to it rather than
+     leaving the user to hunt for it. */
+  fitTo(ids) {
+    const boxes = [...ids].map(id => this.lay.pos.get(id)).filter(Boolean);
+    if (!boxes.length) return;
+    const x0 = Math.min(...boxes.map(p => p.x));
+    const y0 = Math.min(...boxes.map(p => p.y));
+    const x1 = Math.max(...boxes.map(p => p.x)) + CARD_W;
+    const y1 = Math.max(...boxes.map(p => p.y)) + CARD_H;
+    const { clientWidth: w, clientHeight: h } = this.stage;
+    const pad = 60;
+    const scale = clampScale(Math.min((w - pad * 2) / Math.max(1, x1 - x0),
+                                      (h - pad * 2) / Math.max(1, y1 - y0),
+                                      1.2));
+    this.scale = scale;
+    this.tx = w / 2 - ((x0 + x1) / 2) * scale;
+    this.ty = h / 2 - ((y0 + y1) / 2) * scale;
+    this.applyTransform();
+  }
+
   centreOn(id) {
     const p = this.lay.pos.get(id);
     if (!p) return;
@@ -509,9 +553,11 @@ export class MapView {
 
     // Ascension perk lock: a badge over the icon's corner, so the marker is
     // visible at a glance rather than buried in the card's last line.
-    const perks = (t.ascensionPerks?.length ? t.ascensionPerks
-                   : t.inheritedPerks) ?? [];
+    const hard = t.ascensionPerks?.length ? t.ascensionPerks
+      : (t.inheritedPerks?.length ? t.inheritedPerks : []);
+    const perks = hard.length ? hard : (t.softPerks ?? []);
     const perkInherited = !t.ascensionPerks?.length && perks.length > 0;
+    const perkOptional = !hard.length && perks.length > 0;
 
     if (perks.length && this.scale >= ICON_SCALE) {
       const bx = iconBox ? iconBox.x + iconBox.w - 4 : it.x + 16;
@@ -590,12 +636,42 @@ export class MapView {
 
 // -- helpers ----------------------------------------------------------------
 
+/* Circuit-trace routing is the default; ?curves restores the bezier style. */
+export const TRACE_STYLE =
+  !new URLSearchParams(location.search).has("curves");
+
+/* Two routings.
+
+   Curved (default): a cubic bezier with horizontal tangents.
+
+   Trace (dev): the circuit-board look — leave the card horizontally, turn in
+   the empty channel between columns, and arrive horizontally, with the
+   corners chamfered at 45°. Because the vertical run happens in the channel,
+   a trace never crosses a card. */
 function addEdge(path, from, to) {
   const x1 = from.x + CARD_W, y1 = from.y + CARD_H / 2;
   const x2 = to.x, y2 = to.y + CARD_H / 2;
-  const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
+
+  if (!TRACE_STYLE) {
+    const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
+    path.moveTo(x1, y1);
+    path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
+    return;
+  }
+
+  const dy = y2 - y1;
   path.moveTo(x1, y1);
-  path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
+  if (Math.abs(dy) < 1) { path.lineTo(x2, y2); return; }
+
+  // Turn in the middle of the gap, and never inside a card's column.
+  const mid = x2 - Math.max(24, Math.min(70, (x2 - x1) * 0.4));
+  const chamfer = Math.min(14, Math.abs(dy) / 2, Math.max(6, (mid - x1) / 2));
+  const dir = Math.sign(dy);
+  path.lineTo(mid - chamfer, y1);
+  path.lineTo(mid, y1 + chamfer * dir);
+  path.lineTo(mid, y2 - chamfer * dir);
+  path.lineTo(mid + chamfer, y2);
+  path.lineTo(x2, y2);
 }
 
 /* Prefer the game's own name for a perk ("Master Builders"); fall back to

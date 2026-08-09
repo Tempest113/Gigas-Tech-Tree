@@ -1,21 +1,56 @@
 {
-  "_comment": [
-    "Ascension perk requirements the build cannot derive from script.",
-    "Everything else is read from the files: a technology's own `potential`,",
-    "scripted triggers that wrap `has_ascension_perk`, and perks that grant a",
-    "technology via `add_research_option`. Some technologies are handed over",
-    "through a chain the build does not follow — a perk enables a special",
-    "project, and the project grants the technology on completion — so they",
-    "are listed here instead.",
-    "",
-    "Format: technology id -> list of ascension perk ids. Dependent",
-    "technologies inherit the requirement automatically; list only the entry",
-    "point of a chain.",
-    "",
-    "These appear in data/perk-audit.json with reason \"manual\", so they can",
-    "be told apart from requirements found in script."
+ "_comment": [
+  "Ascension perk requirements the build cannot derive from script.",
+  "Everything else is read from the files: a technology's own `potential`,",
+  "scripted triggers that wrap `has_ascension_perk`, and perks that grant a",
+  "technology via `add_research_option`. Some technologies are handed over",
+  "through a chain the build does not follow — a perk enables a special",
+  "project, and the project grants the technology on completion — so they",
+  "are listed here instead.",
+  "",
+  "Format: technology id -> list of ascension perk ids. Dependent",
+  "technologies inherit the requirement automatically; list only the entry",
+  "point of a chain.",
+  "",
+  "These appear in data/perk-audit.json with reason \"manual\", so they can",
+  "be told apart from requirements found in script.",
+  "",
+  "conditionLabels names non-perk routes that appear as alternatives, so the viewer can say \"Mechromancy or Genetic Ascension\".",
+  "perkNames supplies a display name for perks the vanilla extraction has not captured; names found in the game files always win.",
+  "",
+  "\"names\" supplies a perk's display name when the extractor could not capture it from the game's localisation. Names found in the game always win; these are only a fallback.",
+  "",
+  "\"conditionLabels\" renames a condition that appears as an alternative to",
+  "a perk. Keys may be a bare condition (\"has_genetically_ascended\") or a",
+  "condition and value (\"has_country_flag:blokkat_bureau_unlocked\").",
+  "",
+  "The cosmogenesis technologies are handed out by a scripted effect when",
+  "the crisis reaches a level, not by the perk directly. Only technologies",
+  "that come from nowhere else are listed: Dark Matter Propulsion and the",
+  "Enigmatic Decoder are granted at the same moment but are researchable",
+  "by other means, so they are not marked."
+ ],
+ "grants": {
+  "tech_colossus": [
+   "ap_colossus"
   ],
-  "grants": {
-    "tech_colossus": ["ap_colossus"]
-  }
+  "tech_cosmogenesis_escort": [
+   "ap_cosmogenesis"
+  ],
+  "tech_cosmogenesis_mauler": [
+   "ap_cosmogenesis"
+  ],
+  "tech_cosmogenesis_weaver": [
+   "ap_cosmogenesis"
+  ],
+  "tech_cosmogenesis_crisis_2": [
+   "ap_cosmogenesis"
+  ]
+ },
+ "conditionLabels": {
+  "has_country_flag:blokkat_bureau_unlocked": "Blokkat Research Bureau unlock"
+ },
+ "perkNames": {
+  "ap_colossus": "Colossus Project"
+ }
 }

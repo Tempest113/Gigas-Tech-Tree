@@ -151,6 +151,23 @@ try {
       if (repeats.length)
         fail2(`${mode} mode repeats a band label: ${repeats.join(", ")}`);
     }
+
+    // Repeatables keep a band of their own in tier mode, including under a
+    // filter that leaves only a tier or two standing.
+    const gigacon = new Set([...view.model.techs.values()]
+      .filter(t => [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? [])]
+        .includes("ap_gigastructural_constructs")).map(t => t.id));
+    for (const vis of [null, gigacon]) {
+      const lay = layout(view.model.techs, vis, "tier");
+      const nodes = [...view.model.techs.values()]
+        .filter(t => !vis || vis.has(t.id));
+      const xs = kind => nodes.filter(t => !!t.isRepeatable === kind)
+        .map(t => lay.pos.get(t.id)?.x).filter(x => x != null);
+      const rep = xs(true), other = xs(false);
+      if (rep.length && other.length && Math.min(...rep) <= Math.max(...other))
+        fail2("repeatables share columns with ordinary technologies"
+              + (vis ? " when filtered" : ""));
+    }
   }
 
   // requirement filters, hide/show all, and middle-click isolate

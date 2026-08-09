@@ -63,6 +63,7 @@ export function compose(model, vanilla) {
         isRepeatable: v.isRepeatable,
         prerequisites: v.prerequisites, unlocks: [],
         ascensionPerks: v.ascensionPerks ?? [], inheritedPerks: [],
+        softPerks: v.softPerks ?? [],
         grantedByPerks: v.grantedByPerks ?? [],
         perkReasons: v.perkReasons ?? {},
         perkGroups: v.perkGroups ?? [],
@@ -128,7 +129,8 @@ export function compose(model, vanilla) {
     tierReqs: vanilla?.tiers ?? {},
     // Mod perk names override vanilla's: a mod may redefine a perk's name,
     // and several of these perks exist only in the mod.
-    perkNames: { ...(vanilla?.ascensionPerks ?? {}),
+    perkNames: { ...(model.meta?.perkNamesFallback ?? {}),
+                 ...(vanilla?.ascensionPerks ?? {}),
                  ...(model.meta?.perkNames ?? {}) },
     meta: model.meta,
     categories: model.categories,
@@ -154,6 +156,7 @@ function propagatePerks(byId) {
     const t = byId.get(id);
     if (t) {
       const inherited = new Set(t.inheritedPerks ?? []);
+      const soft = new Set(t.softPerks ?? []);
       for (const pid of t.prerequisites) {
         visit(pid);
         const p = byId.get(pid);
@@ -162,8 +165,16 @@ function propagatePerks(byId) {
                             ...(p.inheritedPerks ?? [])]) {
           if (!(t.ascensionPerks ?? []).includes(perk)) inherited.add(perk);
         }
+        // A perk that is one route of several carries down the same way,
+        // so a technology behind Tetradimensional Engineering is placed
+        // with it rather than among the ungated ones.
+        for (const perk of p.softPerks ?? []) {
+          if (!(t.ascensionPerks ?? []).includes(perk) &&
+              !inherited.has(perk)) soft.add(perk);
+        }
       }
       t.inheritedPerks = [...inherited].sort();
+      t.softPerks = [...soft].sort();
     }
     visiting.delete(id);
     done.add(id);

@@ -32,7 +32,7 @@
   "techId": "giga_tech_birch_world_1",
   "name": "The Birch World",
   "perks": {
-   "ap_vast_expanses": "granted"
+   "ap_vast_expanses": "potential"
   },
   "weightZero": true,
   "source": "common/technology/giga_05_weightless.txt#L154"

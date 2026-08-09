@@ -135,7 +135,12 @@ function showModel(newModel) {
     const lay = layout(model.techs, null, colMode);
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
                        model, lay, showDetail,
-                       id => panels?.isolate(id));
+                       id => {
+                         panels?.isolate(id);
+                         // Frame the chain, or the user has to hunt for it.
+                         requestAnimationFrame(() =>
+                           view.fitTo(view.index.items.map(i => i.id)));
+                       });
     window.__view = view;   // test hook (tests/dom-smoke.mjs)
 
     if (DEV) {
@@ -351,13 +356,12 @@ function showDetail(id) {
     addBadge(t.grantedByPerks?.includes(ap)
       ? `granted by ascension perk: ${apName(ap, model.perkNames)}`
       : `requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
+  const condName = key => model.meta?.conditionLabels?.[key]
+    ?? key.replace(/^(has|is)_/, "").replace(/_/g, " ");
   for (const grp of t.perkGroups ?? []) {
-    if (grp.perks.length > 1 || grp.other) {
-      const names = grp.perks.map(p => apName(p, model.perkNames));
-      const alts = grp.other ? [...names, "another qualifying condition"]
-                             : names;
-      addBadge(`or: ${alts.join(" or ")}`, "ap");
-    }
+    const alts = [...grp.perks.map(p => apName(p, model.perkNames)),
+                  ...(grp.conditions ?? []).map(condName)];
+    if (alts.length > 1) addBadge(`requires ${alts.join(" or ")}`, "ap");
   }
   for (const ap of t.inheritedPerks ?? [])
     if (!(t.ascensionPerks ?? []).includes(ap))
