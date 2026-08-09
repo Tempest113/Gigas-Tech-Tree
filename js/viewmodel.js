@@ -6,6 +6,11 @@
 
 export const CARD_W = 208, CARD_H = 64;
 
+/* Categories that stand outside the physics/society/engineering grouping:
+   crisis and event lines that are their own thing regardless of which
+   research area their technologies happen to sit in. Ordered as listed. */
+export const MISC_CATEGORIES = ["blokkats", "sirenalia"];
+
 /* Sorted index of placed cards for range queries. Built once per layout. */
 export function buildIndex(lay, visible) {
   const items = [];

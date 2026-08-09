@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=1.3.2">
 </head>
 <body>
 <header class="app-header">
@@ -27,6 +27,8 @@
     <button id="health-btn" class="header-btn" title="Build health" hidden>Health</button>
     <span id="build-info" class="build-info" title="Upstream commit"></span>
     <span id="app-version" class="build-info" title="Tool version"></span>
+    <span id="perf-meter" class="build-info" hidden
+      title="Draw time per frame: median / worst of the last 60"></span>
   </div>
 </header>
 
@@ -91,12 +93,14 @@
       <li><span class="sw" data-area="society"></span> Society</li>
       <li><span class="sw" data-area="engineering"></span> Engineering</li>
       <li><span class="sw" data-kind="rare"></span> Rare technology</li>
-      <li><span class="sw" data-kind="blokkat"></span> Blokkats category</li>
+      <li><span class="sw" data-kind="blokkat"></span> Blokkats (hex texture)</li>
+      <li><span class="sw" data-kind="siren"></span> Sirenalia (wave art)</li>
       <li><span class="sw" data-kind="stub"></span> From another mod, not loaded</li>
     </ul>
     <p><code>T3</code> is the tier. <code>∞</code> marks an unlimited
     repeatable; <code>×40</code> a repeatable capped at 40 levels. A red line
-    marks a dangerous technology. The number under the name is research cost.</p>
+    marks a dangerous technology; <code>✦</code> marks one that needs an
+    ascension perk before it can appear. The number under the name is research cost.</p>
 
     <h3>Interaction</h3>
     <ul>
@@ -140,6 +144,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=21"></script>
+<script type="module" src="js/main.js?v=1.3.2"></script>
 </body>
 </html>

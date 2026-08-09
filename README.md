@@ -10,6 +10,10 @@ GitHub Actions) and the *Deploy Pages* workflow publishes it.
 
 Version history: [CHANGELOG.md](CHANGELOG.md).
 
+Releasing: bump `APP_VERSION` in `js/version.js` (it versions the page header
+and every data and asset request), bump the `?v=` query on the script and
+stylesheet in `index.html`, and add a changelog entry.
+
 ## Quick start (local)
 
 ```bash

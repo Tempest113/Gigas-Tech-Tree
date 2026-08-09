@@ -4,6 +4,56 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.3.2
+
+### Fixed
+
+- Data and icon requests are now versioned along with the scripts and
+  stylesheet, from a single constant in `js/version.js`. Data files keep
+  stable names across releases, so a browser could serve a cached dataset
+  after an update — showing the previous release's categories while running
+  the new code.
+
+## 1.3.1
+
+### Added
+
+- **Draw-time meter** under `?dev`, showing the median and worst frame draw
+  time of the last sixty frames. It measures the renderer's own work only,
+  so it separates this code from compositing and GPU cost — the number to
+  compare when one machine feels slower than another.
+
+### Changed
+
+- The Sirens category is now **Sirenalia**, and it sits with Blokkats below
+  the divider rather than under Society, since both are content lines rather
+  than research areas. Its texture is layered wave art rather than
+  concentric arcs: four filled sine bands per visible category band, so the
+  cost does not scale with the map.
+
+## 1.3.0
+
+### Added
+
+- **Sirens category.** EAWAF technologies are grouped into their own
+  category, instead of being scattered through particles, psionics and
+  voidcraft. The build applies this via a synthetic category rule, so
+  further content lines can be split off the same way.
+- **Ascension perk requirements.** Technologies gated behind an ascension
+  perk are marked on the card with `✦` and the perk's name, and carry a full
+  badge in the detail panel. Perks named inside `NOT` blocks are ignored,
+  since those gate a technology out rather than in.
+
+### Fixed
+
+- The Blokkats hexagon texture, lost when the map moved to canvas in 1.2.0,
+  is drawn again — as a tiled canvas pattern, so it costs the same whatever
+  the band's size.
+- The canvas backing store is capped at 1.5× device pixel ratio. Canvas cost
+  is fill-rate bound, so a high-resolution display was asking for several
+  times the pixels of a smaller one at the same window size; past 1.5× the
+  extra resolution is invisible on small text.
+
 ## 1.2.0
 
 ### Changed

@@ -6,14 +6,21 @@
    3. any prerequisite id still unknown becomes a stub node (option D)
 */
 
+/* Data files keep stable names across releases, so a browser will happily
+   reuse a cached copy after an update. Version the request the same way
+   index.html versions its script and stylesheet. */
+import { APP_VERSION } from "./version.js";
+
+const v = url => `${url}${url.includes("?") ? "&" : "?"}v=${APP_VERSION}`;
+
 export async function loadManifest() {
-  const r = await fetch("data/manifest.json");
+  const r = await fetch(v("data/manifest.json"));
   if (!r.ok) throw new Error(`manifest.json: HTTP ${r.status}`);
   return r.json();
 }
 
 export async function loadDataset(entry) {
-  const r = await fetch(`data/${entry.file}`);
+  const r = await fetch(v(`data/${entry.file}`));
   if (!r.ok) throw new Error(`${entry.file}: HTTP ${r.status}`);
   const model = await r.json();
   return compose(model, await loadVanilla());
@@ -21,7 +28,7 @@ export async function loadDataset(entry) {
 
 export async function loadVanilla() {
   try {
-    const rv = await fetch("data/vanilla-structural.json");
+    const rv = await fetch(v("data/vanilla-structural.json"));
     if (rv.ok) return await rv.json();
   } catch { /* absent: mod-only mode */ }
   return null;

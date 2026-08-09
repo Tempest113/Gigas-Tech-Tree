@@ -18,6 +18,7 @@
   --danger: #e05c5c;
   --stub: #726e75;
   --blokkat: #52d97e;
+  --siren: #b07be0;
   --font-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
   --font-body: system-ui, "Segoe UI", sans-serif;
   --font-data: ui-monospace, "Cascadia Mono", "JetBrains Mono", monospace;
@@ -92,6 +93,7 @@ select {
 .sidebar-area.area-physics { color: var(--physics); }
 .sidebar-area.area-society { color: var(--society); }
 .sidebar-area.area-engineering { color: var(--engineering); }
+.badge.ap { color: var(--siren); border-color: var(--siren); }
 .sidebar-divider {
   height: 1px; background: var(--muted); opacity: 0.5;
   margin: 14px 2px 8px;
@@ -420,6 +422,7 @@ select {
 .legend .sw[data-area="engineering"] { border-left-color: var(--engineering); }
 .legend .sw[data-kind="rare"] { border-left-color: var(--rare); }
 .legend .sw[data-kind="blokkat"] { border-left-color: var(--blokkat); }
+.legend .sw[data-kind="siren"] { border-left-color: var(--siren); }
 .legend .sw[data-kind="stub"] {
   border-left-color: var(--rare); border-style: dashed; background: transparent;
 }

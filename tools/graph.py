@@ -20,6 +20,25 @@ from .pdx.values import VarTable, resolve
 #: mod being present (see docs/observed-grammar.md, compat pattern).
 CROSSMOD_VAR_FILE = "zz_giga_compat_overwrite_me.txt"
 
+#: Techs matching these id prefixes are grouped into a synthetic category,
+#: overriding the category declared in script. Used for content lines that
+#: are thematically one thing but scattered across research areas.
+SYNTHETIC_CATEGORIES = (
+    ("giga_tech_eawaf_", "sirenalia"),
+)
+
+
+def _collect_ascension_perks(block: Block, out: list) -> None:
+    """Ascension perks named anywhere inside a `potential` block, including
+    nested boolean groups. `NOT = { has_ascension_perk = x }` is skipped —
+    that gates the tech *out*, not in."""
+    for p in block.pairs():
+        if p.key == "has_ascension_perk" and isinstance(p.value, str):
+            if p.value not in out:
+                out.append(p.value)
+        elif isinstance(p.value, Block) and p.key not in ("NOT", "NOR"):
+            _collect_ascension_perks(p.value, out)
+
 
 @dataclass
 class Tech:
@@ -47,6 +66,7 @@ class Tech:
     gateway: Optional[str] = None
     icon: Optional[str] = None
     gated: bool = False  # has a non-trivial `potential` block
+    ascension_perks: list[str] = field(default_factory=list)
     cross_mod_gated: bool = False
     cross_mod_reason: Optional[str] = None
 
@@ -111,6 +131,10 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
             t.categories = [str(v) for v in cat.bare_values()]
         elif cat is not None:
             t.categories = [str(cat)]
+        for prefix, synthetic in SYNTHETIC_CATEGORIES:
+            if tid.startswith(prefix):
+                t.categories = [synthetic]
+                break
         tier_v, tier_err, _ = _resolve_field(b.get_last("tier"), vars_,
                                              provenance)
         t.tier = int(tier_v) if isinstance(tier_v, (int, float)) else None
@@ -144,6 +168,8 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         t.gateway = _plain(b.get_last("gateway"))
         pot = b.get_last("potential")
         t.gated = isinstance(pot, Block) and len(pot) > 0
+        if isinstance(pot, Block):
+            _collect_ascension_perks(pot, t.ascension_perks)
 
         prereq = b.get_last("prerequisites")
         if isinstance(prereq, Block):
@@ -326,6 +352,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "gateway": t.gateway,
             "icon": t.icon,
             "gated": t.gated,
+            "ascensionPerks": t.ascension_perks,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
             "source": t.raw.source_id,

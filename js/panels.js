@@ -3,6 +3,8 @@
 
 const $ = id => document.getElementById(id);
 
+import { MISC_CATEGORIES } from "./viewmodel.js";
+
 export class Panels {
   constructor(model, onFilter, onJump) {
     this.model = model;
@@ -40,6 +42,7 @@ export class Panels {
     // A category whose techs span research areas (Blokkats: physics,
     // society and engineering) doesn't belong under any one area heading.
     const dominant = c => {
+      if (MISC_CATEGORIES.includes(c)) return "misc";
       const m = areaOf.get(c);
       let best = null, n = -1, total = 0;
       for (const [a, k] of m) {
@@ -52,8 +55,14 @@ export class Panels {
       if (m.size > 1 && n / total < 0.8) return "misc";
       return best ?? "misc";
     };
+    const miscRank = c => {
+      const i = MISC_CATEGORIES.indexOf(c);
+      return i === -1 ? MISC_CATEGORIES.length : i;
+    };
     const groups = new Map();
-    for (const c of [...counts.keys()].sort()) {
+    const ordered = [...counts.keys()].sort((a, b) =>
+      (miscRank(a) - miscRank(b)) || (a < b ? -1 : a > b ? 1 : 0));
+    for (const c of ordered) {
       const a = dominant(c) ?? "other";
       if (!groups.has(a)) groups.set(a, []);
       groups.get(a).push(c);

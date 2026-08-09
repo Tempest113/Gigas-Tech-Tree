@@ -2,8 +2,9 @@
 
 import { loadManifest, loadDataset, loadVanilla, compose } from "./data.js";
 import { layout } from "./layout.js";
-import { MapView } from "./render.js";
+import { MapView, apName } from "./render.js";
 import { Panels } from "./panels.js";
+import { APP_VERSION } from "./version.js";
 import { ExploreTable } from "./explore.js";
 import { HealthPanel } from "./health.js";
 
@@ -17,9 +18,7 @@ let modSources = [];   // dev: ordered list of locally-loaded mod folders
 
 const DEV = new URLSearchParams(location.search).has("dev");
 
-/* Tool version. Bump on release and keep index.html's ?v= cache-buster in
-   step so a stale browser cache can't serve mismatched JS/CSS. */
-export const APP_VERSION = "1.2.0";
+export { APP_VERSION } from "./version.js";
 
 async function boot() {
   const status = $("status");
@@ -135,6 +134,25 @@ function showModel(newModel) {
     view = new MapView($("stage"), $("world"), $("edge-canvas"),
                        model, lay, showDetail);
     window.__view = view;   // test hook (tests/dom-smoke.mjs)
+
+    if (DEV) {
+      // Draw-time meter: median and worst of the last 60 frames. Only the
+      // renderer's own work, so it isolates this code from compositing and
+      // GPU cost — useful for comparing machines.
+      const meter = $("perf-meter");
+      meter.hidden = false;
+      let last = 0;
+      view.onFrame = (dt, frames) => {
+        const now = performance.now();
+        if (now - last < 250) return;
+        last = now;
+        const s = [...frames].sort((a, b) => a - b);
+        const med = s[s.length >> 1] ?? 0;
+        const worst = s[s.length - 1] ?? 0;
+        meter.textContent =
+          `draw ${med.toFixed(1)}ms med / ${worst.toFixed(1)}ms max`;
+      };
+    }
 
     const jump = id => {
       setTab("map");
@@ -307,6 +325,8 @@ function showDetail(id) {
            t.stub ? "crossmod" : "");
   if (t.overridesVanilla) addBadge("overrides vanilla", "override");
   if (t.crossModGated) addBadge("requires another mod", "crossmod");
+  for (const ap of t.ascensionPerks ?? [])
+    addBadge(`requires ascension perk: ${apName(ap)}`, "ap");
   if (t.isRare) addBadge("rare");
   if (t.isDangerous) addBadge("dangerous");
   if (t.isRepeatable) {

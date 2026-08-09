@@ -16,6 +16,7 @@
 
 import { CARD_W, CARD_H, buildIndex, clampScale, hitTest, lineageOf,
          viewportRect, visibleCards } from "./viewmodel.js";
+import { APP_VERSION } from "./version.js";
 
 const FONT_DISPLAY = '600 12.5px "Chakra Petch", system-ui, sans-serif';
 const FONT_DATA = '11px ui-monospace, "Cascadia Mono", monospace';
@@ -41,7 +42,9 @@ export class MapView {
     this.colours = readColours();
     this.atlas = null;
     this.atlasMap = null;
+    this.patterns = {};   // lazily built canvas patterns, keyed by category
     this._raf = 0;
+    this._frames = [];        // rolling frame times for the ?dev meter
 
     worldEl.replaceChildren();
     worldEl.style.display = "none";   // cards are drawn, not laid out
@@ -53,12 +56,13 @@ export class MapView {
 
   async _loadAtlas() {
     try {
-      const meta = await fetch("assets/icons/atlas.json").then(r => r.json());
+      const meta = await fetch(`assets/icons/atlas.json?v=${APP_VERSION}`)
+        .then(r => r.json());
       const img = new Image();
       img.decoding = "async";
       await new Promise((res, rej) => {
         img.onload = res; img.onerror = rej;
-        img.src = "assets/icons/atlas.png";
+        img.src = `assets/icons/atlas.png?v=${APP_VERSION}`;
       });
       this.atlasMap = meta.icons;
       this.atlas = img;
@@ -182,7 +186,7 @@ export class MapView {
   }
 
   resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = renderScale();
     const { clientWidth: w, clientHeight: h } = this.stage;
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
@@ -193,7 +197,15 @@ export class MapView {
 
   redraw() {
     if (this._raf) return;                 // coalesce to one draw per frame
-    this._raf = requestAnimationFrame(() => { this._raf = 0; this._draw(); });
+    this._raf = requestAnimationFrame(() => {
+      this._raf = 0;
+      const t0 = performance.now();
+      this._draw();
+      const dt = performance.now() - t0;
+      this._frames.push(dt);
+      if (this._frames.length > 60) this._frames.shift();
+      if (this.onFrame) this.onFrame(dt, this._frames);
+    });
   }
 
   // -- drawing --------------------------------------------------------
@@ -201,7 +213,7 @@ export class MapView {
   _draw() {
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = renderScale();
     const w = this.stage.clientWidth, h = this.stage.clientHeight;
     const C = this.colours;
 
@@ -233,11 +245,26 @@ export class MapView {
           break;
         case "band": {
           if (f.y + f.h < rect.y0 || f.y > rect.y1) continue;
-          const accent = C.area[f.cat === "blokkats" ? "blokkat" : f.area]
-            ?? C.stub;
-          ctx.fillStyle = withAlpha(accent, 0.09);
+          const accent = C.area[bandKey(f)] ?? C.stub;
           roundRect(ctx, f.x, f.y, f.w, f.h, 10);
+          ctx.fillStyle = withAlpha(accent, 0.09);
           ctx.fill();
+          // Signature categories get a texture on top of the wash.
+          if (this.scale > 0.15) {
+            const pat = this._pattern(ctx, f.cat, accent);
+            if (pat) {
+              ctx.save();
+              ctx.clip();
+              ctx.fillStyle = pat;
+              ctx.fillRect(f.x, f.y, f.w, f.h);
+              ctx.restore();
+            } else if (f.cat === "sirenalia") {
+              ctx.save();
+              ctx.clip();
+              drawWaves(ctx, f, accent, rect);
+              ctx.restore();
+            }
+          }
           ctx.strokeStyle = withAlpha(accent, 0.22);
           ctx.lineWidth = 1 / this.scale;
           ctx.stroke();
@@ -246,8 +273,7 @@ export class MapView {
         case "header": {
           if (f.y + 30 < rect.y0 || f.y > rect.y1) continue;
           if (this.scale < 0.12) continue;
-          const accent = C.area[f.cat === "blokkats" ? "blokkat" : f.area]
-            ?? C.muted;
+          const accent = C.area[bandKey(f)] ?? C.muted;
           const label = f.text.toUpperCase();
           ctx.font = '600 15px "Chakra Petch", system-ui, sans-serif';
           const tw = ctx.measureText(label).width + 2.6 * label.length;
@@ -288,6 +314,34 @@ export class MapView {
           break;
       }
     }
+  }
+
+  /* Tiled textures, drawn once into an offscreen canvas and reused as a
+     fill pattern — cheap regardless of band size. */
+  _pattern(ctx, cat, accent) {
+    if (cat !== "blokkats") return null;
+    if (this.patterns[cat] !== undefined) return this.patterns[cat];
+
+    const c = document.createElement("canvas");
+    const g = c.getContext("2d");
+    if (!g) { this.patterns[cat] = null; return null; }
+
+    if (cat === "blokkats") {
+      // Pointy-top honeycomb: one hexagon plus the single centre connector,
+      // which is the only edge a real lattice shares between tiles.
+      const w = 56, h = 97;
+      c.width = w; c.height = h;
+      g.strokeStyle = withAlpha(accent, 0.16);
+      g.lineWidth = 1;
+      g.beginPath();
+      g.moveTo(28, 0); g.lineTo(56, 16.17); g.lineTo(56, 48.5);
+      g.lineTo(28, 64.67); g.lineTo(0, 48.5); g.lineTo(0, 16.17);
+      g.closePath();
+      g.moveTo(28, 64.67); g.lineTo(28, 97);
+      g.stroke();
+    }
+    this.patterns[cat] = ctx.createPattern(c, "repeat");
+    return this.patterns[cat];
   }
 
   _drawEdges(ctx, rect, C) {
@@ -386,7 +440,11 @@ export class MapView {
       ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 42);
     }
 
-    if (t.isDangerous) {
+    if (t.ascensionPerks?.length) {
+      ctx.font = FONT_DATA;
+      ctx.fillStyle = C.rare;
+      ctx.fillText(`\u2726 ${apName(t.ascensionPerks[0])}`, textX, it.y + 56);
+    } else if (t.isDangerous) {
       ctx.font = FONT_DATA;
       ctx.fillStyle = C.danger;
       ctx.fillText("Dangerous technology", textX, it.y + 56);
@@ -403,6 +461,54 @@ function addEdge(path, from, to) {
   const reach = Math.max(40, Math.min(160, (x2 - x1) * 0.5));
   path.moveTo(x1, y1);
   path.bezierCurveTo(x1 + reach, y1, x2 - reach, y2, x2, y2);
+}
+
+/* ap_celestial_printing -> "Celestial Printing" */
+export function apName(id) {
+  return String(id).replace(/^ap_/, "").replace(/_/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/* Canvas cost is fill-rate bound, and a 4K display asks for four times the
+   pixels of a 1080p one at the same window size — the likeliest reason a
+   weaker machine on a smaller screen feels smoother. Cap the backing store
+   at 1.5x: past that the gain is invisible on a map of small text. */
+function renderScale() {
+  return Math.min(window.devicePixelRatio || 1, 1.5);
+}
+
+/* Layered wave art: overlapping sine bands in the accent hue, each darker
+   and lower than the last. Four filled paths per visible band — the cost
+   does not scale with the map, only with what is on screen. */
+function drawWaves(ctx, f, accent, rect) {
+  const x0 = Math.max(f.x, rect.x0), x1 = Math.min(f.x + f.w, rect.x1);
+  if (x1 <= x0) return;
+  const step = 60;
+  const layers = [
+    { amp: 0.10, phase: 0.0, base: 0.30, alpha: 0.05, period: 1600 },
+    { amp: 0.08, phase: 1.1, base: 0.52, alpha: 0.06, period: 1150 },
+    { amp: 0.07, phase: 2.4, base: 0.72, alpha: 0.07, period: 900 },
+    { amp: 0.05, phase: 3.6, base: 0.88, alpha: 0.09, period: 700 },
+  ];
+  for (const L of layers) {
+    ctx.beginPath();
+    ctx.moveTo(x0, f.y + f.h);
+    for (let x = x0; x <= x1 + step; x += step) {
+      const t = ((x - f.x) / L.period) * Math.PI * 2 + L.phase;
+      const y = f.y + f.h * (L.base + Math.sin(t) * L.amp);
+      ctx.lineTo(Math.min(x, x1), y);
+    }
+    ctx.lineTo(x1, f.y + f.h);
+    ctx.closePath();
+    ctx.fillStyle = withAlpha(accent, L.alpha);
+    ctx.fill();
+  }
+}
+
+function bandKey(f) {
+  if (f.cat === "blokkats") return "blokkat";
+  if (f.cat === "sirenalia") return "siren";
+  return f.area;
 }
 
 function expand(r, m) {
@@ -472,6 +578,7 @@ function readColours() {
       society: v("--society", "#63c78a"),
       engineering: v("--engineering", "#e0a458"),
       blokkat: v("--blokkat", "#52d97e"),
+      siren: v("--siren", "#b07be0"),
     },
   };
 }

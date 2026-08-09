@@ -15,6 +15,8 @@ const SUBCOL_GAP = 44;        // between sub-columns inside a tier
 const TIER_GAP = 140;         // between tiers
 const ROW_GAP = 16, SECTION_GAP = 90, SECTION_PAD_TOP = 108;
 const MAX_ROWS = 8;           // wrap taller stacks into extra columns
+import { MISC_CATEGORIES } from "./viewmodel.js";
+
 const AREA_ORDER = ["physics", "society", "engineering", null];
 
 export function layout(techs, visible = null) {
@@ -82,6 +84,7 @@ export function layout(techs, visible = null) {
   // Matches panels.js: a category spread across areas is not filed under
   // any single one.
   const dominantArea = cat => {
+    if (MISC_CATEGORIES.includes(cat)) return null;
     const m = sectionArea.get(cat);
     let best = null, n = -1, total = 0;
     for (const [a, c] of m) {
@@ -91,10 +94,16 @@ export function layout(techs, visible = null) {
     if (m.size > 1 && n / total < 0.8) return null;
     return best;
   };
+  const miscRank = c => {
+    const i = MISC_CATEGORIES.indexOf(c);
+    return i === -1 ? MISC_CATEGORIES.length : i;
+  };
   const sectionKeys = [...sections.keys()].sort((a, b) => {
     const ai = AREA_ORDER.indexOf(dominantArea(a));
     const bi = AREA_ORDER.indexOf(dominantArea(b));
     if (ai !== bi) return ai - bi;
+    const ma = miscRank(a), mb = miscRank(b);
+    if (ma !== mb) return ma - mb;
     return a < b ? -1 : a > b ? 1 : 0;
   });
 
