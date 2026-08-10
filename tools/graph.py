@@ -20,6 +20,10 @@ from .pdx.values import VarTable, resolve
 #: mod being present (see docs/observed-grammar.md, compat pattern).
 CROSSMOD_VAR_FILE = "zz_giga_compat_overwrite_me.txt"
 
+#: Supplying another mod's variables (data/external-techs.json) changes where
+#: the winning definition comes from, but the technology still needs that mod.
+EXTERNAL_VAR_FILE = "external-techs.json"
+
 #: Techs matching these id prefixes are grouped into a synthetic category,
 #: overriding the category declared in script. Used for content lines that
 #: are thematically one thing but scattered across research areas.
@@ -261,6 +265,8 @@ class Tech:
     perk_reasons: dict = field(default_factory=dict)
     cross_mod_gated: bool = False
     cross_mod_reason: Optional[str] = None
+    #: short id of the mod required, from the placeholder variable's name
+    cross_mod_id: Optional[str] = None
 
 
 @dataclass
@@ -592,11 +598,15 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
 
         # Cross-mod gating: cost/weight variable won by the compat file.
         for src, fieldname in ((cost_src, "cost"), (weight_src, "weight")):
-            if src and CROSSMOD_VAR_FILE in src:
+            if src and (CROSSMOD_VAR_FILE in src or EXTERNAL_VAR_FILE in src):
                 t.cross_mod_gated = True
                 t.cross_mod_reason = (
                     f"{fieldname} uses a cross-mod placeholder variable "
                     f"defined in {CROSSMOD_VAR_FILE}")
+                # @acot_tier6cost2 -> "acot": which mod supplies the value.
+                var = b.get_last(fieldname)
+                if isinstance(var, VarRef):
+                    t.cross_mod_id = var.name.split("_")[0]
                 break
 
         # Icon: explicit key -> id -> category -> None (viewer placeholder).
@@ -766,6 +776,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "softPerks": t.soft_perks,
             "crossModGated": t.cross_mod_gated,
             "crossModReason": t.cross_mod_reason,
+            "crossModId": t.cross_mod_id,
             "source": t.raw.source_id,
             "overridesVanilla": t.raw.overrides_earlier_source,
             "sourceFile": f"common/technology/{t.raw.source_file}#L{t.raw.line}",

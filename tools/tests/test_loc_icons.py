@@ -1,4 +1,5 @@
 """Tests for tools/loc.py and tools/icons.py."""
+import json
 from pathlib import Path
 
 from PIL import Image
@@ -96,6 +97,28 @@ def test_icon_conversion_and_determinism(tmp_path: Path):
     # cell = max dims, 52px icons centred inside 58px cells
     assert r1.atlas_map["a"] == {"x": 3, "y": 3, "w": 52, "h": 52}
     assert r1.atlas_map["b"]["w"] == 58
+
+
+def test_atlas_ignores_atlases_and_oversized_files(tmp_path: Path):
+    """The extractor and the build write intermediate atlases into the icon
+    directory. Folding one back in as though it were a 52-pixel icon
+    inflates the cell size to its dimensions, which corrupts every
+    coordinate and asks for a canvas of gigapixels."""
+    from tools.icons import build_atlas_from_pngs
+
+    d = tmp_path / "icons"
+    d.mkdir()
+    for name, size in [("tech_a", (52, 52)), ("tech_b", (52, 52))]:
+        Image.new("RGBA", size, (255, 0, 0, 255)).save(d / f"{name}.png")
+    Image.new("RGBA", (1856, 1860)).save(d / "ap-atlas.png")
+    Image.new("RGBA", (2048, 2048)).save(d / "mod-ap-atlas.png")
+    Image.new("RGBA", (512, 512)).save(d / "something-else.png")
+
+    coords = build_atlas_from_pngs(d, d / "atlas.png", d / "atlas.json")
+
+    assert set(coords) == {"tech_a", "tech_b"}
+    doc = json.loads((d / "atlas.json").read_text())
+    assert doc["cell"] == {"w": 52, "h": 52}
 
 
 def test_icon_failure_gets_placeholder_and_warning(tmp_path: Path):

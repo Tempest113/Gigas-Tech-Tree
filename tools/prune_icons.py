@@ -18,7 +18,8 @@ import argparse
 import json
 from pathlib import Path
 
-KEEP_STEMS = {"atlas", "ap-atlas"}
+def _is_atlas(stem: str) -> bool:
+    return stem == "atlas" or stem.endswith("-atlas")
 
 
 def main() -> None:
@@ -37,7 +38,7 @@ def main() -> None:
 
     needed = set(json.loads(args.needed.read_text(encoding="utf-8")))
     present = {f for f in args.icons.glob("*.png")
-               if f.stem not in KEEP_STEMS}
+               if not _is_atlas(f.stem)}
     unused = sorted(f for f in present if f.stem not in needed)
     missing = sorted(needed - {f.stem for f in present})
 

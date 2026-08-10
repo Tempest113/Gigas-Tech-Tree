@@ -157,6 +157,50 @@ The renderer also measures itself and reduces resolution and skips textures
 while the view is moving on machines that need it; `?render=<n>` forces a
 specific device pixel ratio for testing.
 
+### Technologies from mods outside the build
+
+Gigastructures defines hooks for other mods — its supertensile chain takes
+Ancient Cache of Technologies power cores as prerequisites, and its costs
+come from ACOT's `@acot_*` variables, which Gigastructures ships zeroed for
+the real mod to overwrite. `data/external-techs.json` supplies both, so
+those technologies render as ordinary cards instead of nameless stubs:
+
+- `variables` — loaded after the mod's own, exactly as load order would.
+- `technologies` — name, description, tier, area, category, cost, weight,
+  icon and which mod each comes from.
+
+Icons come from the other mod's `gfx/interface/icons/technologies`:
+
+```bash
+python tools/convert_icons.py --src /path/to/acot/gfx/interface/icons/technologies \
+    --only tech_dark_matter_power_core_dm tech_dark_matter_power_core_ae
+python tools/build_atlas.py
+```
+
+## What survives a mod update
+
+Almost everything is derived from the mod's own files, so ordinary changes
+need no work here: new or renamed technologies, new categories, changed
+tiers, costs, prerequisites, localisation and icons all flow through the
+weekly rebuild. A new category appears as its own section, in the sidebar
+and in the Explore table on its own; if its technologies span research
+areas it is grouped with Blokkats and Sirenalia below the divider
+automatically.
+
+Three things are deliberate choices rather than data, and are the only
+places a change may be wanted:
+
+- `MISC_CATEGORIES` in `js/viewmodel.js` — forces a category below the
+  divider when the "spans several research areas" rule does not catch it.
+- `_pattern` in `js/render.js` plus a colour variable — a bespoke texture
+  for a category, as Blokkats and Sirenalia have. Plain categories need
+  nothing.
+- `SYNTHETIC_CATEGORIES` in `tools/graph.py` — regroups technologies by id
+  prefix without editing the mod.
+
+`data/manual-perk-grants.json` covers requirements that cannot be read from
+script at all; see the comment inside it.
+
 ## Adding another mod
 
 The pipeline is source-list based (`tools/merge.py`): add a second

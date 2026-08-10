@@ -164,9 +164,8 @@ export class Panels {
 
   _matchesSource(t) {
     switch (this.sourceFilter) {
-      case "gigas": return t.source !== "vanilla";
+      case "gigas": return t.source !== "vanilla" && !t.external;
       case "vanilla": return t.source === "vanilla";
-      case "crossmod": return t.crossModGated || t.stub;
       default: return true;
     }
   }
@@ -287,7 +286,9 @@ export class Panels {
     if (req) { this.reqFilter = req; $("req-filter").value = req; }
     const only = p.get("only");
     if (only && this.model.techs.has(only)) { this.isolate(only); return p.get("tech"); }
-    if (q || cats || src || req) this._recompute();
+    // Always compute once: defaults are a filter too — other mods' content
+    // is hidden unless asked for.
+    this._recompute();
     return p.get("tech");
   }
 }

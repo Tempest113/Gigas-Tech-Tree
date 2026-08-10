@@ -192,16 +192,29 @@ export function layout(techs, visible = null, mode = "tier") {
     if (!colLabel[c]) colLabel[c] = new Map();
     colLabel[c].set(key, (colLabel[c].get(key) ?? 0) + 1);
   }
-  /* One label per column: whichever group most of its technologies belong
-     to. Gate mode gives pure bands by construction (each gate owns a
-     disjoint column range), so this is exact there. In tier mode a long
-     chain can carry a low tier into later columns, so a label describes the
-     bulk of a column rather than all of it. */
+  /* A column's label comes from where each group *starts*, not from which
+     group happens to have the most cards in it. Dominance mislabelled
+     columns that a long chain had reached into — an ACOT prerequisite of a
+     tier 7 technology sat in a column labelled tier 5 because tier 5 had
+     more cards there. Groups are ordered by their first column, so labels
+     are monotonic and never repeat. */
   const labels = new Array(nCols).fill("");
-  for (let c = 0; c < nCols; c++) {
-    let best = "", n = -1;
-    for (const [k, v] of (colLabel[c] ?? [])) if (v > n) { best = k; n = v; }
-    labels[c] = best;
+  {
+    const firstCol = new Map();       // group label -> its earliest column
+    for (const t of nodes) {
+      const c = col.get(t.id);
+      const key = mode === "gate"
+        ? GATES[gateRank(t, needsMega)].label
+        : t.isRepeatable ? "Repeatables"
+        : t.tier === null ? "Untiered" : `Tier ${t.tier}`;
+      if (!firstCol.has(key) || c < firstCol.get(key)) firstCol.set(key, c);
+    }
+    const starts = [...firstCol.entries()].sort((a, b) => a[1] - b[1]);
+    let gi = 0;
+    for (let c = 0; c < nCols; c++) {
+      while (gi + 1 < starts.length && starts[gi + 1][1] <= c) gi++;
+      labels[c] = starts[gi]?.[0] ?? "";
+    }
   }
   const dominant = c => labels[c];
 

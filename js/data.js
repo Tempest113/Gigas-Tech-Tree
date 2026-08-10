@@ -107,13 +107,94 @@ export function compose(model, vanilla) {
 
   propagatePerks(byId);
 
+  // Technologies belonging to a mod outside the build, described in
+  // data/external-techs.json. They are ordinary cards, not stubs.
+  const external = model.meta?.externalTechs ?? {};
+  const externalSources = model.meta?.externalSources ?? {};
+  const shortNames = model.meta?.externalShortNames ?? {};
+  for (const [id, e] of Object.entries(external)) {
+    const t = byId.get(id);
+    if (!t) continue;
+    t.stub = false;
+    t.external = true;
+    t.name = e.name ?? t.name;
+    t.nameMissing = false;
+    t.desc = e.desc ?? t.desc;
+    t.tier = e.tier ?? t.tier;
+    t.area = e.area ?? t.area;
+    t.categories = e.categories ?? t.categories;
+    t.cost = e.cost ?? t.cost;
+    t.weight = e.weight ?? t.weight;
+    t.icon = e.icon ?? id;
+    t.isRare = e.isRare ?? t.isRare;
+    t.isDangerous = e.isDangerous ?? t.isDangerous;
+    t.gateway = e.gateway ?? t.gateway;
+    t.source = e.source ?? "external";
+    t.sourceLabel = externalSources[e.source] ?? e.source ?? "Another mod";
+    t.inferredPlacement = false;
+    t.modTag = shortNames[e.source] ?? e.source ?? "MOD";
+  }
+
+  // A Gigastructures technology whose cost comes from another mod's
+  // variables needs that mod too, so it carries the same tag.
+  for (const t of byId.values()) {
+    if (!t.modTag && t.crossModGated) {
+      t.modTag = shortNames[t.crossModId] ??
+        (t.crossModId ? t.crossModId.toUpperCase() : "MOD");
+    }
+  }
+  /* A mod requirement carries down the prerequisite chain: the sigma
+     supertensile takes its cost from ACOT, but one of its prerequisites is
+     the Phanon supertensile, which cannot be reached without the submod. So
+     collect every mod needed anywhere upstream, then drop any that another
+     already implies — AoT needs ACOT, so a card needing both is tagged AoT
+     alone rather than with both. */
+  {
+    const implied = model.meta?.externalImpliedBy ?? {};
+    const impliedTags = new Map();      // tag -> tag it implies
+    for (const [a, b] of Object.entries(implied)) {
+      impliedTags.set(shortNames[a] ?? a, shortNames[b] ?? b);
+    }
+
+    const mods = new Map();             // id -> Set of tags
+    const seen = new Set(), busy = new Set();
+    const gather = id => {
+      if (seen.has(id)) return mods.get(id) ?? new Set();
+      if (busy.has(id)) return new Set();
+      busy.add(id);
+      const t = byId.get(id);
+      const out = new Set(t?.modTag ? [t.modTag] : []);
+      for (const pid of t?.prerequisites ?? [])
+        for (const tag of gather(pid)) out.add(tag);
+      busy.delete(id);
+      seen.add(id);
+      mods.set(id, out);
+      return out;
+    };
+
+    for (const id of byId.keys()) gather(id);
+    for (const [id, tags] of mods) {
+      if (!tags.size) continue;
+      for (const tag of [...tags]) {
+        const weaker = impliedTags.get(tag);
+        if (weaker && tags.has(weaker)) tags.delete(weaker);
+      }
+      const t = byId.get(id);
+      t.modTag = [...tags].sort().join(" + ");
+      t.crossModGated = true;
+    }
+  }
+
   // Stubs (ids referenced but defined nowhere — with vanilla data present,
   // these are external-mod techs like ACOT's) collocate with the techs that
   // need them: inherit the first dependent's section and tier band so e.g.
   // ACOT power cores sit beside the supertensile chain, not in a far-off
   // uncategorised corner.
-  for (const id of stubs) {
+  for (const id of [...stubs, ...Object.keys(external)]) {
     const s = byId.get(id);
+    // An external entry may describe a technology only partly; anything it
+    // leaves out is inferred from what depends on it, as for a stub.
+    if (!s || (s.tier !== null && s.area && s.categories?.length)) continue;
     const dep = s.unlocks.map(u => byId.get(u))
       .sort((a, b) => (a.id < b.id ? -1 : 1))
       .find(x => x && !x.stub);

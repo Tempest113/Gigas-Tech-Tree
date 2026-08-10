@@ -4,6 +4,111 @@ Notable changes to the Gigastructures Tech Tree. Versions refer to the tool
 (`APP_VERSION` in `js/main.js`, shown in the page header), not to the mod or
 game data, which refresh independently.
 
+## 1.10.0
+
+### Added
+
+- **`data/external-techs.json`**, describing technologies and scripted
+  variables that belong to mods outside the build. Gigastructures references
+  Ancient Cache of Technologies power cores as prerequisites and takes its
+  supertensile costs from ACOT's variables, which it ships zeroed for the
+  real mod to overwrite; with those values supplied, the technologies render
+  as ordinary cards with names, tiers, costs and icons rather than as
+  nameless stubs, and the Gigastructures technologies that depend on them
+  stop showing a cost of zero.
+- **`tools/convert_icons.py`**, which converts icons from any mod folder
+  into the site's icon directory.
+
+## 1.11.3
+
+### Fixed
+
+- **Corrupted sprite atlas.** The extractor and the build wrote their
+  intermediate atlases into the icon directory, and the atlas builder
+  excluded only `atlas.png` by name — so `ap-atlas.png` was folded back in as
+  though it were an icon. That set the cell size to its dimensions, putting
+  every icon coordinate wrong, and with a full icon set it asked for a
+  canvas of several gigapixels and was killed outright. Three fixes: any
+  file named like an atlas is ignored, anything larger than 256 pixels is
+  skipped with a warning rather than silently wrecking the layout, and the
+  intermediate atlases are written to a temporary directory so they never
+  land among the icons in the first place.
+
+## 1.11.2
+
+### Fixed
+
+- Mod requirements now carry down the whole prerequisite chain rather than
+  only from a directly-external prerequisite. The sigma supertensile needs
+  the Acquisition of Technology submod because the Phanon supertensile does,
+  which the previous release missed. Where a card needs both a mod and its
+  submod it is tagged with the more specific one alone, declared through
+  `impliedBy` in `data/external-techs.json`.
+
+## 1.11.1
+
+### Added
+
+- **A mod tag in the corner of any card that needs a mod other than
+  Gigastructures** — ACOT or AoT — so it reads at a glance instead of only
+  on opening the technology. Both the technologies belonging to those mods
+  and the Gigastructures technologies that depend on them are tagged, and
+  where a prerequisite comes from a different mod again, the tag names that
+  one: the Phanon supertensile takes its cost from ACOT but cannot be
+  reached without the submod that defines its prerequisite.
+
+### Fixed
+
+- Supplying the other mods' variables had quietly cleared the cross-mod flag
+  on the Gigastructures supertensile technologies, because the winning
+  definition of their cost no longer came from the compatibility file.
+
+## 1.11.0
+
+### Changed
+
+- **Every technology in the tree is now fully described.** The Ancient Cache
+  of Technologies power cores and Civil Phanon Engineering have their real
+  tiers, costs, areas, categories, flags, names, descriptions and icons, so
+  nothing renders as a nameless stub.
+- **Removed the "Show other mods' content" toggle and the "Requires another
+  mod" filter**, which existed only to hide content that had no data. The
+  detail panel still badges a technology that needs another mod installed,
+  since that remains true and worth knowing.
+- Prerequisites of technologies from other mods are deliberately not carried
+  over: they would pull in further technologies needing description of their
+  own. These entries are where Gigastructures meets the other mod, and the
+  tree treats them as starting points.
+
+## 1.10.1
+
+### Added
+
+- ACOT's cost variables, so the four Gigastructures supertensile
+  technologies that depend on them show real costs (80,000 through
+  1,440,000) instead of zero.
+- Names and descriptions for the Ancient Cache of Technologies power cores
+  and Civil Phanon Engineering, which are prerequisites of that chain.
+  Missing fields fall back to inference from the technology that depends on
+  them, so a partly-described entry is still placed sensibly.
+
+## 1.9.2
+
+### Changed
+
+- **Other mods' technologies are hidden by default**, behind a "Show other
+  mods' content" tick in the sidebar (`?external=1` to link a view with them
+  shown). Gigastructures defines a handful as hooks for mods like the
+  Ancient Cache of Technologies; without those mods installed they have no
+  names or icons, so they were clutter.
+
+### Fixed
+
+- A column's band label now comes from where each tier or gate *starts*
+  rather than from whichever group had the most cards in that column. An
+  ACOT prerequisite of a tier 7 technology was sitting in a band labelled
+  tier 5 for that reason, and tier 6 was missing from the labels entirely.
+
 ## 1.9.1
 
 ### Changed
@@ -89,6 +194,111 @@ game data, which refresh independently.
 - The guide has been rewritten around what a reader actually needs: how
   columns work in both modes, what each part of a card means, how to find a
   route, and where the data comes from.
+
+## 1.10.0
+
+### Added
+
+- **`data/external-techs.json`**, describing technologies and scripted
+  variables that belong to mods outside the build. Gigastructures references
+  Ancient Cache of Technologies power cores as prerequisites and takes its
+  supertensile costs from ACOT's variables, which it ships zeroed for the
+  real mod to overwrite; with those values supplied, the technologies render
+  as ordinary cards with names, tiers, costs and icons rather than as
+  nameless stubs, and the Gigastructures technologies that depend on them
+  stop showing a cost of zero.
+- **`tools/convert_icons.py`**, which converts icons from any mod folder
+  into the site's icon directory.
+
+## 1.11.3
+
+### Fixed
+
+- **Corrupted sprite atlas.** The extractor and the build wrote their
+  intermediate atlases into the icon directory, and the atlas builder
+  excluded only `atlas.png` by name — so `ap-atlas.png` was folded back in as
+  though it were an icon. That set the cell size to its dimensions, putting
+  every icon coordinate wrong, and with a full icon set it asked for a
+  canvas of several gigapixels and was killed outright. Three fixes: any
+  file named like an atlas is ignored, anything larger than 256 pixels is
+  skipped with a warning rather than silently wrecking the layout, and the
+  intermediate atlases are written to a temporary directory so they never
+  land among the icons in the first place.
+
+## 1.11.2
+
+### Fixed
+
+- Mod requirements now carry down the whole prerequisite chain rather than
+  only from a directly-external prerequisite. The sigma supertensile needs
+  the Acquisition of Technology submod because the Phanon supertensile does,
+  which the previous release missed. Where a card needs both a mod and its
+  submod it is tagged with the more specific one alone, declared through
+  `impliedBy` in `data/external-techs.json`.
+
+## 1.11.1
+
+### Added
+
+- **A mod tag in the corner of any card that needs a mod other than
+  Gigastructures** — ACOT or AoT — so it reads at a glance instead of only
+  on opening the technology. Both the technologies belonging to those mods
+  and the Gigastructures technologies that depend on them are tagged, and
+  where a prerequisite comes from a different mod again, the tag names that
+  one: the Phanon supertensile takes its cost from ACOT but cannot be
+  reached without the submod that defines its prerequisite.
+
+### Fixed
+
+- Supplying the other mods' variables had quietly cleared the cross-mod flag
+  on the Gigastructures supertensile technologies, because the winning
+  definition of their cost no longer came from the compatibility file.
+
+## 1.11.0
+
+### Changed
+
+- **Every technology in the tree is now fully described.** The Ancient Cache
+  of Technologies power cores and Civil Phanon Engineering have their real
+  tiers, costs, areas, categories, flags, names, descriptions and icons, so
+  nothing renders as a nameless stub.
+- **Removed the "Show other mods' content" toggle and the "Requires another
+  mod" filter**, which existed only to hide content that had no data. The
+  detail panel still badges a technology that needs another mod installed,
+  since that remains true and worth knowing.
+- Prerequisites of technologies from other mods are deliberately not carried
+  over: they would pull in further technologies needing description of their
+  own. These entries are where Gigastructures meets the other mod, and the
+  tree treats them as starting points.
+
+## 1.10.1
+
+### Added
+
+- ACOT's cost variables, so the four Gigastructures supertensile
+  technologies that depend on them show real costs (80,000 through
+  1,440,000) instead of zero.
+- Names and descriptions for the Ancient Cache of Technologies power cores
+  and Civil Phanon Engineering, which are prerequisites of that chain.
+  Missing fields fall back to inference from the technology that depends on
+  them, so a partly-described entry is still placed sensibly.
+
+## 1.9.2
+
+### Changed
+
+- **Other mods' technologies are hidden by default**, behind a "Show other
+  mods' content" tick in the sidebar (`?external=1` to link a view with them
+  shown). Gigastructures defines a handful as hooks for mods like the
+  Ancient Cache of Technologies; without those mods installed they have no
+  names or icons, so they were clutter.
+
+### Fixed
+
+- A column's band label now comes from where each tier or gate *starts*
+  rather than from whichever group had the most cards in that column. An
+  ACOT prerequisite of a tier 7 technology was sitting in a band labelled
+  tier 5 for that reason, and tier 6 was missing from the labels entirely.
 
 ## 1.9.1
 

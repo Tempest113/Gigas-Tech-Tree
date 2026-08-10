@@ -589,6 +589,22 @@ export class MapView {
       }
     }
 
+    // A card that needs a mod other than Gigastructures says so in the
+    // corner, so it reads at a glance rather than only on opening it.
+    if (t.modTag && this.scale >= ICON_SCALE) {
+      ctx.font = '700 9px "Chakra Petch", system-ui, sans-serif';
+      const tw = measureCached(ctx, t.modTag) + 10;
+      const bx = it.x + CARD_W - tw - 4, by = it.y + 4;
+      roundRect(ctx, bx, by, tw, 13, 3);
+      ctx.fillStyle = C.bg;
+      ctx.fill();
+      ctx.strokeStyle = C.rare;
+      ctx.lineWidth = 1 / this.scale;
+      ctx.stroke();
+      ctx.fillStyle = C.rare;
+      ctx.fillText(t.modTag, bx + 5, by + 10);
+    }
+
     if (!withText) { ctx.globalAlpha = 1; return; }
 
     ctx.font = FONT_DISPLAY;
@@ -609,7 +625,7 @@ export class MapView {
       const badge = (t.tier !== null ? `T${t.tier}` : "") + rep;
       ctx.font = '600 10px "Chakra Petch", system-ui, sans-serif';
       const bw = measureCached(ctx, badge);
-      ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 42);
+      ctx.fillText(badge, it.x + CARD_W - 8 - bw, it.y + 44);
     }
 
     if (perks.length) {

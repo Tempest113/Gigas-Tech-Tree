@@ -1,0 +1,122 @@
+{
+ "_comment": [
+  "Technologies and scripted variables from mods that are not part of the",
+  "build, but that Gigastructures references.",
+  "",
+  "Gigastructures defines hooks for the Ancient Cache of Technologies: its",
+  "supertensile chain takes ACOT power cores as prerequisites, and its costs",
+  "come from ACOT's @acot_tierNcostM variables. Gigastructures ships those",
+  "variables set to zero in zz_giga_compat_overwrite_me.txt, expecting ACOT",
+  "to overwrite them, so without the values here those technologies show a",
+  "cost of nothing and their prerequisites have no name, icon or tier.",
+  "",
+  "\"variables\" are loaded after the mod's own, so they overwrite the",
+  "zeroed placeholders exactly as the real mod would.",
+  "",
+  "\"technologies\" describe technologies defined by another mod. Only what",
+  "the tree displays is needed: name, description, tier, area, category,",
+  "cost, weight, icon and which mod it comes from. Icons go in",
+  "assets/icons/<icon>.png — see tools/convert_icons.py.",
+  "",
+  "Anything listed here is shown as ordinary content, not as a stub.",
+  "",
+  "Prerequisites are deliberately not carried over: they would pull in",
+  "further technologies from the same mods, which would need describing",
+  "too. These entries are the point where Gigastructures meets the other",
+  "mod, and the tree treats them as starting points.",
+  "",
+  "\"shortNames\" are the tags drawn in the corner of a card belonging to,",
+  "or depending on, another mod.",
+  "",
+  "\"impliedBy\" records that one mod requires another — the Acquisition of",
+  "Technology submod needs ACOT — so a card needing both is tagged with",
+  "the more specific one alone rather than with both."
+ ],
+ "sources": {
+  "acot": "Ancient Cache of Technologies",
+  "aot": "Acquisition of Technology (Ancient Cache of Technologies submod)"
+ },
+ "variables": {
+  "acot_tier6cost1": 64000,
+  "acot_tier6cost2": 80000,
+  "acot_tier6cost3": 96000,
+  "acot_tier7cost1": 128000,
+  "acot_tier7cost2": 160000,
+  "acot_tier7cost3": 192000,
+  "acot_tier8cost1": 384000,
+  "acot_tier8cost2": 480000,
+  "acot_tier8cost3": 576000,
+  "acot_tier9cost1": 1152000,
+  "acot_tier9cost2": 1440000,
+  "acot_tier9cost3": 1728000,
+  "acot_tier10cost1": 3452000,
+  "acot_tier10cost2": 4320000,
+  "acot_tier10cost3": 4608000
+ },
+ "technologies": {
+  "tech_civil_phanon_application": {
+   "tier": 8,
+   "area": "society",
+   "categories": [
+    "statecraft"
+   ],
+   "cost": 576000,
+   "weight": 0,
+   "isRare": true,
+   "gateway": "phanon_economy",
+   "source": "aot",
+   "name": "Civil Phanon Engineering",
+   "desc": "Our engineers, architects and scientists have come up with some interesting new applications for our newly acquired runic power technology. This should open up new avenues of scientific progress for us!"
+  },
+  "tech_dark_matter_power_core_dm": {
+   "name": "Delta-class Enigmatic Power",
+   "desc": "Now that we understand the concept of both Dark Matter and Dark Energy, it may soon be possible to create a much more powerful power source that surpasses that of Zero Point Reactor. Its revelation will open us the ways to many new possibilities.\n\nResearching this technology may agitate the fallen empires, as we are basically going to out-tech them.",
+   "isRare": true,
+   "source": "acot",
+   "area": "physics",
+   "categories": [
+    "particles"
+   ],
+   "tier": 6,
+   "cost": 64000,
+   "weight": 0,
+   "gateway": "power_generation"
+  },
+  "tech_dark_matter_power_core_ae": {
+   "name": "Alpha-class Enigmatic Power",
+   "desc": "Delta Technologies has provided us many insights regarding potential future of dark energy-based technology. Although we are getting more reasons to believe that the prior assumption that Dark Matter and Dark Energy are linked together may have been not entirely accurate, the name has struck and so we'll still be addressing as Dark Energy still for the time being.\n\nRegardless, our scientists wish to start from a new, fresh perspective so the next stage of the reactor will be code-named \"Alpha\". This literation will see the increased usage of Dark Energy SR to balance out Dark Matter.\n\nResearching this technology may agitate the fallen empires, as we are basically going to out-tech them.",
+   "isRare": true,
+   "source": "acot",
+   "area": "physics",
+   "categories": [
+    "particles"
+   ],
+   "tier": 7,
+   "cost": 128000,
+   "weight": 0,
+   "isDangerous": true,
+   "gateway": "power_generation"
+  },
+  "tech_dark_matter_power_core_se": {
+   "name": "Stellarite Energy Application",
+   "desc": "With our current technology, it is now possible to create powerful equipment and tools to study stellaris properly. Although the true nature behind the specifics of Stellarite Power are still up for debate, none will argue that if this power has a potential to surpass Dark Matter.\n\nWARNING: We do not yet fully comprehend the nature of this power, it is advised that we keep a careful control of this management.",
+   "isRare": true,
+   "source": "acot",
+   "area": "physics",
+   "categories": [
+    "particles"
+   ],
+   "tier": 8,
+   "cost": 1440000,
+   "isDangerous": true,
+   "gateway": "power_generation"
+  }
+ },
+ "shortNames": {
+  "acot": "ACOT",
+  "aot": "AoT"
+ },
+ "impliedBy": {
+  "aot": "acot"
+ }
+}

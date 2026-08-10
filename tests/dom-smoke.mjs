@@ -170,6 +170,31 @@ try {
     }
   }
 
+  // every technology is fully described: none render as bare stubs
+  {
+    const stubs = [...view.model.techs.values()].filter(t => t.stub);
+    console.log("undescribed technologies:", stubs.length);
+    if (stubs.length)
+      fail2(`${stubs.length} technologies have no data (${stubs[0].id})`);
+  }
+
+  // mod requirements carry down the prerequisite chain: the sigma
+  // supertensile needs the submod because the Phanon one does
+  {
+    const tag = id => view.model.techs.get(id)?.modTag;
+    const expect = {
+      giga_tech_amb_supertensiles_acot_delta: "ACOT",
+      giga_tech_amb_supertensiles_acot_phanon: "AoT",
+      giga_tech_amb_supertensiles_acot_sigma: "AoT",
+      tech_civil_phanon_application: "AoT",
+    };
+    for (const [id, want] of Object.entries(expect)) {
+      if (tag(id) !== want)
+        fail2(`${id} tagged ${tag(id)}, expected ${want}`);
+    }
+    console.log("mod tags propagate along prerequisites");
+  }
+
   // requirement filters, hide/show all, and middle-click isolate
   {
     const n = () => view.index.items.length;

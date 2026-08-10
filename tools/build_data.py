@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tools.graph import (build_graph, load_ascension_triggers,
+from tools.graph import (CROSSMOD_VAR_FILE, build_graph, load_ascension_triggers,
                          load_perk_flags, load_perk_tech_grants,
                          to_json_model, weight_is_zero)
 from tools.inline_scripts import InlineScriptLibrary
@@ -101,6 +101,17 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     vanilla_vars = (load_vanilla_structural(vanilla_path)
                     if vanilla_path and vanilla_path.is_file() else None)
     vars_ = load_variables(mod_dir, vanilla_vars=vanilla_vars)
+
+    # Variables from mods outside the build. Gigastructures ships
+    # @acot_* set to zero expecting the real mod to overwrite them, so these
+    # are applied after the mod's own, exactly as load order would.
+    external_path = out_dir / "external-techs.json"
+    external = {}
+    if external_path.is_file():
+        external = json.loads(external_path.read_text(encoding="utf-8"))
+        for name, value in (external.get("variables") or {}).items():
+            if isinstance(value, (int, float)):
+                vars_.define(name, value, "external-techs.json")
 
     gigas = Source(id=mod_id, label=mod_label)
     tech_dir = mod_dir / "common" / "technology"
@@ -184,6 +195,8 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     needed |= {p for t in graph.techs.values()
                for p in t.ascension_perks + t.inherited_perks}
     needed |= {p for perks in perk_grants.values() for p in perks}
+    needed |= {(e.get("icon") or tid)
+               for tid, e in (external.get("technologies") or {}).items()}
     # Vanilla technologies are composed into the map client-side, so their
     # icons are referenced too even though they are not in this dataset.
     if vanilla_path and vanilla_path.is_file():
@@ -203,6 +216,10 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     # Wonders hands over Ring World, Dyson Sphere and Matter Decompressor).
     # Those are vanilla technologies, composed client-side, so the map has
     # to travel with the dataset.
+    meta["externalTechs"] = external.get("technologies") or {}
+    meta["externalSources"] = external.get("sources") or {}
+    meta["externalShortNames"] = external.get("shortNames") or {}
+    meta["externalImpliedBy"] = external.get("impliedBy") or {}
     meta["perkGrants"] = {k: sorted(v) for k, v in sorted(perk_grants.items())}
     meta["manualPerkGrants"] = manual
     meta["manualPerkNames"] = manual_perk_names
@@ -221,6 +238,30 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
                         {q for v in meta["perkGrants"].values() for q in v})
         if loc.get(p)
     }
+
+    # What a companion mod would need to supply: technologies referenced as
+    # prerequisites but defined nowhere, and scripted variables the mod uses
+    # but does not define (the @acot_* placeholders in
+    # zz_giga_compat_overwrite_me.txt resolve to zero without the real mod).
+    vanilla_ids = set()
+    if vanilla_path and vanilla_path.is_file():
+        vanilla_ids = {v["id"] for v in json.loads(
+            vanilla_path.read_text(encoding="utf-8")).get("technologies", [])}
+    external = sorted({d["missing"] for d in graph.dangling}
+                      - vanilla_ids - set(graph.techs))
+    unresolved_vars = sorted({
+        w["message"].split("@")[-1] for w in graph.warnings
+        if w.get("kind") == "unresolved-variable" and "@" in w.get("message", "")
+    })
+    placeholder_vars = sorted({
+        name for name, d in vars_.defs.items()
+        if CROSSMOD_VAR_FILE in (d.source_file or "")
+    })
+    (out_dir / "needed-external.json").write_text(
+        json.dumps({"technologies": external,
+                    "variables": sorted(set(unresolved_vars)
+                                        | set(placeholder_vars))},
+                   indent=1) + "\n", encoding="utf-8")
 
     # An auditable record of every ascension perk marking: which perk, and
     # whether it comes from the technology's own `potential`, from a perk
@@ -277,15 +318,18 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         # game — the vanilla extractor cannot supply them.
         ap_src = mod_dir / "gfx" / "interface" / "icons" / "ascension_perks"
         if ap_src.is_dir():
+            import tempfile
+            _tmp = Path(tempfile.mkdtemp())
             convert_icons(ap_src, icons_out,
-                          icons_out / "mod-ap-atlas.png",
-                          icons_out / "mod-ap-atlas.json",
+                          _tmp / "mod-ap-atlas.png",
+                          _tmp / "mod-ap-atlas.json",
                           only=set(needed))
         icon_src = mod_dir / "gfx" / "interface" / "icons" / "technologies"
         if icon_src.is_dir():
+            import tempfile
+            _tmp2 = Path(tempfile.mkdtemp())
             r = convert_icons(icon_src, icons_out,
-                              icons_out / "atlas.png",
-                              icons_out / "atlas.json")
+                              _tmp2 / "atlas.png", _tmp2 / "atlas.json")
             model["meta"]["iconWarnings"] = r.warnings
 
     # Atlas always covers every PNG present (mod + any vanilla icons the

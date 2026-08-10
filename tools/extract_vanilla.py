@@ -253,8 +253,10 @@ def main() -> None:
             print(f"icon filter   : {len(wanted)} keys referenced")
         icon_src = (args.game_dir / "gfx" / "interface" / "icons"
                     / "technologies")
+        import tempfile
+        _tmp0 = Path(tempfile.mkdtemp())
         r = convert_icons(icon_src, args.icons,
-                          args.icons / "atlas.png", args.icons / "atlas.json",
+                          _tmp0 / "atlas.png", _tmp0 / "atlas.json",
                           only=wanted)
         print(f"icons         : {len(r.converted)} converted, "
               f"{len(r.warnings)} failed")
@@ -264,9 +266,11 @@ def main() -> None:
         ap_src = (args.game_dir / "gfx" / "interface" / "icons"
                   / "ascension_perks")
         if ap_src.is_dir():
+            import tempfile
+            _tmp = Path(tempfile.mkdtemp())
             ra = convert_icons(ap_src, args.icons,
-                               args.icons / "ap-atlas.png",
-                               args.icons / "ap-atlas.json", only=wanted)
+                               _tmp / "ap-atlas.png",
+                               _tmp / "ap-atlas.json", only=wanted)
             print(f"perk icons    : {len(ra.converted)} converted")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(

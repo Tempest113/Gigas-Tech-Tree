@@ -430,6 +430,9 @@ select {
 .legend .sw[data-kind="rare"] { border-left-color: var(--rare); }
 .legend .sw[data-kind="blokkat"] { border-left-color: var(--blokkat); }
 .legend .sw[data-kind="siren"] { border-left-color: var(--siren); }
+.legend .sw[data-kind="mod"] {
+  border-left-color: var(--rare); background: var(--card);
+}
 .legend .sw[data-kind="stub"] {
   border-left-color: var(--rare); border-style: dashed; background: transparent;
 }
@@ -456,3 +459,6 @@ select {
 
 .guide-lead { color: var(--text); font-size: 13px; }
 #guide-panel code { color: var(--physics); }
+
+.sidebar-toggle { color: var(--muted); }
+.sidebar-toggle span { text-transform: none !important; }

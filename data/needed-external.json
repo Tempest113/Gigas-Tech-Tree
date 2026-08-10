@@ -1,0 +1,16 @@
+{
+ "technologies": [
+  "tech_civil_phanon_application",
+  "tech_dark_matter_power_core_ae",
+  "tech_dark_matter_power_core_dm",
+  "tech_dark_matter_power_core_se"
+ ],
+ "variables": [
+  "has_ancient_caches",
+  "has_bug_branch",
+  "has_more_events_mod",
+  "has_planetary_diversity",
+  "has_sins_of_fallen_empires",
+  "oxr_mdlc_mod"
+ ]
+}

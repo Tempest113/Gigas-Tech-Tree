@@ -138,18 +138,34 @@ def build_atlas_from_pngs(icon_dir: Path, out_png: Path,
     any vanilla icons the maintainer has added). The viewer draws cards on
     canvas and takes every icon from this one image, so it must cover the
     whole set, not just the mod's own icons."""
-    files = sorted((f for f in icon_dir.glob("*.png")
-                    if f.name != "atlas.png"), key=lambda p: p.name)
+    # Never treat an atlas as an icon. The extractor and the build write
+    # intermediate atlases, and folding one of those back in as if it were a
+    # 52-pixel icon inflates the cell size to its dimensions — which both
+    # corrupts every coordinate and tries to allocate a canvas of gigapixels.
+    MAX_ICON = 256
+    files = []
+    for f in sorted(icon_dir.glob("*.png"), key=lambda p: p.name):
+        if f.stem == "atlas" or f.stem.endswith("-atlas"):
+            continue
+        files.append(f)
     if not files:
         return {}
     images = []
+    oversized = []
     for f in files:
         try:
             im = Image.open(f)
             im.load()
-            images.append((f.stem, im.convert("RGBA")))
         except Exception:
             continue
+        if im.width > MAX_ICON or im.height > MAX_ICON:
+            # Whatever this is, it is not a technology icon.
+            oversized.append((f.name, im.size))
+            continue
+        images.append((f.stem, im.convert("RGBA")))
+    for name, size in oversized:
+        print(f"  skipped {name}: {size[0]}x{size[1]} is too large to be "
+              f"an icon")
 
     cell_w = max(im.width for _, im in images)
     cell_h = max(im.height for _, im in images)
