@@ -246,6 +246,8 @@ class Tech:
     is_repeatable: bool = False
     reverse_engineerable: bool = True
     prerequisites: list[str] = field(default_factory=list)
+    #: {"all": id} or {"any": [ids]} — an OR group needs only one member
+    prerequisite_groups: list = field(default_factory=list)
     unlocks: list[str] = field(default_factory=list)
     unlock_text: list[str] = field(default_factory=list)
     weight_modifiers: list[dict] = field(default_factory=list)
@@ -578,9 +580,8 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
             if not any(grp["perks"] == [perk] for grp in t.perk_groups):
                 t.perk_groups.append({"perks": [perk], "conditions": []})
 
-        prereq = b.get_last("prerequisites")
-        if isinstance(prereq, Block):
-            t.prerequisites = [str(v) for v in prereq.bare_values()]
+        t.prerequisites, t.prerequisite_groups = parse_prerequisites(
+            b.get_last("prerequisites"))
 
         pfd = b.get_last("prereqfor_desc")
         if isinstance(pfd, Block):
@@ -754,6 +755,42 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
     return res
 
 
+def parse_prerequisites(block: Block) -> tuple:
+    """Prerequisites as a flat list and as groups.
+
+    Most are a plain list, but an `OR = { … }` group is satisfied by any one
+    of its members — vanilla Titans need battleships *or* the bio-ship
+    equivalent. Returning both keeps edges and ordering working off the flat
+    list while the requirement can still be stated correctly.
+    """
+    flat: list = []
+    groups: list = []
+    if not isinstance(block, Block):
+        return flat, groups
+
+    for v in block.bare_values():
+        tid = str(v)
+        if tid not in flat:
+            flat.append(tid)
+        groups.append({"all": tid})
+
+    for p in block.pairs():
+        if p.key in ("OR", "or") and isinstance(p.value, Block):
+            alts = [str(v) for v in p.value.bare_values()]
+            for tid in alts:
+                if tid not in flat:
+                    flat.append(tid)
+            if alts:
+                groups.append({"any": alts})
+        elif isinstance(p.value, Block):
+            sub_flat, sub_groups = parse_prerequisites(p.value)
+            for tid in sub_flat:
+                if tid not in flat:
+                    flat.append(tid)
+            groups.extend(sub_groups)
+    return flat, groups
+
+
 def _plain(v) -> Optional[str]:
     if v is None or isinstance(v, Block):
         return None
@@ -800,6 +837,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "isRepeatable": t.is_repeatable,
             "reverseEngineerable": t.reverse_engineerable,
             "prerequisites": t.prerequisites,
+            "prerequisiteGroups": t.prerequisite_groups,
             "unlocks": sorted(t.unlocks),
             "unlockText": t.unlock_text,
             "weightModifiers": t.weight_modifiers,

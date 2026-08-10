@@ -259,7 +259,6 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     ) if labels_path.is_file() else {}
 
     # Manual names are a fallback: anything the game files provide wins.
-    meta["perkNamesFallback"] = manual_perk_names
     meta["perkNames"] = {
         p: strip_markup(loc.name(p) or "") or p
         for p in sorted({q for t in graph.techs.values()

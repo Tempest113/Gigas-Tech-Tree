@@ -399,7 +399,36 @@ function showDetail(id) {
     }
     body.appendChild(ul);
   };
-  linkList("Prerequisites", t.prerequisites);
+  /* Prerequisites keep their shape: a plain list, except where an OR group
+     means any one of several will do (Titans take battleships or the
+     bio-ship equivalent). */
+  if (t.prerequisiteGroups?.length) {
+    const h = document.createElement("h3");
+    h.textContent = "Prerequisites";
+    body.appendChild(h);
+    const ul = document.createElement("ul");
+    for (const grp of t.prerequisiteGroups) {
+      const li = document.createElement("li");
+      const ids = grp.all ? [grp.all] : (grp.any ?? []);
+      ids.forEach((pid, i) => {
+        if (i) {
+          const or = document.createElement("span");
+          or.className = "swap-condition";
+          or.textContent = " or ";
+          li.appendChild(or);
+        }
+        const a = document.createElement("span");
+        a.className = "tech-link";
+        a.textContent = model.techs.get(pid)?.name ?? pid;
+        a.onclick = () => { view.select(pid); view.centreOn(pid); };
+        li.appendChild(a);
+      });
+      ul.appendChild(li);
+    }
+    body.appendChild(ul);
+  } else {
+    linkList("Prerequisites", t.prerequisites);
+  }
   linkList("Unlocks", t.unlocks);
 
   /* Technology swaps: the same research slot delivers a different

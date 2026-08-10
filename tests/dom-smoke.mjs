@@ -195,6 +195,19 @@ try {
     console.log("mod tags propagate along prerequisites");
   }
 
+  // a perk whose icon file is not named after it still resolves
+  {
+    const map = view.model.perkIcons ?? {};
+    if (!Object.keys(map).length)
+      fail2("perk icon mapping missing from the composed model");
+    for (const [perk, icon] of Object.entries(map)) {
+      const used = [...view.model.techs.values()].some(t =>
+        (t.ascensionPerks ?? []).includes(perk) ||
+        (t.inheritedPerks ?? []).includes(perk));
+      if (used) console.log(`perk icon mapped: ${perk} -> ${icon}`);
+    }
+  }
+
   // an icon missing from the atlas falls back to its own file
   {
     const key = "ap_galactic_wonders";
@@ -212,6 +225,46 @@ try {
       fail2("an icon missing from the atlas was not requested individually");
     console.log(`atlas fallback requests individual icons (${key})`);
     if (had) view.atlasMap[key] = { x: 0, y: 0, w: 52, h: 52 };
+  }
+
+  // isolating and searching are alternative narrowings; each clears the other
+  {
+    const sb = $("search-box");
+    const type = v => {
+      sb.value = v;
+      sb.dispatchEvent(new window.Event("input", { bubbles: true }));
+    };
+    type("battleship");
+    await new Promise(r => setTimeout(r, 60));
+    view.onIsolate("giga_tech_alderson_disk");
+    await new Promise(r => setTimeout(r, 100));
+    if (sb.value !== "") fail2("isolating did not clear the search");
+    if ($("isolate-bar").hidden) fail2("isolate bar missing after isolating");
+    type("tetra");
+    await new Promise(r => setTimeout(r, 60));
+    if (!$("isolate-bar").hidden) fail2("searching did not clear the isolate");
+    type("");
+    await new Promise(r => setTimeout(r, 60));
+    console.log("isolate and search clear one another");
+  }
+
+  // an OR prerequisite is stated as a choice, not as several requirements
+  {
+    const anyOf = [...view.model.techs.values()]
+      .find(t => (t.prerequisiteGroups ?? []).some(g => g.any));
+    if (!anyOf) fail2("no technology with an OR prerequisite in the dataset");
+    const grp = anyOf.prerequisiteGroups.find(g => g.any);
+    // every alternative still counts for edges and placement
+    for (const id of grp.any)
+      if (!anyOf.prerequisites.includes(id))
+        fail2(`${id} missing from the flat prerequisite list`);
+    view.select(anyOf.id);
+    await new Promise(r => setTimeout(r, 60));
+    const text = $("detail-body").textContent;
+    if (!text.includes(" or "))
+      fail2("OR prerequisite not shown as a choice");
+    console.log(`OR prerequisites shown as a choice (${anyOf.id})`);
+    view.select(null);
   }
 
   // technology variants appear in the detail panel

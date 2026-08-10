@@ -139,6 +139,10 @@ export class Panels {
     const results = $("search-results");
     box.addEventListener("input", () => {
       this.query = box.value.trim().toLowerCase();
+      if (this.query && this.isolated) {
+        this.isolated = null;
+        $("isolate-bar").hidden = true;
+      }
       this._recompute();
       results.replaceChildren();
       if (this.query.length < 2) return;
@@ -197,6 +201,14 @@ export class Panels {
   }
 
   isolate(id) {
+    // Isolating a chain and filtering by text are two ways of narrowing to
+    // different things; leaving both on hides most of the chain you asked
+    // for. Each clears the other.
+    if (id && this.query) {
+      this.query = "";
+      $("search-box").value = "";
+      $("search-results").replaceChildren();
+    }
     this.isolated = id;
     const bar = $("isolate-bar");
     if (id) {

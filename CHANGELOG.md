@@ -19,6 +19,49 @@ game data, which refresh independently.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
 
+## 1.14.3
+
+### Fixed
+
+- The Colossus Project badge fell back to `✦` even with its icon present:
+  the mapping from a perk to a differently-named icon file was written into
+  the dataset but never passed through to the viewer. The declared-name
+  fallback had the same problem — the build wrote the map under one name and
+  the viewer read another — and the build was emitting it twice under both.
+
+## 1.14.2
+
+### Changed
+
+- Isolating a chain clears the search, and searching clears an isolated
+  chain. They narrow to different things, so leaving both on hid most of
+  whichever was asked for last.
+- The extractor converts every ascension perk icon rather than filtering
+  against the previous build's list. Which perks the tree references depends
+  on gating that the extraction is about to reveal, so a filtered run could
+  never catch up — Mind Over Matter and Galactic Contender were left without
+  icons for that reason. The pruner removes any that turn out unreferenced.
+- Prerequisite groups from the base game reach the viewer, so a vanilla
+  technology with a choice of prerequisites — Titans, which take battleships
+  or the bio-ship equivalent — draws its edges. This needs a fresh
+  extraction: a vanilla file made before groups were parsed records no
+  prerequisites at all for those technologies.
+
+## 1.14.1
+
+### Added
+
+- **Prerequisites that offer a choice** are stated as one: `prerequisites =
+  { a OR = { b c } }` reads "a" and "b or c" rather than listing three
+  requirements. Fourteen Gigastructures technologies use this, and vanilla
+  does for Titans, which take battleships or the bio-ship equivalent. Every
+  alternative still counts for edges and ordering, so a technology sits
+  right of whichever route is taken.
+- An ascension perk carries down to a dependent technology only when *every*
+  alternative route imposes it. Needing a perk for one branch of a choice
+  does not make it a requirement — it makes the other branch the way round
+  it.
+
 ## 1.14.0
 
 ### Fixed
@@ -333,6 +376,49 @@ game data, which refresh independently.
   stop showing a cost of zero.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
+
+## 1.14.3
+
+### Fixed
+
+- The Colossus Project badge fell back to `✦` even with its icon present:
+  the mapping from a perk to a differently-named icon file was written into
+  the dataset but never passed through to the viewer. The declared-name
+  fallback had the same problem — the build wrote the map under one name and
+  the viewer read another — and the build was emitting it twice under both.
+
+## 1.14.2
+
+### Changed
+
+- Isolating a chain clears the search, and searching clears an isolated
+  chain. They narrow to different things, so leaving both on hid most of
+  whichever was asked for last.
+- The extractor converts every ascension perk icon rather than filtering
+  against the previous build's list. Which perks the tree references depends
+  on gating that the extraction is about to reveal, so a filtered run could
+  never catch up — Mind Over Matter and Galactic Contender were left without
+  icons for that reason. The pruner removes any that turn out unreferenced.
+- Prerequisite groups from the base game reach the viewer, so a vanilla
+  technology with a choice of prerequisites — Titans, which take battleships
+  or the bio-ship equivalent — draws its edges. This needs a fresh
+  extraction: a vanilla file made before groups were parsed records no
+  prerequisites at all for those technologies.
+
+## 1.14.1
+
+### Added
+
+- **Prerequisites that offer a choice** are stated as one: `prerequisites =
+  { a OR = { b c } }` reads "a" and "b or c" rather than listing three
+  requirements. Fourteen Gigastructures technologies use this, and vanilla
+  does for Titans, which take battleships or the bio-ship equivalent. Every
+  alternative still counts for edges and ordering, so a technology sits
+  right of whichever route is taken.
+- An ascension perk carries down to a dependent technology only when *every*
+  alternative route imposes it. Needing a perk for one branch of a choice
+  does not make it a requirement — it makes the other branch the way round
+  it.
 
 ## 1.14.0
 

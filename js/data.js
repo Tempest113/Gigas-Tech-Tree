@@ -83,7 +83,9 @@ export function compose(model, vanilla) {
         levels: v.levels ?? null, costPerLevel: null,
         isStart: v.isStart, isRare: v.isRare, isDangerous: v.isDangerous,
         isRepeatable: v.isRepeatable,
-        prerequisites: v.prerequisites, unlocks: [],
+        prerequisites: v.prerequisites,
+        prerequisiteGroups: v.prerequisiteGroups ?? [],
+        unlocks: [],
         ascensionPerks: v.ascensionPerks ?? [], inheritedPerks: [],
         softPerks: v.softPerks ?? [],
         grantedByPerks: v.grantedByPerks ?? [],
@@ -261,9 +263,13 @@ export function compose(model, vanilla) {
     tierReqs: vanilla?.tiers ?? {},
     // Mod perk names override vanilla's: a mod may redefine a perk's name,
     // and several of these perks exist only in the mod.
-    perkNames: { ...(model.meta?.perkNamesFallback ?? {}),
+    // Declared fallbacks first, then the game's own names, then the mod's:
+    // a name found in the files always beats a declared one.
+    perkNames: { ...(model.meta?.manualPerkNames ?? {}),
                  ...(vanilla?.ascensionPerks ?? {}),
                  ...(model.meta?.perkNames ?? {}) },
+    // Perks whose icon file is not named after the perk.
+    perkIcons: model.meta?.perkIcons ?? {},
     meta: model.meta,
     categories: model.categories,
     health: model.health,
@@ -289,14 +295,30 @@ function propagatePerks(byId) {
     if (t) {
       const inherited = new Set(t.inheritedPerks ?? []);
       const soft = new Set(t.softPerks ?? []);
-      for (const pid of t.prerequisites) {
-        visit(pid);
-        const p = byId.get(pid);
-        if (!p) continue;
-        for (const perk of [...(p.ascensionPerks ?? []),
-                            ...(p.inheritedPerks ?? [])]) {
+      /* A perk carries down only when every route imposes it. Where a
+         prerequisite is one of several alternatives, needing a perk for one
+         route does not make it a requirement — it makes the other route the
+         way round it. */
+      const groups = t.prerequisiteGroups?.length
+        ? t.prerequisiteGroups
+        : (t.prerequisites ?? []).map(id => ({ all: id }));
+      for (const grp of groups) {
+        const ids = grp.all ? [grp.all] : (grp.any ?? []);
+        for (const id of ids) visit(id);
+        const sets = ids.map(id => {
+          const p = byId.get(id);
+          return new Set([...(p?.ascensionPerks ?? []),
+                          ...(p?.inheritedPerks ?? [])]);
+        });
+        if (!sets.length) continue;
+        for (const perk of sets[0]) {
+          if (!sets.every(s => s.has(perk))) continue;
           if (!(t.ascensionPerks ?? []).includes(perk)) inherited.add(perk);
         }
+      }
+      for (const pid of t.prerequisites) {
+        const p = byId.get(pid);
+        if (!p) continue;
         // A perk that is one route of several carries down the same way,
         // so a technology behind Tetradimensional Engineering is placed
         // with it rather than among the ungated ones.

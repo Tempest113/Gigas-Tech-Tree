@@ -36,7 +36,8 @@ from tools.pdx.lexer import LexError
 from tools.pdx.values import VarTable, resolve
 from tools.pdx.parser import VarRef
 from tools.loc import LocTable, strip_markup
-from tools.graph import (_collect_ascension_perks, load_ascension_triggers,
+from tools.graph import (_collect_ascension_perks, parse_prerequisites,
+                         load_ascension_triggers,
                          load_perk_flags, load_perk_tech_grants,
                          weight_is_zero)
 
@@ -93,6 +94,8 @@ def extract(game_dir: Path, game_version: str,
             cats = ([str(v) for v in cat.bare_values()]
                     if isinstance(cat, Block) else
                     [str(cat)] if cat is not None else [])
+            prereq_flat, prereq_groups = parse_prerequisites(
+                b.get_last("prerequisites"))
             prereq = b.get_last("prerequisites")
             levels = b.get_last("levels")
             entry_name = (strip_markup(loc.resolve_substitutions(
@@ -140,8 +143,9 @@ def extract(game_dir: Path, game_version: str,
                 "weight": _resolved_num("weight"),
                 "area": _s(b.get_last("area")),
                 "categories": cats,
-                "prerequisites": ([str(v) for v in prereq.bare_values()]
-                                  if isinstance(prereq, Block) else []),
+                "prerequisites": prereq_flat,
+                **({"prerequisiteGroups": prereq_groups}
+                   if any("any" in g for g in prereq_groups) else {}),
                 "isStart": b.get_last("is_start_tech") == "yes",
                 "isRare": b.get_last("is_rare") == "yes",
                 "isDangerous": b.get_last("is_dangerous") == "yes",
@@ -179,6 +183,24 @@ def extract(game_dir: Path, game_version: str,
         "technologies": techs,
         "errors": errors,
     }
+
+
+def _prereq_groups(prereq) -> list:
+    """Prerequisites as alternative groups; see tools/graph.py. Vanilla uses
+    this for Titans, which take battleships or the bio-ship equivalent."""
+    if not isinstance(prereq, Block):
+        return []
+    groups = [[str(v)] for v in prereq.bare_values()]
+    for p in prereq.pairs():
+        if p.key in ("OR", "or") and isinstance(p.value, Block):
+            alts = [str(v) for v in p.value.bare_values()]
+            if alts:
+                groups.append(alts)
+    return groups
+
+
+def _prereq_flat(prereq) -> list:
+    return [x for grp in _prereq_groups(prereq) for x in grp]
 
 
 def _s(v):
@@ -272,9 +294,14 @@ def main() -> None:
         if ap_src.is_dir():
             import tempfile
             _tmp = Path(tempfile.mkdtemp())
+            # Perk icons are converted in full rather than filtered. Which
+            # perks the tree references depends on gating this extraction is
+            # about to reveal, so filtering against the previous build's
+            # list can never catch up. They are small, and the pruner
+            # removes any that turn out to be unreferenced.
             ra = convert_icons(ap_src, args.icons,
                                _tmp / "ap-atlas.png",
-                               _tmp / "ap-atlas.json", only=wanted)
+                               _tmp / "ap-atlas.json")
             print(f"perk icons    : {len(ra.converted)} converted")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
