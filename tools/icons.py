@@ -11,6 +11,7 @@ Gigastructures icons decode fine; this is armour for future commits.)
 """
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import math
@@ -180,8 +181,14 @@ def build_atlas_from_pngs(icon_dir: Path, out_png: Path,
         coords[stem] = {"x": cx, "y": cy, "w": im.width, "h": im.height}
 
     _save_png_deterministic(atlas, out_png)
+    # The coordinate file carries a hash of the image it describes, so the
+    # viewer can request that exact image. Rebuilding the atlas without
+    # bumping the tool version previously left browsers pairing new
+    # coordinates with a cached image.
+    digest = hashlib.sha256(out_png.read_bytes()).hexdigest()[:12]
     out_json.write_text(
         json.dumps({"cell": {"w": cell_w, "h": cell_h}, "columns": cols,
+                    "hash": digest,
                     "icons": dict(sorted(coords.items()))},
                    indent=0, sort_keys=True) + "\n", encoding="utf-8")
     return coords

@@ -195,6 +195,76 @@ try {
     console.log("mod tags propagate along prerequisites");
   }
 
+  // an icon missing from the atlas falls back to its own file
+  {
+    const key = "ap_galactic_wonders";
+    const gated = [...view.model.techs.values()]
+      .find(t => (t.ascensionPerks ?? []).includes(key));
+    if (!gated) fail2(`no technology requires ${key}`);
+    const had = view.atlasMap && key in view.atlasMap;
+    if (view.atlasMap) delete view.atlasMap[key];
+    view.loose.delete(key);
+    // the badge only draws for a card on screen
+    view.centreOn(gated.id);
+    view.redraw();
+    await new Promise(r => setTimeout(r, 80));
+    if (!view.loose.has(key))
+      fail2("an icon missing from the atlas was not requested individually");
+    console.log(`atlas fallback requests individual icons (${key})`);
+    if (had) view.atlasMap[key] = { x: 0, y: 0, w: 52, h: 52 };
+  }
+
+  // technology variants appear in the detail panel
+  {
+    const swapped = [...view.model.techs.values()]
+      .find(t => t.swaps?.length > 1);
+    if (!swapped) fail2("no technology with variants in the dataset");
+    view.select(swapped.id);
+    await new Promise(r => setTimeout(r, 60));
+    const text = $("detail-body").textContent;
+    console.log(`variants shown for ${swapped.id}: ${swapped.swaps.length}`);
+    if (!/Variants?/.test(text)) fail2("variants section missing");
+    for (const s of swapped.swaps) {
+      if (s.displayName && !text.includes(s.displayName))
+        fail2(`variant ${s.displayName} not listed`);
+    }
+    /* Unresolved $references$ mean data/vanilla-structural.json predates the
+       extractor that captures them. That is a data problem rather than a
+       code one, so it fails only when the file is current — otherwise it
+       reports, so a stale file cannot hide a real regression either. */
+    {
+      const current = !!view.model.meta?.vanillaHasLoc;
+      const bad = [];
+      for (const x of view.model.techs.values()) {
+        const fields = [x.name, ...(x.swaps ?? []).map(sw => sw.displayName)];
+        for (const f of fields)
+          if (f && /^\$.+\$$/.test(f.trim())) bad.push(f);
+      }
+      if (bad.length && current)
+        fail2(`unresolved localisation references: ${bad.join(", ")}`);
+      if (bad.length)
+        console.log(`note: ${bad.length} unresolved reference(s) — `
+          + "data/vanilla-structural.json predates the current extractor");
+    }
+
+    // no colour codes or icon tokens survive into displayed text
+    for (const x of view.model.techs.values()) {
+      const fields = [x.name, x.desc,
+                      ...(x.swaps ?? []).flatMap(sw => [sw.displayName, sw.desc])];
+      for (const f of fields) {
+        if (f && /[§£]/.test(f))
+          fail2(`markup left in displayed text: ${JSON.stringify(f.slice(0, 60))}`);
+      }
+    }
+
+    // every variant resolves an icon, falling back to its parent's
+    let iconless = 0;
+    for (const t of view.model.techs.values())
+      for (const sw of t.swaps ?? []) if (!sw.icon) iconless++;
+    if (iconless) fail2(`${iconless} variants have no icon`);
+    view.select(null);
+  }
+
   // requirement filters, hide/show all, and middle-click isolate
   {
     const n = () => view.index.items.length;

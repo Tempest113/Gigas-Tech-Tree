@@ -402,6 +402,52 @@ function showDetail(id) {
   linkList("Prerequisites", t.prerequisites);
   linkList("Unlocks", t.unlocks);
 
+  /* Technology swaps: the same research slot delivers a different
+     technology depending on the empire, so the variants and the condition
+     that picks each one belong on the card's detail. */
+  if (t.swaps?.length) {
+    const h = document.createElement("h3");
+    h.textContent = t.swaps.length > 1 ? "Variants" : "Variant";
+    body.appendChild(h);
+    const ul = document.createElement("ul");
+    ul.className = "variant-list";
+    for (const s of t.swaps) {
+      const li = document.createElement("li");
+
+      const head = document.createElement("div");
+      head.className = "variant-head";
+      if (s.icon) {
+        const img = document.createElement("img");
+        img.className = "variant-icon";
+        img.src = `assets/icons/${s.icon}.png`;
+        img.alt = "";
+        img.loading = "lazy";
+        img.onerror = () => img.remove();
+        head.appendChild(img);
+      }
+      const name = document.createElement("span");
+      name.className = "variant-name";
+      name.textContent = s.displayName || s.name;
+      head.appendChild(name);
+      li.appendChild(head);
+
+      if (s.conditions?.length) {
+        const cond = document.createElement("div");
+        cond.className = "swap-condition";
+        cond.textContent = s.conditions.join(", ");
+        li.appendChild(cond);
+      }
+      if (s.desc) {
+        const p = document.createElement("p");
+        p.className = "variant-desc";
+        p.textContent = s.desc;
+        li.appendChild(p);
+      }
+      ul.appendChild(li);
+    }
+    body.appendChild(ul);
+  }
+
   if (t.unlockText.length) {
     const h = document.createElement("h3");
     h.textContent = "Grants";

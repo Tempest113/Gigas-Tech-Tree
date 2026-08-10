@@ -1,11 +1,11 @@
 {
  "datasets": [
   {
-   "commit": "5e8e6b68d0fc4a04e6307a575fa9c7c4f77b83c3",
-   "file": "gigas-5e8e6b68d0fc.json",
+   "commit": "767cf17d9420d4d219df8ea787596d1d56ac9c9a",
+   "file": "gigas-767cf17d9420.json",
    "id": "gigas",
    "label": "Gigastructural Engineering & More (Pouchkinn)",
-   "technologies": 301
+   "technologies": 300
   }
  ],
  "schemaVersion": 1

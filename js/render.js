@@ -44,6 +44,11 @@ export class MapView {
     this.atlas = null;
     this.atlasMap = null;
     this.patterns = {};   // lazily built canvas patterns, keyed by category
+    /* The atlas is the fast path, but it is built from whatever icons were
+       present when it was generated — an atlas from another machine can be
+       missing some. Anything absent falls back to its own file, loaded once
+       and cached, so a stale atlas degrades to slower rather than blank. */
+    this.loose = new Map();
     this._raf = 0;
     this._frames = [];        // rolling frame times for the ?dev meter
     this._edgePaths = null;   // cached; world coords are view-independent
@@ -63,18 +68,49 @@ export class MapView {
 
   async _loadAtlas() {
     try {
-      const meta = await fetch(`assets/icons/atlas.json?v=${APP_VERSION}`)
-        .then(r => r.json());
+      // The coordinates are versioned with the tool; the image is requested
+      // by the hash the coordinates carry, so the two can never be paired
+      // from different builds.
+      const meta = await fetch(`assets/icons/atlas.json?v=${APP_VERSION}`,
+                               { cache: "no-cache" }).then(r => r.json());
       const img = new Image();
       img.decoding = "async";
       await new Promise((res, rej) => {
         img.onload = res; img.onerror = rej;
-        img.src = `assets/icons/atlas.png?v=${APP_VERSION}`;
+        img.src = `assets/icons/atlas.png?v=${meta.hash ?? APP_VERSION}`;
       });
       this.atlasMap = meta.icons;
       this.atlas = img;
       this.redraw();
     } catch { /* icons are optional; cards render without them */ }
+  }
+
+  /* An icon not in the atlas, loaded from assets/icons/<key>.png. Returns
+     an image once it has loaded, null until then (and for good if it does
+     not exist). */
+  _looseIcon(key) {
+    if (!key) return null;
+    if (this.loose.has(key)) return this.loose.get(key);
+    this.loose.set(key, null);
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => { this.loose.set(key, img); this.redraw(); };
+    img.onerror = () => this.loose.set(key, false);
+    img.src = `assets/icons/${key}.png?v=${APP_VERSION}`;
+    return null;
+  }
+
+  /* Draw an icon from the atlas, or from its own file if the atlas lacks
+     it. Returns true when something was drawn. */
+  _drawIcon(ctx, key, x, y, w, h) {
+    const s = this.atlasMap?.[key];
+    if (s && this.atlas) {
+      ctx.drawImage(this.atlas, s.x, s.y, s.w, s.h, x, y, w, h);
+      return true;
+    }
+    const img = this._looseIcon(key);
+    if (img) { ctx.drawImage(img, x, y, w, h); return true; }
+    return false;
   }
 
   // -- events ---------------------------------------------------------
@@ -543,12 +579,12 @@ export class MapView {
 
     let textX = it.x + 12;
     let iconBox = null;
-    if (withIcons && t.icon && this.atlasMap?.[t.icon]) {
-      const s = this.atlasMap[t.icon];
-      iconBox = { x: it.x + 9, y: it.y + 12, w: 40, h: 40 };
-      ctx.drawImage(this.atlas, s.x, s.y, s.w, s.h,
-                    iconBox.x, iconBox.y, iconBox.w, iconBox.h);
-      textX = it.x + 57;
+    if (withIcons && t.icon) {
+      const box = { x: it.x + 9, y: it.y + 12, w: 40, h: 40 };
+      if (this._drawIcon(ctx, t.icon, box.x, box.y, box.w, box.h)) {
+        iconBox = box;
+        textX = it.x + 57;
+      }
     }
 
     // Ascension perk lock: a badge over the icon's corner, so the marker is
@@ -571,17 +607,16 @@ export class MapView {
       if (perkInherited) ctx.setLineDash([3 / this.scale, 2 / this.scale]);
       ctx.stroke();
       ctx.setLineDash([]);
-      const icon = this.atlasMap?.[perks[0]];
-      if (icon) {
-        // The perk's own icon, clipped into the badge disc.
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(bx, by, 7.5, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(this.atlas, icon.x, icon.y, icon.w, icon.h,
-                      bx - 8, by - 8, 16, 16);
-        ctx.restore();
-      } else {
+      // A perk's icon is usually named after it; perkIcons covers the ones
+      // the game names differently.
+      const iconKey = this.model.perkIcons?.[perks[0]] ?? perks[0];
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(bx, by, 7.5, 0, Math.PI * 2);
+      ctx.clip();
+      const drew = this._drawIcon(ctx, iconKey, bx - 8, by - 8, 16, 16);
+      ctx.restore();
+      if (!drew) {
         ctx.fillStyle = C.rare;
         ctx.font = '700 12px "Chakra Petch", system-ui, sans-serif';
         const gw = measureCached(ctx, "\u2726");

@@ -58,6 +58,11 @@ python tools/extract_vanilla.py \
 
 Repo path (maintainer): `/home/Tempest1273/Github/Gigas-Tech-Tree/`.
 
+`data/vanilla-structural.json` is generated from a local game install and is
+never rebuilt by CI. **Do not overwrite it with a copy from elsewhere** — the
+committed one is the only current copy. The build warns if it predates the
+current extractor.
+
 Re-run after each Stellaris patch and commit the JSON (plus any new icon
 PNGs into `assets/icons/`, using `cp -n` so existing files aren't clobbered).
 Push the vanilla commit **before** the weekly mod refresh runs: the mod build
@@ -120,8 +125,9 @@ work without a Gigastructures checkout:
 - `tools/prune_icons.py` — deletes committed icons the site no longer
   references (dry run by default, `--apply` to delete).
 - `tools/build_atlas.py` — rebuilds `assets/icons/atlas.png` and its
-  coordinate file. **Run this after adding or removing any icon**, since the
-  renderer draws every icon from the atlas.
+  coordinate file. Run this after adding or removing icons. An icon the
+  atlas does not contain still renders, from its own file, so a stale atlas
+  costs speed rather than correctness.
 
 ### Ascension perk requirements
 

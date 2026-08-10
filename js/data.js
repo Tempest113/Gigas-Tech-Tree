@@ -34,6 +34,28 @@ export async function loadVanilla() {
   return null;
 }
 
+/* Substitute $key$ references the mod could not resolve on its own, using
+   the vanilla strings the extractor captured. Applied at compose time so a
+   name resolves as soon as the vanilla file is refreshed, without waiting
+   for the mod dataset to be rebuilt. */
+function resolveLoc(text, locExtra) {
+  if (!text || !text.includes("$")) return text;
+  const out = text.replace(/\$([A-Za-z0-9_.\-']+)\$/g,
+    (m, key) => locExtra[key] ?? locExtra["giga_vanilla_" + key] ?? m);
+  return stripMarkup(out);
+}
+
+/* Colour codes (§Y…§!) and icon tokens (£energy£) are stripped from names
+   and descriptions at build time, but a substituted value can carry its own,
+   so strip again after substituting. */
+function stripMarkup(text) {
+  return text
+    .replace(/§./g, "")
+    .replace(/£[A-Za-z0-9_]+£?/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 export function compose(model, vanilla) {
   const byId = new Map();
   for (const t of model.technologies) byId.set(t.id, { ...t, stub: false });
@@ -101,6 +123,35 @@ export function compose(model, vanilla) {
       if (!(t.ascensionPerks ?? []).includes(p)) {
         t.ascensionPerks = [...(t.ascensionPerks ?? []), p];
         t.perkReasons[p] = manual.includes(p) ? "manual" : "granted";
+      }
+    }
+  }
+
+  // A variant with no icon of its own uses the parent's. For a vanilla
+  // override the parent's icon is only known once vanilla is composed in,
+  // so this has to happen here rather than at build time.
+  for (const t of byId.values()) {
+    for (const s of t.swaps ?? []) {
+      if (!s.icon) s.icon = t.icon ?? null;
+    }
+  }
+
+  {
+    // Substitutions resolve from the captured strings first, then from the
+    // vanilla technologies themselves — $tech_ring_world_desc$ is just
+    // another technology's description, which is already to hand.
+    const locExtra = { ...(vanilla?.locExtra ?? {}) };
+    for (const v of vanilla?.technologies ?? []) {
+      if (v.name && !(v.id in locExtra)) locExtra[v.id] = v.name;
+      if (v.desc && !(`${v.id}_desc` in locExtra))
+        locExtra[`${v.id}_desc`] = v.desc;
+    }
+    for (const t of byId.values()) {
+      t.name = resolveLoc(t.name, locExtra);
+      t.desc = resolveLoc(t.desc, locExtra);
+      for (const s of t.swaps ?? []) {
+        s.displayName = resolveLoc(s.displayName, locExtra);
+        s.desc = resolveLoc(s.desc, locExtra);
       }
     }
   }

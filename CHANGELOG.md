@@ -19,6 +19,130 @@ game data, which refresh independently.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
 
+## 1.14.0
+
+### Fixed
+
+- **Missing ascension perk badges.** The sprite atlas is built from whatever
+  icons are present when it is generated, so an atlas built elsewhere can be
+  missing some — the vanilla perk icons, in practice, since those are
+  extracted from a local game install. An icon the atlas does not contain is
+  now loaded from its own file instead, cached, so a stale atlas costs a few
+  requests rather than leaving cards and badges blank.
+
+## 1.13.4
+
+### Fixed
+
+- Perk icons for soft requirements — a perk that is one route among several,
+  such as Mechromancy on The Vat — were not counted as referenced, so the
+  pruner offered to delete them.
+- `$tech_x$` and `$tech_x_desc$` references resolve from the vanilla
+  technologies already in the dataset, not only from captured localisation.
+  Ring Segment's variant description no longer depends on the capture having
+  happened.
+
+## 1.13.3
+
+### Fixed
+
+- The build now warns when `data/vanilla-structural.json` predates the
+  current extractor — no captured localisation, no perk names, no tier
+  requirements — instead of quietly producing a degraded tree. The smoke
+  test reports unresolved `$references$` always and fails on them when the
+  file is current, so a stale file can neither hide a real regression nor
+  masquerade as one.
+- README warns against overwriting that file from another copy: it is
+  generated from a local game install, never rebuilt by CI, and the
+  committed one is the only current version.
+
+## 1.13.2
+
+### Fixed
+
+- Colour codes survived into displayed text where a name or description was
+  filled in from a captured vanilla string — Ring Segment appeared as
+  "§YRing Segment§!". Markup is stripped both when the extractor captures a
+  string and after the viewer substitutes one, so an already-committed
+  vanilla file is cleaned up without needing another extraction. The smoke
+  test now fails on any markup reaching displayed text.
+
+## 1.13.1
+
+### Fixed
+
+- A technology variant with no icon of its own now uses its parent's, as the
+  game does. The mod ships an icon for the bio-ship ring world variant but
+  not the other two, which were left iconless. For a variant of a vanilla
+  override the parent's icon is only known once vanilla is composed in, so
+  the fallback happens there.
+- Localisation captured for the mod's unresolved references now has its own
+  `$refs$` resolved first. Capturing a raw value only exposed the next
+  unresolved key — `tech_ring_world_desc` gave way to
+  `$ring_world_1_MEGASTRUCTURE_DETAILS$` — needing another extractor run
+  each time.
+- The four Ancient Cache of Technologies icons ship with the site, so they
+  no longer need converting after each release.
+
+## 1.13.0
+
+### Fixed
+
+- **Icons scrambled after rebuilding the atlas.** The atlas image was
+  cache-busted by the tool version, so rebuilding it locally — adding the
+  ACOT icons, say — left browsers pairing fresh coordinates with a cached
+  image, and every icon drew from the wrong place. The coordinate file now
+  carries a hash of the image it describes and the viewer requests that
+  exact image, so the two cannot come from different builds.
+- **Technology swap conditions were misread.** `giga_can_use_habitables` is
+  not about megastructures being enabled: it is
+  `NOR = { wilderness, one-planet origin, nomadic }`. Ring Segment's
+  variants now read "Ordinary empire" and "Wilderness, one-planet or nomadic
+  empire". An explicit label for a condition and value is taken as the whole
+  statement rather than being negated.
+- **Cosmogenesis ships were unmarked.** The escort, battlecruiser, fallen
+  empire titan, weaver, mauler, harbinger and stinger carry no perk check of
+  their own — they are handed out by the crisis-level effect — so they are
+  declared in `data/manual-perk-grants.json`. The crisis, world, thesis and
+  lathe technologies name the perk in their own `potential` and needed
+  nothing.
+- The Colossus Project's icon is named `ap_colossus_project`, not after the
+  perk; `perkIcons` now maps it.
+
+### Added
+
+- **Variants show their icon and description**, not just a name and a
+  condition.
+- Variant names and descriptions are collected among the localisation keys
+  the mod references but does not define, so `$utopia.2000.name$` and
+  `$tech_ring_world_desc$` resolve on the next extractor run. Substitution
+  also happens in the viewer, so a refreshed vanilla file fixes them without
+  waiting for the mod dataset to rebuild.
+
+## 1.12.1
+
+### Added
+
+- `perkIcons` in `data/manual-perk-grants.json`, pointing a perk at an icon
+  file whose name differs from the perk id — the Colossus Project's icon is
+  not called `ap_colossus`. The mapped name is what the icon tooling looks
+  for, so the pruner and the extractor agree with the renderer.
+
+## 1.12.0
+
+### Added
+
+- **Technology variants in the detail panel.** Several technologies are
+  swapped for a different version depending on the empire — Ring Segment
+  becomes one of three depending on whether habitable megastructures are
+  available and whether the empire uses bio-ships. The variants and the
+  condition that selects each are now listed, in plain words rather than
+  script (`is_wilderness_empire = yes` reads "Wilderness empire"). Seven
+  technologies have them.
+- Variant names are included when collecting localisation keys the mod
+  references but does not define, so a name like `$utopia.2000.name$`
+  resolves on the next extractor run.
+
 ## 1.11.3
 
 ### Fixed
@@ -209,6 +333,130 @@ game data, which refresh independently.
   stop showing a cost of zero.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
+
+## 1.14.0
+
+### Fixed
+
+- **Missing ascension perk badges.** The sprite atlas is built from whatever
+  icons are present when it is generated, so an atlas built elsewhere can be
+  missing some — the vanilla perk icons, in practice, since those are
+  extracted from a local game install. An icon the atlas does not contain is
+  now loaded from its own file instead, cached, so a stale atlas costs a few
+  requests rather than leaving cards and badges blank.
+
+## 1.13.4
+
+### Fixed
+
+- Perk icons for soft requirements — a perk that is one route among several,
+  such as Mechromancy on The Vat — were not counted as referenced, so the
+  pruner offered to delete them.
+- `$tech_x$` and `$tech_x_desc$` references resolve from the vanilla
+  technologies already in the dataset, not only from captured localisation.
+  Ring Segment's variant description no longer depends on the capture having
+  happened.
+
+## 1.13.3
+
+### Fixed
+
+- The build now warns when `data/vanilla-structural.json` predates the
+  current extractor — no captured localisation, no perk names, no tier
+  requirements — instead of quietly producing a degraded tree. The smoke
+  test reports unresolved `$references$` always and fails on them when the
+  file is current, so a stale file can neither hide a real regression nor
+  masquerade as one.
+- README warns against overwriting that file from another copy: it is
+  generated from a local game install, never rebuilt by CI, and the
+  committed one is the only current version.
+
+## 1.13.2
+
+### Fixed
+
+- Colour codes survived into displayed text where a name or description was
+  filled in from a captured vanilla string — Ring Segment appeared as
+  "§YRing Segment§!". Markup is stripped both when the extractor captures a
+  string and after the viewer substitutes one, so an already-committed
+  vanilla file is cleaned up without needing another extraction. The smoke
+  test now fails on any markup reaching displayed text.
+
+## 1.13.1
+
+### Fixed
+
+- A technology variant with no icon of its own now uses its parent's, as the
+  game does. The mod ships an icon for the bio-ship ring world variant but
+  not the other two, which were left iconless. For a variant of a vanilla
+  override the parent's icon is only known once vanilla is composed in, so
+  the fallback happens there.
+- Localisation captured for the mod's unresolved references now has its own
+  `$refs$` resolved first. Capturing a raw value only exposed the next
+  unresolved key — `tech_ring_world_desc` gave way to
+  `$ring_world_1_MEGASTRUCTURE_DETAILS$` — needing another extractor run
+  each time.
+- The four Ancient Cache of Technologies icons ship with the site, so they
+  no longer need converting after each release.
+
+## 1.13.0
+
+### Fixed
+
+- **Icons scrambled after rebuilding the atlas.** The atlas image was
+  cache-busted by the tool version, so rebuilding it locally — adding the
+  ACOT icons, say — left browsers pairing fresh coordinates with a cached
+  image, and every icon drew from the wrong place. The coordinate file now
+  carries a hash of the image it describes and the viewer requests that
+  exact image, so the two cannot come from different builds.
+- **Technology swap conditions were misread.** `giga_can_use_habitables` is
+  not about megastructures being enabled: it is
+  `NOR = { wilderness, one-planet origin, nomadic }`. Ring Segment's
+  variants now read "Ordinary empire" and "Wilderness, one-planet or nomadic
+  empire". An explicit label for a condition and value is taken as the whole
+  statement rather than being negated.
+- **Cosmogenesis ships were unmarked.** The escort, battlecruiser, fallen
+  empire titan, weaver, mauler, harbinger and stinger carry no perk check of
+  their own — they are handed out by the crisis-level effect — so they are
+  declared in `data/manual-perk-grants.json`. The crisis, world, thesis and
+  lathe technologies name the perk in their own `potential` and needed
+  nothing.
+- The Colossus Project's icon is named `ap_colossus_project`, not after the
+  perk; `perkIcons` now maps it.
+
+### Added
+
+- **Variants show their icon and description**, not just a name and a
+  condition.
+- Variant names and descriptions are collected among the localisation keys
+  the mod references but does not define, so `$utopia.2000.name$` and
+  `$tech_ring_world_desc$` resolve on the next extractor run. Substitution
+  also happens in the viewer, so a refreshed vanilla file fixes them without
+  waiting for the mod dataset to rebuild.
+
+## 1.12.1
+
+### Added
+
+- `perkIcons` in `data/manual-perk-grants.json`, pointing a perk at an icon
+  file whose name differs from the perk id — the Colossus Project's icon is
+  not called `ap_colossus`. The mapped name is what the icon tooling looks
+  for, so the pruner and the extractor agree with the renderer.
+
+## 1.12.0
+
+### Added
+
+- **Technology variants in the detail panel.** Several technologies are
+  swapped for a different version depending on the empire — Ring Segment
+  becomes one of three depending on whether habitable megastructures are
+  available and whether the empire uses bio-ships. The variants and the
+  condition that selects each are now listed, in plain words rather than
+  script (`is_wilderness_empire = yes` reads "Wilderness empire"). Seven
+  technologies have them.
+- Variant names are included when collecting localisation keys the mod
+  references but does not define, so a name like `$utopia.2000.name$`
+  resolves on the next extractor run.
 
 ## 1.11.3
 

@@ -109,6 +109,10 @@ def _collect_perk_groups(block: Block, groups: list,
 #: what a player would call them. Anything unlisted keeps a prettified form
 #: of its script name, so a new condition is readable rather than invisible.
 CONDITION_LABELS = {
+    "is_wilderness_empire": "Wilderness empire",
+    "is_nomadic": "Nomadic empire",
+    "country_uses_bio_ships": "Bio-ships",
+    "giga_can_use_habitables": "Habitable megastructures enabled",
     "has_genetically_ascended": "Genetic Ascension",
     "has_psionically_ascended": "Psionic Ascension",
     "has_cybernetically_ascended": "Cybernetic Ascension",
@@ -293,6 +297,30 @@ def _as_int(v) -> Optional[int]:
         return int(v)
     except (TypeError, ValueError):
         return None
+
+
+def _readable_conditions(block: Block) -> list:
+    """A trigger as short readable phrases rather than script.
+
+    `is_wilderness_empire = yes` becomes "Wilderness empire"; `= no` negates
+    it. Used for technology swaps, where the trigger decides which variant
+    an empire gets and is worth stating plainly.
+    """
+    out = []
+    for p in block.pairs():
+        if isinstance(p.value, Block):
+            out.extend(_readable_conditions(p.value))
+            continue
+        keyed = f"{p.key}:{p.value}"
+        if keyed in CONDITION_LABELS:
+            label = CONDITION_LABELS[keyed]
+        else:
+            label = _condition_label(p.key, p.value)
+            if p.value == "no":
+                label = f"Not: {label[0].lower()}{label[1:]}"
+        if label and label not in out:
+            out.append(label)
+    return out
 
 
 def _cond_text(block: Block) -> str:
@@ -585,6 +613,10 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                         "conditions": None, "factor": None,
                     })
 
+        # Icon: explicit key -> id -> category -> None (viewer placeholder).
+        t.icon = resolve_icon(tid, _plain(b.get_last("icon")),
+                              icon_stems, categories, t.categories)
+
         for swap in b.get_all("technology_swap"):
             if isinstance(swap, Block):
                 sname = _plain(swap.get_last("name"))
@@ -593,6 +625,17 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                     "name": sname,
                     "displayName": strip_markup(loc.name(sname) or sname or "?"),
                     "trigger": _cond_text(trig) if isinstance(trig, Block) else None,
+                    "conditions": (_readable_conditions(trig)
+                                   if isinstance(trig, Block) else []),
+                    "desc": (strip_markup(loc.name(f"{sname}_desc") or "")
+                             or None) if sname else None,
+                    # A swap uses its own icon file when one exists, and
+                    # otherwise the parent technology's — the mod ships an
+                    # icon for the bio-ship ring world variant but not the
+                    # other, and the game falls back the same way.
+                    "icon": resolve_icon(
+                        sname or "", _plain(swap.get_last("icon")),
+                        icon_stems, categories, t.categories) or t.icon,
                     "inheritIcon": _as_bool(swap.get_last("inherit_icon")),
                 })
 
@@ -608,10 +651,6 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 if isinstance(var, VarRef):
                     t.cross_mod_id = var.name.split("_")[0]
                 break
-
-        # Icon: explicit key -> id -> category -> None (viewer placeholder).
-        t.icon = resolve_icon(tid, _plain(b.get_last("icon")),
-                              icon_stems, categories, t.categories)
 
         # Localisation. Names/descs are stored markup-free: colour keys are
         # visual clutter on cards (user decision), icon tokens unrenderable.

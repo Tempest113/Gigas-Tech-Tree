@@ -98,6 +98,17 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
         for f in sorted(loc_dir.glob("*.yml")):
             loc.load_file(f.read_bytes(), f.name)
 
+    # A vanilla file from an older extractor silently degrades the result —
+    # missing perk names, missing substitutions, missing gating — so say so.
+    if vanilla_path and vanilla_path.is_file():
+        _v = json.loads(vanilla_path.read_text(encoding="utf-8"))
+        for key, why in (("locExtra", "substituted names stay unresolved"),
+                         ("ascensionPerks", "perks fall back to derived names"),
+                         ("tiers", "tier requirements are guessed")):
+            if key not in _v:
+                print(f"WARNING: {vanilla_path.name} has no '{key}' — {why}. "
+                      f"Re-run tools/extract_vanilla.py.")
+
     vanilla_vars = (load_vanilla_structural(vanilla_path)
                     if vanilla_path and vanilla_path.is_file() else None)
     vars_ = load_variables(mod_dir, vanilla_vars=vanilla_vars)
@@ -136,11 +147,13 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     manual_path = out_dir / "manual-perk-grants.json"
     manual = {}
     manual_perk_names = {}
+    manual_perk_icons = {}
     if manual_path.is_file():
         _doc = json.loads(manual_path.read_text(encoding="utf-8"))
         manual = _doc.get("grants") or {}
         CONDITION_LABELS.update(_doc.get("conditionLabels") or {})
         manual_perk_names = _doc.get("perkNames") or {}
+        manual_perk_icons = _doc.get("perkIcons") or {}
         for tid, perks in manual.items():
             merged_perks = perk_grants.setdefault(tid, [])
             for p in perks:
@@ -167,6 +180,11 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
             "overrides": sum(t.raw.overrides_earlier_source
                              for t in graph.techs.values()),
         },
+        # Whether the vanilla file is current enough to resolve substituted
+        # names; the smoke test only enforces resolution when it is.
+        "vanillaHasLoc": bool(vanilla_path and vanilla_path.is_file()
+                              and "locExtra" in json.loads(
+                                  vanilla_path.read_text(encoding="utf-8"))),
         "locWarnings": loc.warnings,
         "unexpandedInlineScripts": sorted(
             {u["script"] for u in lib.unexpanded}),
@@ -179,8 +197,11 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     import re as _re
     unresolved = sorted({
         m for t in graph.techs.values()
-        for m in _re.findall(r"\$([A-Za-z0-9_.\-']+)\$",
-                             f"{t.name or ''} {t.desc or ''}")
+        for m in _re.findall(
+            r"\$([A-Za-z0-9_.\-']+)\$",
+            " ".join([t.name or "", t.desc or ""]
+                     + [s.get("displayName") or "" for s in t.swaps]
+                     + [s.get("desc") or "" for s in t.swaps]))
     })
     meta["unresolvedLocKeys"] = unresolved
     (out_dir if out_dir.is_dir() else Path(".")).mkdir(parents=True, exist_ok=True)
@@ -192,9 +213,16 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     # extractor reads this so it converts only what is needed, rather than
     # every icon in the game's folders.
     needed = {t.icon for t in graph.techs.values() if t.icon}
-    needed |= {p for t in graph.techs.values()
-               for p in t.ascension_perks + t.inherited_perks}
-    needed |= {p for perks in perk_grants.values() for p in perks}
+    # Soft perks (one route among several) and any perk named in an
+    # either/or group are drawn too, so their icons are referenced.
+    needed |= {manual_perk_icons.get(p, p) for t in graph.techs.values()
+               for p in (t.ascension_perks + t.inherited_perks
+                         + t.soft_perks
+                         + [q for grp in t.perk_groups for q in grp["perks"]])}
+    needed |= {manual_perk_icons.get(p, p)
+               for perks in perk_grants.values() for p in perks}
+    needed |= {s["icon"] for t in graph.techs.values()
+               for s in t.swaps if s.get("icon")}
     needed |= {(e.get("icon") or tid)
                for tid, e in (external.get("technologies") or {}).items()}
     # Vanilla technologies are composed into the map client-side, so their
@@ -223,6 +251,7 @@ def build(mod_dir: Path, out_dir: Path, icons_out: Path | None,
     meta["perkGrants"] = {k: sorted(v) for k, v in sorted(perk_grants.items())}
     meta["manualPerkGrants"] = manual
     meta["manualPerkNames"] = manual_perk_names
+    meta["perkIcons"] = manual_perk_icons
 
     labels_path = out_dir / "condition-labels.json"
     meta["conditionLabels"] = (

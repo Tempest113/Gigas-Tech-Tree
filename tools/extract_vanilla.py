@@ -229,7 +229,11 @@ def main() -> None:
         for k in wanted:
             v = loc_all.get(k)
             if v:
-                extra[k] = v
+                # Resolve nested $refs$ now: capturing a raw value only
+                # exposes the next unresolved key, needing another run. Strip
+                # markup too — these are substituted into names and
+                # descriptions that are otherwise markup-free.
+                extra[k] = strip_markup(loc_all.resolve_substitutions(v))
         model["locExtra"] = dict(sorted(extra.items()))
         print(f"loc keys filled: {len(extra)}/{len(wanted)}")
 
