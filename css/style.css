@@ -474,3 +474,108 @@ select {
 
 .sidebar-toggle { color: var(--muted); }
 .sidebar-toggle span { text-transform: none !important; }
+
+/* -- mobile ------------------------------------------------------------- */
+
+/* The desktop layout is a fixed sidebar beside a stage. A phone has room
+   for one of those, so below 820px the sidebar becomes a drawer over the
+   stage and the detail panel becomes a bottom sheet. Nothing here changes
+   the desktop layout: every rule is inside a query. */
+
+.sidebar-toggle { display: none; }
+.scrim { display: none; }
+
+@media (max-width: 820px) {
+  /* Header: the title shortens to its first word and the controls scroll
+     sideways rather than wrapping onto a second row, which would eat a
+     tenth of the viewport. */
+  .app-header {
+    height: auto; min-height: 48px; padding: 6px 10px;
+    gap: 8px; flex-wrap: wrap;
+    padding-top: max(6px, env(safe-area-inset-top));
+  }
+  .app-title { font-size: 13px; }
+  .app-title-dim { display: none; }
+  .header-controls {
+    order: 3; width: 100%; gap: 8px;
+    overflow-x: auto; scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .header-controls::-webkit-scrollbar { display: none; }
+  .header-btn, .diff-toggle { flex: none; white-space: nowrap; }
+  .build-info { white-space: nowrap; }
+
+  .sidebar-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card); color: var(--text);
+    border: 1px solid var(--line); border-radius: 4px;
+    font-family: var(--font-display); font-size: 12px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 6px 10px; cursor: pointer;
+  }
+  .sidebar-toggle[aria-expanded="true"] {
+    border-color: var(--physics); color: var(--physics);
+  }
+
+  .app-body { height: calc(100% - 84px); position: relative; }
+
+  /* Drawer. Off-canvas by default so it never steals a tap from the map. */
+  .sidebar {
+    position: absolute; z-index: 20; inset: 0 auto 0 0;
+    width: min(280px, 84vw); flex: none;
+    transform: translateX(-100%);
+    transition: transform 160ms ease;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    box-shadow: 2px 0 16px rgb(0 0 0 / 0.5);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .scrim {
+    display: block; position: absolute; inset: 0; z-index: 15;
+    background: rgb(0 0 0 / 0.5);
+    opacity: 0; pointer-events: none; transition: opacity 160ms ease;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  /* Detail panel as a bottom sheet — a 340px panel pinned top-right covers
+     the card it describes on a narrow screen. */
+  .detail-panel {
+    top: auto; right: 0; left: 0; bottom: 0; width: auto;
+    max-height: 62%; border-radius: 10px 10px 0 0;
+    border-left: none; border-right: none; border-bottom: none;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 20px rgb(0 0 0 / 0.45);
+  }
+  .detail-close { top: 10px; right: 12px; font-size: 24px; padding: 4px 8px; }
+
+  /* Zoom controls sit above the sheet and take a finger, not a cursor. */
+  .zoom-controls {
+    right: 10px; bottom: 10px; z-index: 12;
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+  .zoom-controls button { width: 40px; height: 40px; font-size: 18px; }
+  #zoom-readout { min-width: 40px; }
+
+  .isolate-bar {
+    bottom: auto; top: 10px; z-index: 12;
+    max-width: calc(100% - 20px);
+  }
+  .modal-panel { top: 8px; width: calc(100% - 16px); padding: 12px 14px; }
+  .tab-panel { padding: 10px 12px; }
+  .status { top: 45%; font-size: 13px; }
+}
+
+/* Touch pointers get larger hit targets regardless of viewport width —
+   a tablet is wide but still has no cursor. */
+@media (pointer: coarse) {
+  .sidebar-cat { padding: 7px 0; }
+  .search-results li { padding: 9px 8px; }
+  .header-btn { padding: 7px 12px; }
+  #search-box { padding: 9px 10px; font-size: 16px; } /* 16px: iOS will not
+    zoom the page when a field this size takes focus. */
+  .detail-panel ul { padding-left: 20px; }
+  .tech-link { padding: 2px 0; display: inline-block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .scrim { transition: none; }
+}

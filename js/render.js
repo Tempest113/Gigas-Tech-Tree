@@ -119,11 +119,38 @@ export class MapView {
     const stage = this.stage;
     let panning = false, px = 0, py = 0, moved = false, downId = null;
 
+    /* Touch needs three things mouse does not: two fingers to zoom (there is
+       no wheel), a long press to isolate (there is no middle button), and no
+       hover lineage (a finger has no hover state, and computing one on every
+       move costs a redraw per frame while panning).
+
+       Live pointers are tracked by id so a pinch can be measured. A second
+       finger cancels whatever the first was doing: the pan stops, the long
+       press is called off, and the tap is not treated as a selection. */
+    const live = new Map();
+    let pinchDist = 0, pinchMid = null, longPressTimer = null;
+    const LONG_PRESS_MS = 500;
+    const LONG_PRESS_SLOP = 10;
+
+    const cancelLongPress = () => {
+      if (longPressTimer !== null) { clearTimeout(longPressTimer); longPressTimer = null; }
+    };
+    const twoPointers = () => {
+      const [a, b] = [...live.values()];
+      return [Math.hypot(a.x - b.x, a.y - b.y),
+              { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }];
+    };
+
     // Middle button: show only this technology's chain. Handled on
     // pointerdown because the browser's autoscroll would otherwise swallow
     // it, and prevented so no autoscroll cursor appears.
     stage.addEventListener("auxclick", e => {
       if (e.button === 1) e.preventDefault();
+    });
+    // A long press is the touch equivalent, so the platform context menu
+    // must not fire on top of it.
+    stage.addEventListener("contextmenu", e => {
+      if (live.size) e.preventDefault();
     });
     stage.addEventListener("pointerdown", e => {
       if (e.button === 1) {
@@ -132,24 +159,68 @@ export class MapView {
         if (id) { this.select(id); this.onIsolate(id); }
         return;
       }
+      live.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (live.size === 2) {
+        // Second finger down: stop panning, start pinching.
+        panning = false; moved = true; downId = null;
+        cancelLongPress();
+        stage.classList.remove("panning");
+        [pinchDist, pinchMid] = twoPointers();
+        return;
+      }
+      if (live.size > 2) return;
+
       panning = true; moved = false;
       px = e.clientX; py = e.clientY;
       downId = this.pickAt(e.clientX, e.clientY);
       stage.classList.add("panning");
       stage.setPointerCapture?.(e.pointerId);
+
+      if (e.pointerType !== "mouse" && downId) {
+        const id = downId, sx = e.clientX, sy = e.clientY;
+        longPressTimer = setTimeout(() => {
+          longPressTimer = null;
+          // Committed to isolating: the lift must not also select.
+          moved = true; panning = false;
+          stage.classList.remove("panning");
+          navigator.vibrate?.(10);
+          this.select(id);
+          this.onIsolate(id);
+        }, LONG_PRESS_MS);
+        void sx; void sy;
+      }
     });
 
     stage.addEventListener("pointermove", e => {
+      if (live.has(e.pointerId)) live.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (live.size === 2) {
+        const [dist, mid] = twoPointers();
+        if (pinchDist > 0) {
+          this.zoomAt(mid.x, mid.y, dist / pinchDist);
+          // Dragging both fingers together pans as well as zooms.
+          this.tx += mid.x - pinchMid.x;
+          this.ty += mid.y - pinchMid.y;
+          this.applyTransform();
+        }
+        pinchDist = dist; pinchMid = mid;
+        return;
+      }
+
       if (panning) {
         const dx = e.clientX - px, dy = e.clientY - py;
         if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+        if (longPressTimer !== null
+            && Math.abs(dx) + Math.abs(dy) > LONG_PRESS_SLOP) cancelLongPress();
         this.tx += dx; this.ty += dy;
         px = e.clientX; py = e.clientY;
         this.applyTransform();
         return;
       }
       // Hover preview only when nothing is selected; a selection owns the
-      // highlight until it is cleared.
+      // highlight until it is cleared. Touch and pen have no hover.
+      if (e.pointerType !== "mouse") return;
       if (this.selected) return;
       const id = this.pickAt(e.clientX, e.clientY);
       if (id !== this.hovered) {
@@ -160,14 +231,23 @@ export class MapView {
       }
     });
 
-    stage.addEventListener("pointerup", () => {
+    const endPointer = e => {
+      cancelLongPress();
+      live.delete(e.pointerId);
+      if (live.size < 2) { pinchDist = 0; pinchMid = null; }
+      // Lifting one finger of a pinch leaves the other one resting, not
+      // panning; panning resumes only on a fresh press.
+      if (live.size > 0) { panning = false; stage.classList.remove("panning"); return; }
       panning = false;
       stage.classList.remove("panning");
       if (!moved) this.select(downId);
       downId = null;
-    });
+    };
+    stage.addEventListener("pointerup", endPointer);
+    stage.addEventListener("pointercancel", endPointer);
 
-    stage.addEventListener("pointerleave", () => {
+    stage.addEventListener("pointerleave", e => {
+      if (e.pointerType !== "mouse") return;
       if (!this.selected && this.hovered) {
         this.hovered = null; this.lineage = null;
         this._lineagePath = null; this.redraw();
