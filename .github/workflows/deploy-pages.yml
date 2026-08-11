@@ -21,9 +21,6 @@ concurrency:
 
 jobs:
   test:
-    # Production repo only. A preview fork publishes via deploy-preview.yml,
-    # which has no test gate on purpose.
-    if: github.repository == 'Tempest113/Gigas-Tech-Tree'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
