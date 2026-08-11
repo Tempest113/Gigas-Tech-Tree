@@ -10,6 +10,7 @@ import { HealthPanel } from "./health.js";
 
 const $ = id => document.getElementById(id);
 
+let closeDrawer = () => {};
 let view = null;
 let model = null;
 let panels = null;
@@ -267,6 +268,25 @@ function bindChrome(jump) {
     }
   });
 
+  /* Sidebar drawer. Only reachable below the CSS breakpoint, where the
+     toggle is the sole way in; above it the sidebar is always present and
+     the class is inert. Selecting a technology from search closes it, so
+     the map is not left hidden behind the drawer. */
+  {
+    const bar = $("sidebar"), scrim = $("scrim"), btn = $("sidebar-toggle");
+    const setOpen = on => {
+      bar.classList.toggle("open", on);
+      scrim.classList.toggle("open", on);
+      btn.setAttribute("aria-expanded", String(on));
+    };
+    btn.onclick = () => setOpen(!bar.classList.contains("open"));
+    scrim.onclick = () => setOpen(false);
+    bar.addEventListener("click", e => {
+      if (e.target.closest("#search-results li")) setOpen(false);
+    });
+    closeDrawer = () => setOpen(false);
+  }
+
   $("zoom-in").onclick = () => view.zoomAt(
     innerWidth / 2, innerHeight / 2, 1.25);
   $("zoom-out").onclick = () => view.zoomAt(
@@ -286,6 +306,7 @@ function bindKeys() {
       e.preventDefault(); $("search-box").focus();
     } else if (e.key === "Escape") {
       closeModals();
+      closeDrawer();
       if (panels?.isolated) panels.isolate(null);
       view.select(null);
     } else if (e.key === "Backspace") {

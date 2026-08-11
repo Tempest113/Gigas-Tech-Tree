@@ -58,8 +58,14 @@ ok(clampScale(99) === 2.5 && clampScale(0.0001) === 0.05, "zoom is clamped");
 
 // -- real dataset: culling actually reduces work ---------------------------
 {
+  // Read the dataset the manifest points at. The refresh workflow names the
+  // file after the upstream commit, so hardcoding it here breaks the suite —
+  // and with it the deploy — on the next data refresh.
+  const manifest = JSON.parse(readFileSync(
+    new URL("../data/manifest.json", import.meta.url)));
+  const entry = manifest.datasets.find(d => d.id === "gigas") ?? manifest.datasets[0];
   const model = JSON.parse(readFileSync(
-    new URL("../data/gigas-767cf17d9420.json", import.meta.url)));
+    new URL(`../data/${entry.file}`, import.meta.url)));
   const vanilla = JSON.parse(readFileSync(
     new URL("../data/vanilla-structural.json", import.meta.url)));
   const techs = new Map();
