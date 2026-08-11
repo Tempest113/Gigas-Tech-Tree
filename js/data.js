@@ -85,6 +85,7 @@ export function compose(model, vanilla) {
         isRepeatable: v.isRepeatable,
         prerequisites: v.prerequisites,
         prerequisiteGroups: v.prerequisiteGroups ?? [],
+        conditionalPrerequisites: v.conditionalPrerequisites ?? [],
         unlocks: [],
         ascensionPerks: v.ascensionPerks ?? [], inheritedPerks: [],
         softPerks: v.softPerks ?? [],
@@ -154,6 +155,25 @@ export function compose(model, vanilla) {
       for (const s of t.swaps ?? []) {
         s.displayName = resolveLoc(s.displayName, locExtra);
         s.desc = resolveLoc(s.desc, locExtra);
+      }
+    }
+  }
+
+  /* Conditions are written at build time, when only the mod's own
+     technology names are known. Anything still showing as an id is looked
+     up now that vanilla is composed in. */
+  {
+    const nameOf = id => byId.get(id)?.name;
+    const swap = s => typeof s === "string"
+      ? s.replace(/\b(?:giga_)?tech_[a-z0-9_]+\b/g, m => nameOf(m) ?? m)
+      : s;
+    for (const t of byId.values()) {
+      if (t.availability?.length) t.availability = t.availability.map(swap);
+      for (const grp of t.perkGroups ?? []) {
+        if (grp.conditions?.length) grp.conditions = grp.conditions.map(swap);
+      }
+      for (const s of t.swaps ?? []) {
+        if (s.conditions?.length) s.conditions = s.conditions.map(swap);
       }
     }
   }

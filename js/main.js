@@ -296,15 +296,32 @@ function bindKeys() {
 
 /* Full prerequisite closure of a tech, topologically ordered, with
    cumulative cost — "what does it take to reach this". */
+/* A route to a technology. Where prerequisites offer a choice — Titans take
+   battleships or the bio-ship equivalent — the path follows one branch
+   rather than both, which would otherwise list two mutually exclusive
+   fleets as though both were needed. The first alternative in the script is
+   taken: that is the ordinary route, with the bio-ship line as the
+   variant. The alternatives are named on the step. */
 function pathTo(targetId) {
   const need = [];
   const seen = new Set();
+  const alternatives = new Map();     // chosen id -> ids not taken
+
+  const groupsOf = t => (t.prerequisiteGroups?.length
+    ? t.prerequisiteGroups
+    : (t.prerequisites ?? []).map(id => ({ all: id })));
+
   const visit = id => {
     if (seen.has(id)) return;
     seen.add(id);
     const t = model.techs.get(id);
     if (!t || t.stub) return;
-    for (const p of [...t.prerequisites].sort()) visit(p);
+    for (const grp of groupsOf(t)) {
+      const ids = grp.all ? [grp.all] : (grp.any ?? []);
+      if (!ids.length) continue;
+      if (ids.length > 1) alternatives.set(ids[0], ids.slice(1));
+      visit(ids[0]);
+    }
     need.push(t);
   };
   visit(targetId);
@@ -312,7 +329,8 @@ function pathTo(targetId) {
   return need.map(t => {
     const cost = typeof t.cost === "number" ? t.cost : 0;
     cum += cost;
-    return { tech: t, cost, cumulative: cum };
+    return { tech: t, cost, cumulative: cum,
+             alternatives: alternatives.get(t.id) ?? [] };
   });
 }
 
@@ -375,6 +393,19 @@ function showDetail(id) {
   }
   body.appendChild(badges);
 
+  if (t.availability?.length) {
+    const h = document.createElement("h3");
+    h.textContent = "Availability";
+    body.appendChild(h);
+    const ul = document.createElement("ul");
+    for (const a of t.availability) {
+      const li = document.createElement("li");
+      li.textContent = a;
+      ul.appendChild(li);
+    }
+    body.appendChild(ul);
+  }
+
   if (t.desc) {
     const d = document.createElement("p");
     d.className = "detail-desc";
@@ -423,6 +454,14 @@ function showDetail(id) {
         a.onclick = () => { view.select(pid); view.centreOn(pid); };
         li.appendChild(a);
       });
+      // Some empires skip a prerequisite entirely — nomads reach Orbital
+      // Ecosystems without Terrestrial Sculpting, which they cannot take.
+      if (grp.unless?.length) {
+        const note = document.createElement("span");
+        note.className = "swap-condition";
+        note.textContent = ` (not needed for: ${grp.unless.join(", ")})`;
+        li.appendChild(note);
+      }
       ul.appendChild(li);
     }
     body.appendChild(ul);
@@ -508,6 +547,17 @@ function showDetail(id) {
         const c = typeof step.tech.cost === "number"
           ? String(step.cost) : "\u2014";
         li.append(` — ${c} (\u03a3 ${step.cumulative})`);
+        for (const altId of step.alternatives) {
+          const or = document.createElement("span");
+          or.className = "swap-condition";
+          or.textContent = " or ";
+          li.appendChild(or);
+          const link = document.createElement("span");
+          link.className = "tech-link";
+          link.textContent = model.techs.get(altId)?.name ?? altId;
+          link.onclick = () => { view.select(altId); view.centreOn(altId); };
+          li.appendChild(link);
+        }
         ol.appendChild(li);
       }
       body.appendChild(ol);

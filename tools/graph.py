@@ -57,10 +57,13 @@ def _collect_perk_groups(block: Block, groups: list,
     triggers = triggers or {}
     flags = flags or {}
     local: list = []
+    techs: list = []     # technologies named as an alternative route
     conds: list = []     # non-perk alternatives seen at this level
     for p in block.pairs():
         if p.key == "has_ascension_perk" and isinstance(p.value, str):
             local.append(p.value)
+        elif p.key == "has_technology" and isinstance(p.value, str):
+            techs.append(p.value)
         elif p.key in triggers and p.value == "yes" and triggers[p.key]:
             local.append(triggers[p.key])
         elif p.key == "has_country_flag" and isinstance(p.value, str) \
@@ -97,17 +100,21 @@ def _collect_perk_groups(block: Block, groups: list,
                 conds.append(label)
     if local:
         if inside_or:
-            groups.append({"perks": local, "conditions": conds})
+            groups.append({"perks": local, "conditions": conds, "techs": techs})
         else:
             for perk in local:
-                groups.append({"perks": [perk], "conditions": []})
+                groups.append({"perks": [perk], "conditions": [], "techs": techs})
     elif inside_or and conds and not groups:
-        groups.append({"perks": [], "conditions": conds})
+        groups.append({"perks": [], "conditions": conds, "techs": techs})
 
 
 #: Conditions that appear as alternatives to an ascension perk, mapped to
 #: what a player would call them. Anything unlisted keeps a prettified form
 #: of its script name, so a new condition is readable rather than invisible.
+#: technology id -> display name, for conditions that name a technology.
+#: Filled by build_graph once localisation is available.
+_TECH_NAMES: dict = {}
+
 CONDITION_LABELS = {
     "is_wilderness_empire": "Wilderness empire",
     "is_nomadic": "Nomadic empire",
@@ -123,8 +130,12 @@ CONDITION_LABELS = {
 
 #: Keys that qualify a requirement rather than offering an alternative
 #: route; they must never be listed as a way to obtain a technology.
+#: conditions that say nothing a reader can act on
+_NOISE = {"has_global_flag", "count", "always", "hidden_trigger",
+          "num_owned_planets", "years_passed"}
+
 _NOT_AN_OPTION = {"NOT", "NOR", "AND", "hidden_trigger", "has_global_flag",
-                  "has_technology", "uses_district_set", "any_owned_planet",
+                  "uses_district_set", "any_owned_planet",
                   "has_valid_civic", "always",
                   # A finished tradition tree is the same route as the
                   # ascension it completes; listing both says it twice.
@@ -142,6 +153,11 @@ def _condition_label(key: str, value) -> str:
         return CONDITION_LABELS[key]
     if key == "has_country_flag" and isinstance(value, str):
         return value.replace("_", " ").strip().capitalize()
+    if key == "has_crisis_level" and isinstance(value, str):
+        return (value.replace("crisis_", "").replace("_", " ")
+                .strip().capitalize())
+    if key == "has_technology" and isinstance(value, str):
+        return _TECH_NAMES.get(value) or value
     if key == "has_active_tradition" and isinstance(value, str):
         stem = value.replace("tr_", "").split("_")[0]
         return f"{stem.capitalize()} tradition"
@@ -251,6 +267,10 @@ class Tech:
     unlocks: list[str] = field(default_factory=list)
     unlock_text: list[str] = field(default_factory=list)
     weight_modifiers: list[dict] = field(default_factory=list)
+    #: plain-word statements of what makes the technology available at all
+    availability: list = field(default_factory=list)
+    #: prerequisites some empires are exempt from
+    conditional_prerequisites: list = field(default_factory=list)
     swaps: list[dict] = field(default_factory=list)
     gateway: Optional[str] = None
     icon: Optional[str] = None
@@ -301,6 +321,71 @@ def _as_int(v) -> Optional[int]:
         return None
 
 
+def _conditional_prereqs(pot: Block, triggers: dict) -> list:
+    """Technologies required only by some empires.
+
+    `potential = { OR = { is_nomadic = yes has_technology = X } }` means X is
+    a prerequisite unless the empire is nomadic — Orbital Ecosystems does
+    this so nomads, who cannot take the usual route, still reach it. That is
+    a prerequisite with an exemption, not a perk requirement, and belongs in
+    the prerequisite list rather than in a banner of its own.
+    """
+    out = []
+    for p in pot.pairs():
+        if p.key not in ("OR", "or") or not isinstance(p.value, Block):
+            continue
+        techs, others = [], []
+        for q in p.value.pairs():
+            if q.key == "has_technology" and isinstance(q.value, str):
+                techs.append(q.value)
+            elif q.key == "has_ascension_perk" or q.key in triggers:
+                others = None
+                break
+            elif q.key not in _NOISE and not isinstance(q.value, Block):
+                others.append(_condition_label(q.key, q.value))
+        if others is None or not techs:
+            continue
+        for tid in techs:
+            out.append({"tech": tid, "unless": others})
+    return out
+
+
+def _availability(body: Block) -> list:
+    """What stops a technology coming up in research, in plain words.
+
+    Some technologies have neither prerequisites nor a `potential` gate:
+    they carry a weight modifier of zero unless a condition holds. The
+    Nano-Assembler is weightless until the empire reaches cosmogenesis
+    level 5, which is the only thing that makes it available.
+    """
+    out = []
+    wm = body.get_last("weight_modifier")
+    if not isinstance(wm, Block):
+        return out
+    for p in wm.pairs():
+        if p.key != "modifier" or not isinstance(p.value, Block):
+            continue
+        factor = p.value.get_last("factor")
+        if str(factor) not in ("0", "0.0"):
+            continue
+        rest = Block()
+        rest.items = [i for i in p.value.items
+                      if not (isinstance(i, Pair) and i.key == "factor")]
+        # `factor = 0` under a NOT is a requirement stated backwards.
+        negated = [i for i in rest.items
+                   if isinstance(i, Pair) and i.key in ("NOT", "NOR")
+                   and isinstance(i.value, Block)]
+        if negated and len(rest.items) == len(negated):
+            for n in negated:
+                terms = _readable_conditions(n.value)
+                if terms:
+                    out.append(f"Only with {', '.join(terms)}")
+        # The positive form ("weight zero while X") is nearly always an
+        # internal detail — a flag, a count, another technology already
+        # held — and says nothing useful about how to get the technology.
+    return out
+
+
 def _readable_conditions(block: Block) -> list:
     """A trigger as short readable phrases rather than script.
 
@@ -312,6 +397,8 @@ def _readable_conditions(block: Block) -> list:
     for p in block.pairs():
         if isinstance(p.value, Block):
             out.extend(_readable_conditions(p.value))
+            continue
+        if p.key in _NOISE:
             continue
         keyed = f"{p.key}:{p.value}"
         if keyed in CONDITION_LABELS:
@@ -495,6 +582,12 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                 perk_flags: Optional[dict] = None) -> GraphResult:
     res = GraphResult()
     provenance = var_provenance or vars_
+    _TECH_NAMES.clear()
+    for _tid, _td in techdefs.items():
+        _n = loc.name(_tid)
+        if _n:
+            _TECH_NAMES[_tid] = strip_markup(_n)
+
     icon_stems = icon_stems or set()
     categories = categories or {}
     ascension_triggers = ascension_triggers or {}
@@ -583,6 +676,18 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         t.prerequisites, t.prerequisite_groups = parse_prerequisites(
             b.get_last("prerequisites"))
 
+        if isinstance(pot, Block):
+            t.conditional_prerequisites = _conditional_prereqs(
+                pot, ascension_triggers)
+            for cp in t.conditional_prerequisites:
+                # Counts for edges and ordering like any prerequisite.
+                if cp["tech"] not in t.prerequisites:
+                    t.prerequisites.append(cp["tech"])
+                    t.prerequisite_groups.append(
+                        {"all": cp["tech"], "unless": cp["unless"]})
+            # Those groups described a prerequisite, not a perk requirement.
+            t.perk_groups = [grp for grp in t.perk_groups if grp["perks"]]
+
         pfd = b.get_last("prereqfor_desc")
         if isinstance(pfd, Block):
             for custom in pfd.get_all("custom"):
@@ -591,6 +696,8 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
                     if title:
                         t.unlock_text.append(
                             strip_markup(loc.name(title) or title))
+
+        t.availability = _availability(b)
 
         wm = b.get_last("weight_modifier")
         if isinstance(wm, Block):
@@ -841,6 +948,8 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "unlocks": sorted(t.unlocks),
             "unlockText": t.unlock_text,
             "weightModifiers": t.weight_modifiers,
+            "availability": t.availability,
+            "conditionalPrerequisites": t.conditional_prerequisites,
             "swaps": t.swaps,
             "gateway": t.gateway,
             "icon": t.icon,

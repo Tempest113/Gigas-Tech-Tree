@@ -19,6 +19,43 @@ game data, which refresh independently.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
 
+## 1.15.1
+
+### Changed
+
+- **A technology required only by some empires is treated as a
+  prerequisite**, not announced in a banner. Orbital Ecosystems lists
+  Terrestrial Sculpting among its prerequisites, with the edge to match, and
+  notes "(not needed for: Nomadic empire)" — nomads cannot take that
+  technology, which is why the exemption exists. Three technologies work
+  this way.
+- Alternatives in a research path are links like every other technology,
+  rather than plain text.
+
+## 1.15.0
+
+### Changed
+
+- **"Ascension Gate" mode is now "Primary Gate"** — Mega-Engineering is a
+  technology, not a perk, so naming the mode after perks was wrong.
+- **Research paths follow one branch of a choice.** A path to Asteroid
+  Artillery listed corvettes through battleships *and* maulers through
+  stingers, as though an empire needed both fleets. It now follows the first
+  route in the script — the ordinary one, with the bio-ship line as the
+  variant — and names the alternatives on the step they replace.
+
+### Added
+
+- **Availability**, for technologies that have neither prerequisites nor a
+  `potential` gate but carry no research weight until something happens. The
+  Nano-Assembler reads "Only with Cosmogenesis level 5". Seven technologies
+  have one; the inverse form (weight zero *while* something holds) is left
+  out, being an internal detail rather than a route in.
+- A technology named in a requirement counts as an alternative route rather
+  than being ignored: Orbital Ecosystems reads "Nomadic empire or Terrestrial
+  Sculpting". Technology ids appearing in any condition are replaced with
+  their names once vanilla is composed in.
+
 ## 1.14.3
 
 ### Fixed
@@ -376,6 +413,43 @@ game data, which refresh independently.
   stop showing a cost of zero.
 - **`tools/convert_icons.py`**, which converts icons from any mod folder
   into the site's icon directory.
+
+## 1.15.1
+
+### Changed
+
+- **A technology required only by some empires is treated as a
+  prerequisite**, not announced in a banner. Orbital Ecosystems lists
+  Terrestrial Sculpting among its prerequisites, with the edge to match, and
+  notes "(not needed for: Nomadic empire)" — nomads cannot take that
+  technology, which is why the exemption exists. Three technologies work
+  this way.
+- Alternatives in a research path are links like every other technology,
+  rather than plain text.
+
+## 1.15.0
+
+### Changed
+
+- **"Ascension Gate" mode is now "Primary Gate"** — Mega-Engineering is a
+  technology, not a perk, so naming the mode after perks was wrong.
+- **Research paths follow one branch of a choice.** A path to Asteroid
+  Artillery listed corvettes through battleships *and* maulers through
+  stingers, as though an empire needed both fleets. It now follows the first
+  route in the script — the ordinary one, with the bio-ship line as the
+  variant — and names the alternatives on the step they replace.
+
+### Added
+
+- **Availability**, for technologies that have neither prerequisites nor a
+  `potential` gate but carry no research weight until something happens. The
+  Nano-Assembler reads "Only with Cosmogenesis level 5". Seven technologies
+  have one; the inverse form (weight zero *while* something holds) is left
+  out, being an internal detail rather than a route in.
+- A technology named in a requirement counts as an alternative route rather
+  than being ignored: Orbital Ecosystems reads "Nomadic empire or Terrestrial
+  Sculpting". Technology ids appearing in any condition are replaced with
+  their names once vanilla is composed in.
 
 ## 1.14.3
 

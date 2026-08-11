@@ -248,6 +248,49 @@ try {
     console.log("isolate and search clear one another");
   }
 
+  // a research path follows one branch of a choice, not both
+  {
+    const anyOf = [...view.model.techs.values()]
+      .find(t => (t.prerequisiteGroups ?? []).some(g => g.any));
+    view.select(anyOf.id);
+    await new Promise(r => setTimeout(r, 60));
+    const items = [...$("detail-body").querySelectorAll("ol.research-path li")]
+      .map(li => li.querySelector(".tech-link")?.textContent ?? "");
+    const grp = anyOf.prerequisiteGroups.find(g => g.any);
+    const names = grp.any.map(id => view.model.techs.get(id)?.name);
+    const taken = names.filter(n => n && items.includes(n));
+    console.log(`research path: ${items.length} steps, `
+      + `${taken.length} of ${names.length} alternatives walked`);
+    if (!items.length) fail2("research path empty");
+    if (taken.length > 1)
+      fail2("research path walks both branches: " + taken.join(", "));
+    // alternatives on a step are links, not plain text
+    const links = [...$("detail-body")
+      .querySelectorAll("ol.research-path li .tech-link")].length;
+    const steps2 = $("detail-body").querySelectorAll("ol.research-path li").length;
+    if (links < steps2) fail2("a research path step is not a link");
+    view.select(null);
+  }
+
+  // a prerequisite some empires are exempt from is a prerequisite, with a
+  // note — not a banner of its own
+  {
+    const cond = [...view.model.techs.values()]
+      .find(t => (t.conditionalPrerequisites ?? []).some(c => c.unless?.length));
+    if (cond) {
+      const cp = cond.conditionalPrerequisites.find(c => c.unless?.length);
+      if (!cond.prerequisites.includes(cp.tech))
+        fail2("conditional prerequisite missing from the prerequisite list");
+      view.select(cond.id);
+      await new Promise(r => setTimeout(r, 60));
+      const text = $("detail-body").textContent;
+      if (!text.includes("not needed for"))
+        fail2("exemption not shown beside the prerequisite");
+      console.log(`conditional prerequisite shown for ${cond.id}`);
+      view.select(null);
+    }
+  }
+
   // an OR prerequisite is stated as a choice, not as several requirements
   {
     const anyOf = [...view.model.techs.values()]
