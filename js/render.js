@@ -674,6 +674,15 @@ export class MapView {
     const perks = hard.length ? hard : (t.softPerks ?? []);
     const perkInherited = !t.ascensionPerks?.length && perks.length > 0;
     const perkOptional = !hard.length && perks.length > 0;
+    // These lists arrive in traversal order, not priority order, so a
+    // technology behind both gates could name either. The card has room for
+    // one, and it must be the same gate the layout filed the card under —
+    // otherwise a card sitting in the Gigastructural Constructs band reads
+    // "Needs Galactic Wonders". Highest gate wins, matching gateRank().
+    const strongestPerk = list =>
+      list.find(p => p === "ap_gigastructural_constructs")
+      ?? list.find(p => p === "ap_galactic_wonders")
+      ?? list[0];
 
     if (perks.length && this.scale >= ICON_SCALE) {
       const bx = iconBox ? iconBox.x + iconBox.w - 4 : it.x + 16;
@@ -753,7 +762,7 @@ export class MapView {
       // or inherited from a prerequisite, are distinctions for the detail
       // panel — on the card they all mean "not without this perk".
       ctx.fillText(fit(ctx, "Needs " +
-                            apName(perks[0], this.model.perkNames),
+                            apName(strongestPerk(perks), this.model.perkNames),
                         it.x + CARD_W - 8 - textX),
                    textX, it.y + 56);
     } else if (t.isDangerous) {

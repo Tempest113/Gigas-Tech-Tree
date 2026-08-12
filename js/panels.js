@@ -192,8 +192,13 @@ export class Panels {
     } else {
       set = new Set();
       for (const t of this.model.techs.values()) {
+        // Soft perks count, matching gateRank() in layout.js: a technology
+        // reachable only through this perk or a questline flag is filed
+        // under the gate on the map, so the filter must agree or the gate
+        // band and the filter disagree about the same technology.
         if ((t.ascensionPerks ?? []).includes(id) ||
-            (t.inheritedPerks ?? []).includes(id)) set.add(t.id);
+            (t.inheritedPerks ?? []).includes(id) ||
+            (t.softPerks ?? []).includes(id)) set.add(t.id);
       }
     }
     this._reqCache.set(this.reqFilter, set);

@@ -7,6 +7,7 @@ cross-mod gating (the ACOT-placeholder pattern).
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
@@ -29,6 +30,13 @@ EXTERNAL_VAR_FILE = "external-techs.json"
 #: are thematically one thing but scattered across research areas.
 #: Friendly names for non-perk requirements that appear as alternatives.
 #: Extend via data/manual-perk-grants.json ("conditionLabels").
+#: `prereqfor_desc` customs whose title is a decorative tooltip heading
+#: rather than something the technology grants. Gigastructures uses these to
+#: classify a megastructure's scale (header_01_gigac, header_02_tetra); their
+#: localised text is a technology-sounding phrase, so treating them as grants
+#: makes a technology look like it grants its own prerequisite.
+_IS_TOOLTIP_HEADER = re.compile(r"^(?:[a-z0-9]+_)*header_", re.I)
+
 CONDITION_LABELS: dict = {
     "has_genetically_ascended": "Genetic Ascension",
     "is_machine_empire": "a machine empire",
@@ -693,7 +701,13 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
             for custom in pfd.get_all("custom"):
                 if isinstance(custom, Block):
                     title = _plain(custom.get_last("title"))
-                    if title:
+                    # `header_*` customs are decorative section headings in
+                    # the game's tooltip ("Tetradimensional Engineering",
+                    # "Gigastructural Constructs") that classify the scale of
+                    # the megastructure. They are not things the technology
+                    # grants, and reading them as such made a technology
+                    # appear to grant its own prerequisite.
+                    if title and not _IS_TOOLTIP_HEADER.match(title):
                         t.unlock_text.append(
                             strip_markup(loc.name(title) or title))
 
