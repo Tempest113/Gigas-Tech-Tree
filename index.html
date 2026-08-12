@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.16.0">
+<link rel="stylesheet" href="css/style.css?v=1.17.0">
 </head>
 <body>
 <header class="app-header">
@@ -25,7 +25,8 @@
     <input id="localmod-input" type="file" webkitdirectory multiple hidden>
     <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
     <button id="modlist-btn" class="header-btn" hidden>Mods</button>
-    <label class="diff-toggle" title="Columns by research tier, or by ascension perk gate">
+    <label id="mode-toggle" class="diff-toggle"
+           title="Columns by research tier, or by ascension perk gate">
       <span>Columns</span>
       <select id="mode-select" aria-label="Column mode">
         <option value="tier">Tier</option>
@@ -103,9 +104,13 @@
     <p><strong>Tier</strong> mode puts each technology in its research tier,
     with repeatables in a band at the far right. Within a tier, technologies
     behind an ascension perk sit right of those without one.</p>
-    <p><strong>Primary Gate</strong> mode replaces tiers with the
-    progression itself — No Gate, then Mega-Engineering, Galactic Wonders and
-    Gigastructural Constructs — each in a band of its own.</p>
+    <p><strong>Primary Gate</strong> mode groups by the ascension perk that
+    locks a technology — No Gate, Mega-Engineering, Galactic Wonders,
+    Gigastructural Constructs, Cosmogenesis — and orders by tier inside each
+    band, so each band reads left to right like the tier view. Perks that
+    themselves require Gigastructural Constructs (A Celestial Armada, A Weapon
+    to Pierce the Heavens, Vast Expanses, Unshackled Transportation) are shown
+    in that band rather than as gates of their own.</p>
 
     <h3>On a card</h3>
     <ul class="legend">
@@ -182,6 +187,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=1.16.0"></script>
+<script type="module" src="js/main.js?v=1.17.0"></script>
 </body>
 </html>

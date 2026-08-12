@@ -35,7 +35,20 @@ export const GATES = [
   { id: "galwon", label: "Galactic Wonders", perk: "ap_galactic_wonders" },
   { id: "gigacon", label: "Gigastructural Constructs",
     perk: "ap_gigastructural_constructs" },
+  { id: "cosmo", label: "Cosmogenesis", perk: "ap_cosmogenesis" },
 ];
+
+/* Perks that are themselves locked behind Gigastructural Constructs. Each of
+   these declares `has_gigastructural_constructs = yes` in its own `possible`
+   block upstream, so a technology behind one of them is behind Gigastructural
+   Constructs too and belongs in that band rather than looking ungated.
+   Extend this list if Gigastructures adds another downstream perk. */
+const GIGACON_DOWNSTREAM = new Set([
+  "ap_celestial_printing",   // A Celestial Armada
+  "ap_qso",                  // A Weapon to Pierce the Heavens
+  "ap_vast_expanses",        // Vast Expanses (Birch World)
+  "ap_supermassive_ehof",    // Unshackled Transportation
+]);
 
 /* Highest gate a technology sits behind. Perks are checked first because
    they are the stronger statement; Mega-Engineering counts when it is
@@ -46,8 +59,13 @@ function gateRank(t, needsMega) {
   // ones, not among those needing nothing.
   const perks = [...(t.ascensionPerks ?? []), ...(t.inheritedPerks ?? []),
                  ...(t.softPerks ?? [])];
-  if (perks.includes("ap_gigastructural_constructs")) return 3;
+  // Checked before Galactic Wonders: these technologies carry Galactic
+  // Wonders too, inherited through their prerequisites, and the deeper gate
+  // is the one that actually limits them.
+  if (perks.includes("ap_gigastructural_constructs")
+      || perks.some(p => GIGACON_DOWNSTREAM.has(p))) return 3;
   if (perks.includes("ap_galactic_wonders")) return 2;
+  if (perks.includes("ap_cosmogenesis")) return 4;
   if (needsMega.has(t.id)) return 1;
   return 0;
 }
@@ -88,10 +106,16 @@ export function layout(techs, visible = null, mode = "tier") {
 
   const seedOf = t => {
     const gate = gateRank(t, needsMega);
-    if (mode === "gate") return gate;
-    if (t.isRepeatable) return REPEATABLE_SEED;
+    if (t.isRepeatable && mode !== "gate") return REPEATABLE_SEED;
     const base = t.tier === null || !tierIndex.has(t.tier)
       ? 0 : tierIndex.get(t.tier);
+    // Gate mode still orders by tier inside the band. Seeding every
+    // technology in a gate at the same column left short chains stacked in
+    // one heap at the band's left edge while long ones stretched away, so
+    // the band read as a pile rather than a tree. Tier gives each band the
+    // same left-to-right progression the tier mode has; the gate offset
+    // applied during relaxation keeps the bands from interleaving.
+    if (mode === "gate") return base;
     // Within the same tier, a gated technology sits right of an ungated one.
     return base * 4 + gate;
   };
@@ -132,7 +156,10 @@ export function layout(techs, visible = null, mode = "tier") {
       for (const id of order) {
         if (gateOf.get(id) !== g) continue;
         const t = techs.get(id);
-        let c = gateBase[g];
+        // Start from the tier seed, offset into this gate's column range,
+        // so a tier-1 technology stays near the band's left edge instead of
+        // collapsing onto the same column as everything else in the band.
+        let c = gateBase[g] + (col.get(id) ?? 0);
         for (const p of t.prerequisites ?? []) {
           if (present.has(p)) c = Math.max(c, col.get(p) + 1);
         }

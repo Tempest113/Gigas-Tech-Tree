@@ -15,11 +15,12 @@ let view = null;
 let model = null;
 let panels = null;
 let explore = null;
+const DEV_EARLY = new URLSearchParams(location.search).has("dev");
 let colMode = new URLSearchParams(location.search).get("cols") === "gate"
   ? "gate" : "tier";
 let modSources = [];   // dev: ordered list of locally-loaded mod folders
 
-const DEV = new URLSearchParams(location.search).has("dev");
+const DEV = DEV_EARLY;
 
 export { APP_VERSION } from "./version.js";
 
