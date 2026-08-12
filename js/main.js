@@ -7,6 +7,7 @@ import { Panels } from "./panels.js";
 import { APP_VERSION } from "./version.js";
 import { ExploreTable } from "./explore.js";
 import { HealthPanel } from "./health.js";
+import { inaccessibleNote } from "./viewmodel.js";
 
 const $ = id => document.getElementById(id);
 
@@ -230,6 +231,7 @@ function bindChrome(jump) {
   // Health is a mod-developer instrument; end users don't need a lint
   // report. Visible only with ?dev in the URL.
   if (DEV) {
+    $("profile-toggle").hidden = false;
     $("health-btn").hidden = false;
     $("health-btn").onclick = e => {
       e.stopPropagation();
@@ -287,6 +289,13 @@ function bindChrome(jump) {
     });
     closeDrawer = () => setOpen(false);
   }
+
+  /* Empire profile (prototype, ?dev only). Narrows the tree to what an
+     empire of that shape can ever research. */
+  $("profile-select").onchange = e => {
+    panels.profile = e.target.value;
+    panels._recompute();
+  };
 
   $("zoom-in").onclick = () => view.zoomAt(
     innerWidth / 2, innerHeight / 2, 1.25);
@@ -392,21 +401,51 @@ function showDetail(id) {
            t.stub ? "crossmod" : "");
   if (t.overridesVanilla) addBadge("overrides vanilla", "override");
   if (t.crossModGated) addBadge("requires another mod", "crossmod");
-  for (const ap of t.ascensionPerks ?? [])
-    addBadge(t.grantedByPerks?.includes(ap)
-      ? `granted by ascension perk: ${apName(ap, model.perkNames)}`
-      : `requires ascension perk: ${apName(ap, model.perkNames)}`, "ap");
+  /* Vanilla ships one perk id per DLC combination — ap_galactic_wonders,
+     ap_galactic_wonders_utopia, ap_galactic_wonders_utopia_and_megacorp —
+     and every one of them is called "Galactic Wonders". A technology listing
+     three of them is behind ONE requirement, whichever variant the player's
+     DLC set provides, so showing three identical badges is wrong. Collapse
+     by display name. If any variant hands the technology over rather than
+     gating it, that is the truer statement and wins. */
+  {
+    const seen = new Map();
+    for (const ap of t.ascensionPerks ?? []) {
+      const label = apName(ap, model.perkNames);
+      const granted = t.grantedByPerks?.includes(ap) ?? false;
+      seen.set(label, (seen.get(label) ?? false) || granted);
+    }
+    for (const [label, granted] of seen)
+      addBadge(granted ? `granted by ascension perk: ${label}`
+                       : `requires ascension perk: ${label}`, "ap");
+  }
   const condName = key => model.meta?.conditionLabels?.[key]
     ?? key.replace(/^(has|is)_/, "").replace(/_/g, " ");
   for (const grp of t.perkGroups ?? []) {
-    const alts = [...grp.perks.map(p => apName(p, model.perkNames)),
-                  ...(grp.conditions ?? []).map(condName)];
+    // Same collapse as above: "Galactic Wonders or Galactic Wonders" is a
+    // DLC variant pair, not a choice the player gets to make.
+    const alts = [...new Set([
+      ...grp.perks.map(p => apName(p, model.perkNames)),
+      ...(grp.conditions ?? []).map(condName)])];
     if (alts.length > 1) addBadge(`requires ${alts.join(" or ")}`, "ap");
   }
-  for (const ap of t.inheritedPerks ?? [])
-    if (!(t.ascensionPerks ?? []).includes(ap))
-      addBadge(`needs ${apName(ap, model.perkNames)}, via a prerequisite`,
-               "ap");
+  {
+    const ownLabels = new Set(
+      (t.ascensionPerks ?? []).map(ap => apName(ap, model.perkNames)));
+    const inherited = new Set(
+      (t.inheritedPerks ?? []).map(ap => apName(ap, model.perkNames)));
+    for (const label of inherited)
+      if (!ownLabels.has(label))
+        addBadge(`needs ${label}, via a prerequisite`, "ap");
+  }
+  {
+    // Stated even when no profile is selected: "why can I not get this"
+    // is exactly the question a nomad player has, and hiding the answer
+    // behind the profile picker is the one place it is least likely to
+    // be seen.
+    const note = inaccessibleNote(t);
+    if (note) addBadge(note, "ap");
+  }
   if (t.isRare) addBadge("rare");
   if (t.isDangerous) addBadge("dangerous");
   if (t.isRepeatable) {

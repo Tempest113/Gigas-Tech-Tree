@@ -56,8 +56,16 @@ jobs:
       - name: Install build dependencies
         run: pip install Pillow pytest
 
+      - name: Set up Node
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4
+        with:
+          node-version: "20"
+
       - name: Run parser test suite
         run: python -m pytest tools/tests/ -q
+
+      - name: Keep the previous dataset for comparison
+        run: cp data/gigas-*.json /tmp/previous-dataset.json || true
 
       - name: Record upstream commit
         id: upstream
@@ -71,8 +79,31 @@ jobs:
             --commit "${{ steps.upstream.outputs.sha }}" \
             --vanilla data/vanilla-structural.json
 
-      # build_data.py itself enforces the tech-count floor (fails the job
-      # below it). Summarise counts for the run page.
+      # The tech-count floor in build_data.py only catches a catastrophic
+      # parse failure. Every regression this repo has actually hit kept the
+      # count intact and changed the SHAPE of the data — 64 ascension-perk
+      # markings vanished at 301 technologies. Compare against the dataset
+      # that is already committed, and stop before pushing rather than
+      # letting a deploy go red days later.
+      - name: Regression check against committed dataset
+        run: |
+          python tools/check_regression.py \
+            --old /tmp/previous-dataset.json \
+            --new "$(ls data/gigas-*.json | head -1)" \
+            --vanilla data/vanilla-structural.json
+
+      # The JS suite is what actually caught every problem here: it composes
+      # vanilla with the mod data the way the browser does, which the Python
+      # tests never touch. Running it only at deploy time meant bad data was
+      # already committed by the time anything complained.
+      - name: Run browser-model test suite
+        run: |
+          npm install --no-fund --no-audit jsdom@24
+          node tests/viewmodel-test.mjs
+          node tests/pdxparse-test.mjs
+          node tests/dom-smoke.mjs
+
+      # Summarise counts for the run page.
       - name: Job summary
         run: |
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"

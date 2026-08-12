@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=1.17.0">
+<link rel="stylesheet" href="css/style.css?v=1.17.1">
 </head>
 <body>
 <header class="app-header">
@@ -25,6 +25,15 @@
     <input id="localmod-input" type="file" webkitdirectory multiple hidden>
     <button id="localmod-reset" class="header-btn" hidden>Back to Gigas</button>
     <button id="modlist-btn" class="header-btn" hidden>Mods</button>
+    <label id="profile-toggle" class="diff-toggle" hidden
+           title="Hide technologies this empire type can never research">
+      <span>Empire</span>
+      <select id="profile-select" aria-label="Empire profile">
+        <option value="all">All empires</option>
+        <option value="standard">Standard</option>
+        <option value="nomadic">Nomadic</option>
+      </select>
+    </label>
     <label id="mode-toggle" class="diff-toggle"
            title="Columns by research tier, or by ascension perk gate">
       <span>Columns</span>
@@ -187,6 +196,6 @@
 </div>
 </main>
 
-<script type="module" src="js/main.js?v=1.17.0"></script>
+<script type="module" src="js/main.js?v=1.17.1"></script>
 </body>
 </html>

@@ -105,3 +105,43 @@ export function descendantsOf(techs, id) {
 export function clampScale(s) {
   return Math.min(2.5, Math.max(0.05, s));
 }
+
+
+/* Empire profiles (prototype).
+
+   `empireGates` on a technology is predicate -> required value, read from the
+   mod's `potential` block: {"nomadic": false} means the technology exists
+   only for empires that are NOT nomadic.
+
+   Deliberately two axes rather than one list of profiles. A mechanical nomad
+   is a real empire, and a single dropdown of mutually exclusive profiles
+   cannot express it; a profile is a named preset over a set of empire
+   properties, so adding "machine nomad" later is a data change here rather
+   than a change to how filtering works. */
+export const EMPIRE_PROFILES = {
+  all:      { label: "All empires", props: null },
+  standard: { label: "Standard", props: { nomadic: false } },
+  nomadic:  { label: "Nomadic", props: { nomadic: true } },
+};
+
+/** Whether a technology can ever appear for the given profile. */
+export function profileAllows(tech, profileId) {
+  const profile = EMPIRE_PROFILES[profileId];
+  if (!profile || !profile.props) return true;
+  const gates = tech.empireGates;
+  if (!gates) return true;
+  for (const [pred, required] of Object.entries(gates)) {
+    if (!(pred in profile.props)) continue;
+    if (profile.props[pred] !== required) return false;
+  }
+  return true;
+}
+
+/** Human-readable reason a profile cannot research this, or null. */
+export function inaccessibleNote(tech, perspective = "nomadic") {
+  const gates = tech.empireGates;
+  if (!gates || !(perspective in gates)) return null;
+  if (gates[perspective] === false)
+    return `inaccessible to ${perspective} empires`;
+  return `only for ${perspective} empires`;
+}

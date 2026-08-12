@@ -277,6 +277,10 @@ class Tech:
     weight_modifiers: list[dict] = field(default_factory=list)
     #: plain-word statements of what makes the technology available at all
     availability: list = field(default_factory=list)
+    #: Structured empire-type gates read from `potential`, e.g.
+    #: {"is_nomadic": False}. Kept as data rather than the flattened
+    #: prose in `availability`, so the viewer can filter on it.
+    empire_gates: dict = field(default_factory=dict)
     #: prerequisites some empires are exempt from
     conditional_prerequisites: list = field(default_factory=list)
     swaps: list[dict] = field(default_factory=list)
@@ -355,6 +359,42 @@ def _conditional_prereqs(pot: Block, triggers: dict) -> list:
             continue
         for tid in techs:
             out.append({"tech": tid, "unless": others})
+    return out
+
+
+#: Empire-shape predicates that appear directly in a `potential` block and
+#: decide whether a technology can ever appear for an empire. Only checks
+#: whose meaning is a stable property of the empire belong here: `is_nomadic`
+#: is a permanent country type, whereas `has_technology` is progress and
+#: `has_country_flag` is questline state, and neither should be read as "this
+#: empire can never have this".
+EMPIRE_PREDICATES = {
+    "is_nomadic": "nomadic",
+    "is_machine_empire": "machine",
+    "is_gestalt": "gestalt",
+    "is_hive_empire": "hive",
+}
+
+
+def _empire_gates(pot: Block) -> dict:
+    """Read empire-shape gates out of a `potential` block.
+
+    Returns predicate -> required boolean, so `potential = { is_nomadic = no }`
+    becomes {"nomadic": False}: this technology exists only for empires that
+    are NOT nomadic. Top level only, deliberately — a predicate nested under
+    OR is an alternative route rather than a hard gate, and flattening the two
+    together would claim a technology is unreachable when it is not.
+    """
+    out: dict = {}
+    for item in pot.items:
+        if not isinstance(item, Pair):
+            continue
+        name = EMPIRE_PREDICATES.get(item.key)
+        if name is None:
+            continue
+        val = _as_bool(item.value)
+        if val is not None:
+            out[name] = val
     return out
 
 
@@ -651,6 +691,7 @@ def build_graph(techdefs: dict[str, TechDef], vars_: VarTable,
         pot = b.get_last("potential")
         t.gated = isinstance(pot, Block) and len(pot) > 0
         if isinstance(pot, Block):
+            t.empire_gates = _empire_gates(pot)
             before = list(t.ascension_perks)
             _collect_perk_groups(pot, t.perk_groups, ascension_triggers,
                                  flags=perk_flags)
@@ -963,6 +1004,7 @@ def to_json_model(res: GraphResult, categories: dict, meta: dict) -> dict:
             "unlockText": t.unlock_text,
             "weightModifiers": t.weight_modifiers,
             "availability": t.availability,
+            "empireGates": t.empire_gates,
             "conditionalPrerequisites": t.conditional_prerequisites,
             "swaps": t.swaps,
             "gateway": t.gateway,

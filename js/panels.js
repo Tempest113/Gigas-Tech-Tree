@@ -3,7 +3,8 @@
 
 const $ = id => document.getElementById(id);
 
-import { descendantsOf, lineageOf, MISC_CATEGORIES } from "./viewmodel.js";
+import { descendantsOf, lineageOf, MISC_CATEGORIES,
+         profileAllows } from "./viewmodel.js";
 
 export class Panels {
   constructor(model, onFilter, onJump) {
@@ -14,6 +15,11 @@ export class Panels {
     this.query = "";
     this.sourceFilter = "all";  // all | gigas | vanilla | crossmod
     this.reqFilter = "all";     // all | tech:<id> | perk:<id>
+    // Empire profile (prototype, ?dev only). "all" shows every technology
+    // regardless of empire shape; a named profile hides what that empire can
+    // never research. Distinct from the other filters: those narrow what you
+    // are looking at, this one narrows what exists for you.
+    this.profile = "all";
     this.isolated = null;       // technology id, from a middle-click
     this._reqCache = new Map();
     this._buildSidebar();
@@ -240,7 +246,8 @@ export class Panels {
       ? lineageOf(this.model.techs, this.isolated) : null;
 
     if (this.activeCats === null && !this.query &&
-        this.sourceFilter === "all" && !reqSet && !isoSet) {
+        this.sourceFilter === "all" && !reqSet && !isoSet &&
+        this.profile === "all") {
       this.onFilter(null);
       this.syncUrl();
       return;
@@ -256,6 +263,7 @@ export class Panels {
         if (this.activeCats && !this.activeCats.has(cat)) continue;
         if (!this._matchesSource(t)) continue;
       }
+      if (!profileAllows(t, this.profile)) continue;
       if (this.query &&
           !t.name.toLowerCase().includes(this.query) &&
           !t.id.toLowerCase().includes(this.query)) continue;

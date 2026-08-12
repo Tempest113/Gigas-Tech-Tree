@@ -64,7 +64,13 @@ function gateRank(t, needsMega) {
   // is the one that actually limits them.
   if (perks.includes("ap_gigastructural_constructs")
       || perks.some(p => GIGACON_DOWNSTREAM.has(p))) return 3;
-  if (perks.includes("ap_galactic_wonders")) return 2;
+  // Vanilla ships one id per DLC combination (ap_galactic_wonders_utopia,
+  // ap_galactic_wonders_utopia_and_megacorp, ...), all named "Galactic
+  // Wonders". Match the family: a technology carrying only a variant is
+  // behind the same gate, and exact-matching the base id would drop it into
+  // "No Gate". Nothing does that today, but a DLC-conditional technology
+  // added later would fail silently.
+  if (perks.some(p => p.startsWith("ap_galactic_wonders"))) return 2;
   if (perks.includes("ap_cosmogenesis")) return 4;
   if (needsMega.has(t.id)) return 1;
   return 0;
