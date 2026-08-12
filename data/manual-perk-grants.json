@@ -37,6 +37,9 @@
   "tech_colossus": [
    "ap_colossus"
   ],
+  "tech_ring_world": [
+   "ap_galactic_wonders"
+  ],
   "tech_cosmogenesis_escort": [
    "ap_cosmogenesis"
   ],
