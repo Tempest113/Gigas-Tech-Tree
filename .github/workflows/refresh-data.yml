@@ -42,6 +42,8 @@ jobs:
             common/technology
             common/scripted_variables
             common/inline_scripts
+            common/scripted_triggers
+            common/ascension_perks
             localisation/english
             gfx/interface/icons/technologies
           sparse-checkout-cone-mode: true
