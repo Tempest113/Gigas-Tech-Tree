@@ -57,9 +57,13 @@ jobs:
         run: pip install Pillow pytest
 
       - name: Set up Node
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4
+        # Must match deploy-pages.yml. The suite runs in both workflows and a
+        # version skew means the refresh can reject data the deploy would
+        # accept, or the reverse. pdxparse-test's cp1252 fallback is the
+        # canary: it needs a full-ICU TextDecoder for windows-1252.
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Run parser test suite
         run: python -m pytest tools/tests/ -q

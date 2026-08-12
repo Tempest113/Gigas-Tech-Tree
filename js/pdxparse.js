@@ -7,6 +7,30 @@
 
 // ---------------------------------------------------------------- decoding
 
+/* windows-1252's high range, spelled out.
+
+   This used to be `new TextDecoder("windows-1252")`. That decoder is a
+   legacy single-byte encoding, and legacy encodings are only present when
+   Node is built with full ICU — a small-icu or system-icu runner throws
+   RangeError and the whole parse fails on one smart quote. Rather than
+   depend on how a given CI image happened to be built, map the 32 code
+   points by hand. Everything outside 0x80-0x9F is identical to latin-1,
+   which is just the code point itself. */
+const CP1252_HIGH = [
+  0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021,
+  0x02C6, 0x2030, 0x0160, 0x2039, 0x0152, 0x008D, 0x017D, 0x008F,
+  0x0090, 0x2018, 0x2019, 0x201C, 0x201D, 0x2022, 0x2013, 0x2014,
+  0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x009D, 0x017E, 0x0178,
+];
+
+function decodeCp1252(bytes) {
+  let out = "";
+  for (const b of bytes)
+    out += String.fromCharCode(
+      b >= 0x80 && b <= 0x9F ? CP1252_HIGH[b - 0x80] : b);
+  return out;
+}
+
 export function decodeBytes(buf) {
   const bytes = new Uint8Array(buf);
   let start = 0;
@@ -16,8 +40,7 @@ export function decodeBytes(buf) {
     return new TextDecoder("utf-8", { fatal: true }).decode(body)
       .replace(/\r\n?/g, "\n");
   } catch {
-    return new TextDecoder("windows-1252").decode(body)
-      .replace(/\r\n?/g, "\n");
+    return decodeCp1252(body).replace(/\r\n?/g, "\n");
   }
 }
 
